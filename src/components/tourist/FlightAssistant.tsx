@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,15 @@ interface FlightInfo {
 const FlightAssistant = () => {
   const [pnr, setPnr] = useState("");
   const [flightInfo, setFlightInfo] = useState<FlightInfo | null>(null);
+  const [showTransfer, setShowTransfer] = useState(false);
   const { toast } = useToast();
+  const transferInfo = {
+    plate: "07 ABC 123",
+    driver: "Ahmet Yılmaz",
+    phone: "+90 532 123 45 67",
+    waitingArea: "Terminal 2 - B Kapısı",
+    estimatedTime: "10 dakika",
+  };
 
   const handlePNRSearch = () => {
     if (pnr === "098765") {
@@ -38,6 +45,7 @@ const FlightAssistant = () => {
         title: "PNR Bulundu",
         description: "Uçuş bilgileriniz görüntüleniyor.",
       });
+      setShowTransfer(true);
     } else {
       toast({
         variant: "destructive",
@@ -133,6 +141,40 @@ const FlightAssistant = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {showTransfer && (
+        <div className="mt-4 bg-accent p-4 rounded-lg space-y-3">
+          <div className="flex justify-between items-center">
+            <h3 className="font-medium">Transfer Aracı İster misiniz?</h3>
+            <Button
+              variant="outline"
+              onClick={() => setShowTransfer(false)}
+            >
+              Evet, İstiyorum
+            </Button>
+          </div>
+          {transferInfo && (
+            <div className="grid grid-cols-2 gap-3 mt-3">
+              <div>
+                <p className="text-sm text-gray-500">Plaka</p>
+                <p className="font-medium">{transferInfo.plate}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Sürücü</p>
+                <p className="font-medium">{transferInfo.driver}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Bekleme Alanı</p>
+                <p className="font-medium">{transferInfo.waitingArea}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Tahmini Süre</p>
+                <p className="font-medium">{transferInfo.estimatedTime}</p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

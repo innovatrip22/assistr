@@ -1,6 +1,6 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const EventAssistant = () => {
   const upcomingEvents = [
@@ -24,6 +24,10 @@ const EventAssistant = () => {
     },
   ];
 
+  const handleBuyTicket = (eventTitle: string) => {
+    window.open("https://www.biletix.com/search/" + encodeURIComponent(eventTitle), "_blank");
+  };
+
   return (
     <div className="bg-white p-6 rounded-xl shadow-lg">
       <div className="flex items-center gap-3 mb-6">
@@ -46,9 +50,18 @@ const EventAssistant = () => {
             {upcomingEvents.map((event) => (
               <div
                 key={event.title}
-                className="bg-gray-50 p-4 rounded-lg space-y-2"
+                className="bg-accent p-4 rounded-lg space-y-2"
               >
-                <h3 className="font-semibold">{event.title}</h3>
+                <div className="flex justify-between items-start">
+                  <h3 className="font-semibold">{event.title}</h3>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleBuyTicket(event.title)}
+                  >
+                    Bilet Al
+                  </Button>
+                </div>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>
                     <p className="text-gray-500">Tarih</p>
