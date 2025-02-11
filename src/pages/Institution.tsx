@@ -155,7 +155,7 @@ const Institution = () => {
         .setPopup(
           new mapboxgl.Popup({ offset: 25 })
             .setHTML(`<h3 class="font-bold">${point.location}</h3><p>Yoğunluk: ${
-              point.intensity === 'high' ? 'Y��ksek' : 'Orta'
+              point.intensity === 'high' ? 'Y����ksek' : 'Orta'
             }</p>`)
         )
         .addTo(map.current);
@@ -176,6 +176,16 @@ const Institution = () => {
       return;
     }
 
+    // Önce mevcut denetimi deaktif et
+    setInspections(currentInspections => 
+      currentInspections.map(inspection => 
+        inspection.business === business 
+          ? { ...inspection, status: "Completed" }
+          : inspection
+      )
+    );
+
+    // Yeni denetim oluştur
     const newInspection: Inspection = {
       id: Math.random().toString(),
       business,
@@ -185,23 +195,23 @@ const Institution = () => {
       status: "Pending"
     };
 
-    switch (source) {
-      case "problem":
-        setProblemBusinesses(currentBusinesses => 
-          currentBusinesses.filter(b => b.name !== business)
-        );
-        break;
-      case "pending":
-        setInspections(currentInspections => 
-          currentInspections.filter(i => i.business !== business)
-        );
-        break;
+    // Kaynak tipine göre ilgili listeden kaldır
+    if (source === "problem") {
+      setProblemBusinesses(currentBusinesses => 
+        currentBusinesses.filter(b => b.name !== business)
+      );
     }
 
+    // Yeni denetimi ekle
     setInspections(currentInspections => [...currentInspections, newInspection]);
 
+    // Seçili denetmeni sıfırla
     setSelectedInspector("");
     
+    // Dialog'u kapat
+    setDialogOpen(false);
+    
+    // Başarı bildirimi göster
     toast({
       title: "Denetim Başlatıldı",
       description: `${business} için denetim ${selectedInspector}'a atandı.`,
