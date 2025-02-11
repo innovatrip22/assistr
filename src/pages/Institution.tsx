@@ -52,7 +52,7 @@ interface Inspection {
 }
 
 const Institution = () => {
-  const [priceReports] = useState<PriceReport[]>([
+  const [priceReports, setPriceReports] = useState<PriceReport[]>([
     {
       id: "1",
       business: "Sahil Restaurant",
@@ -75,7 +75,7 @@ const Institution = () => {
     },
   ]);
 
-  const [problemBusinesses] = useState<BusinessIssue[]>([
+  const [problemBusinesses, setProblemBusinesses] = useState<BusinessIssue[]>([
     {
       id: "1",
       name: "Plaj Cafe",
@@ -166,7 +166,7 @@ const Institution = () => {
     };
   }, []);
 
-  const handleStartInspection = (business: string) => {
+  const handleStartInspection = (business: string, source?: "problem" | "emergency") => {
     if (!selectedInspector) {
       toast({
         variant: "destructive",
@@ -185,7 +185,13 @@ const Institution = () => {
       status: "Pending"
     };
 
+    if (source === "problem") {
+      setProblemBusinesses(prev => prev.filter(b => b.name !== business));
+    }
+
     setInspections(prev => [...prev, newInspection]);
+    setSelectedInspector("");
+    
     toast({
       title: "Denetim Başlatıldı",
       description: `${business} için denetim ${selectedInspector}'a atandı.`,
@@ -297,7 +303,7 @@ const Institution = () => {
                     </div>
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm" className="w-full">
-                        Detayları Görüntüle
+                        Denetim Başlat
                       </Button>
                     </DialogTrigger>
                   </div>
@@ -350,23 +356,62 @@ const Institution = () => {
               <Bell className="w-6 h-6 text-primary" />
               <h2 className="text-xl font-semibold">Acil Bildirimler</h2>
             </div>
-            <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-red-600 mt-1" />
-                <div>
-                  <h3 className="font-semibold text-red-800">
-                    Kaleiçi Bölgesinde Yoğun Şikayet
-                  </h3>
-                  <p className="text-sm text-red-600 mt-1">
-                    Son 24 saatte 5 farklı işletme hakkında fahiş fiyat şikayeti alındı.
-                    Acil denetim gerekiyor.
-                  </p>
-                  <Button variant="destructive" size="sm" className="mt-3">
-                    Denetim Başlat
-                  </Button>
+            <Dialog>
+              <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="w-5 h-5 text-red-600 mt-1" />
+                  <div>
+                    <h3 className="font-semibold text-red-800">
+                      Kaleiçi Bölgesinde Yoğun Şikayet
+                    </h3>
+                    <p className="text-sm text-red-600 mt-1">
+                      Son 24 saatte 5 farklı işletme hakkında fahiş fiyat şikayeti alındı.
+                      Acil denetim gerekiyor.
+                    </p>
+                    <DialogTrigger asChild>
+                      <Button variant="destructive" size="sm" className="mt-3">
+                        Denetim Başlat
+                      </Button>
+                    </DialogTrigger>
+                  </div>
                 </div>
               </div>
-            </div>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Kaleiçi Bölgesi - Denetmen Ata</DialogTitle>
+                  <DialogDescription>
+                    <div className="space-y-4 mt-4">
+                      <div>
+                        <label className="text-sm font-medium">
+                          Denetmen Seçin
+                        </label>
+                        <Select
+                          value={selectedInspector}
+                          onValueChange={setSelectedInspector}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Denetmen seçin" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {inspectors.map((inspector) => (
+                              <SelectItem key={inspector} value={inspector}>
+                                {inspector}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Button 
+                        className="w-full"
+                        onClick={() => handleStartInspection("Kaleiçi Bölgesi", "emergency")}
+                      >
+                        Denetimi Başlat
+                      </Button>
+                    </div>
+                  </DialogDescription>
+                </DialogHeader>
+              </DialogContent>
+            </Dialog>
           </div>
 
           <div className="bg-white p-6 rounded-xl shadow-lg">
