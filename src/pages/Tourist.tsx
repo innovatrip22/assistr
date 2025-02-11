@@ -7,9 +7,7 @@ import TravelAssistant from "@/components/tourist/TravelAssistant";
 import EventAssistant from "@/components/tourist/EventAssistant";
 import FeedbackAssistant from "@/components/tourist/FeedbackAssistant";
 import ReportAssistant from "@/components/tourist/ReportAssistant";
-import { MessageSquare, Send } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { MessageSquare } from "lucide-react";
 
 const Tourist = () => {
   const [showWelcome, setShowWelcome] = useState(true);
@@ -41,27 +39,6 @@ const Tourist = () => {
           </div>
         </motion.div>
       )}
-
-      <div className="fixed bottom-4 right-4 bg-white p-4 rounded-xl shadow-lg z-50 max-w-md w-full md:w-96">
-        <div className="space-y-4">
-          <div className="flex gap-3">
-            <div className="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-              <MessageSquare className="w-4 h-4 text-white" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">
-                Antalya hakkında bir soru sormak ister misiniz?
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Input placeholder="Mesajınızı yazın..." />
-            <Button>
-              <Send className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
