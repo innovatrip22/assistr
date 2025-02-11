@@ -155,7 +155,7 @@ const Institution = () => {
         .setPopup(
           new mapboxgl.Popup({ offset: 25 })
             .setHTML(`<h3 class="font-bold">${point.location}</h3><p>Yoğunluk: ${
-              point.intensity === 'high' ? 'Yüksek' : 'Orta'
+              point.intensity === 'high' ? 'Y��ksek' : 'Orta'
             }</p>`)
         )
         .addTo(map.current);
@@ -189,7 +189,11 @@ const Institution = () => {
       setProblemBusinesses(prev => prev.filter(b => b.name !== business));
     }
 
-    setInspections(prev => [...prev, newInspection]);
+    setInspections(prev => {
+      const filteredInspections = prev.filter(i => i.business !== business);
+      return [...filteredInspections, newInspection];
+    });
+
     setSelectedInspector("");
     
     toast({
