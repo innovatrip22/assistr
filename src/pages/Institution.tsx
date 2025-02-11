@@ -94,7 +94,7 @@ const Institution = () => {
     },
   ]);
 
-  const [inspections] = useState<Inspection[]>([
+  const [inspections, setInspections] = useState<Inspection[]>([
     {
       id: "1",
       business: "Sahil Restaurant",
