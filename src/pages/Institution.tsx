@@ -166,7 +166,7 @@ const Institution = () => {
     };
   }, []);
 
-  const handleStartInspection = (business: string, source?: "problem" | "emergency") => {
+  const handleStartInspection = (business: string, source?: "problem" | "emergency" | "pending") => {
     if (!selectedInspector) {
       toast({
         variant: "destructive",
@@ -185,14 +185,20 @@ const Institution = () => {
       status: "Pending"
     };
 
-    if (source === "problem") {
-      setProblemBusinesses(prev => prev.filter(b => b.name !== business));
+    switch (source) {
+      case "problem":
+        setProblemBusinesses(currentBusinesses => 
+          currentBusinesses.filter(b => b.name !== business)
+        );
+        break;
+      case "pending":
+        setInspections(currentInspections => 
+          currentInspections.filter(i => i.business !== business)
+        );
+        break;
     }
 
-    setInspections(prev => {
-      const filteredInspections = prev.filter(i => i.business !== business);
-      return [...filteredInspections, newInspection];
-    });
+    setInspections(currentInspections => [...currentInspections, newInspection]);
 
     setSelectedInspector("");
     
@@ -201,6 +207,8 @@ const Institution = () => {
       description: `${business} için denetim ${selectedInspector}'a atandı.`,
     });
   };
+
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-6">
@@ -284,7 +292,11 @@ const Institution = () => {
             </div>
             <div className="space-y-4">
               {problemBusinesses.map((business) => (
-                <Dialog key={business.id}>
+                <Dialog 
+                  key={business.id}
+                  open={dialogOpen}
+                  onOpenChange={setDialogOpen}
+                >
                   <div className="bg-accent p-4 rounded-lg space-y-2">
                     <div className="flex justify-between">
                       <h3 className="font-semibold">{business.name}</h3>
@@ -313,7 +325,7 @@ const Institution = () => {
                   </div>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>{business.name} - Detaylı Bilgi</DialogTitle>
+                      <DialogTitle>{business.name} - Denetmen Ata</DialogTitle>
                       <DialogDescription>
                         <div className="space-y-4 mt-4">
                           <div>
@@ -425,7 +437,11 @@ const Institution = () => {
             </div>
             <div className="space-y-4">
               {inspections.filter(i => i.status === "Pending").map((inspection) => (
-                <Dialog key={inspection.id}>
+                <Dialog 
+                  key={inspection.id}
+                  open={dialogOpen}
+                  onOpenChange={setDialogOpen}
+                >
                   <div className="bg-accent p-4 rounded-lg space-y-2">
                     <div className="flex justify-between">
                       <h3 className="font-semibold">{inspection.business}</h3>
@@ -472,7 +488,10 @@ const Institution = () => {
                           </div>
                           <Button 
                             className="w-full"
-                            onClick={() => handleStartInspection(inspection.business)}
+                            onClick={() => {
+                              handleStartInspection(inspection.business, "pending");
+                              setDialogOpen(false);
+                            }}
                           >
                             Denetimi Başlat
                           </Button>
