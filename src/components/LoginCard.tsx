@@ -1,5 +1,5 @@
 
-import { Building2, Store, Passport } from "lucide-react";
+import { Building2, Store, UserCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface LoginCardProps {
@@ -15,7 +15,7 @@ const LoginCard = ({ type, onClick }: LoginCardProps) => {
       case "business":
         return <Store className="w-12 h-12" />;
       case "tourist":
-        return <Passport className="w-12 h-12" />;
+        return <UserCircle className="w-12 h-12" />;
     }
   };
 
