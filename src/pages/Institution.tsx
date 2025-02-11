@@ -1,6 +1,6 @@
+
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Map, AlertTriangle, FileText, Bell, ClipboardCheck, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import mapboxgl from 'mapbox-gl';
@@ -116,6 +116,7 @@ const Institution = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [selectedInspector, setSelectedInspector] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const inspectors = [
@@ -155,7 +156,7 @@ const Institution = () => {
         .setPopup(
           new mapboxgl.Popup({ offset: 25 })
             .setHTML(`<h3 class="font-bold">${point.location}</h3><p>Yoğunluk: ${
-              point.intensity === 'high' ? 'Y����ksek' : 'Orta'
+              point.intensity === 'high' ? 'Yüksek' : 'Orta'
             }</p>`)
         )
         .addTo(map.current);
@@ -176,11 +177,11 @@ const Institution = () => {
       return;
     }
 
-    // Önce mevcut denetimi deaktif et
+    // Önce mevcut denetimi tamamlandı olarak işaretle
     setInspections(currentInspections => 
       currentInspections.map(inspection => 
-        inspection.business === business 
-          ? { ...inspection, status: "Completed" }
+        inspection.business === business && inspection.status === "Pending"
+          ? { ...inspection, status: "Completed", result: "Tamamlandı" }
           : inspection
       )
     );
@@ -195,7 +196,7 @@ const Institution = () => {
       status: "Pending"
     };
 
-    // Kaynak tipine göre ilgili listeden kaldır
+    // Eğer sorunlu işletmeler listesinden geliyorsa, listeden kaldır
     if (source === "problem") {
       setProblemBusinesses(currentBusinesses => 
         currentBusinesses.filter(b => b.name !== business)
@@ -203,22 +204,35 @@ const Institution = () => {
     }
 
     // Yeni denetimi ekle
-    setInspections(currentInspections => [...currentInspections, newInspection]);
+    setInspections(prev => [...prev, newInspection]);
 
-    // Seçili denetmeni sıfırla
+    // Denetmen seçimini sıfırla
     setSelectedInspector("");
     
     // Dialog'u kapat
     setDialogOpen(false);
     
-    // Başarı bildirimi göster
+    // Bildirim göster
     toast({
       title: "Denetim Başlatıldı",
       description: `${business} için denetim ${selectedInspector}'a atandı.`,
     });
   };
 
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const handleResolveReport = (reportId: string) => {
+    setPriceReports(current =>
+      current.map(report =>
+        report.id === reportId
+          ? { ...report, status: "Resolved" }
+          : report
+      )
+    );
+
+    toast({
+      title: "Şikayet Çözüldü",
+      description: "Fahiş fiyat şikayeti başarıyla çözüldü.",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-6">
@@ -230,6 +244,7 @@ const Institution = () => {
         <h1 className="text-3xl font-bold text-gray-800 mb-8">Kurum Paneli</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Harita Bileşeni */}
           <div className="bg-white p-6 rounded-xl shadow-lg">
             <div className="flex items-center gap-3 mb-6">
               <Map className="w-6 h-6 text-primary" />
@@ -250,6 +265,7 @@ const Institution = () => {
             </div>
           </div>
 
+          {/* Fahiş Fiyat Uyarıları */}
           <div className="bg-white p-6 rounded-xl shadow-lg">
             <div className="flex items-center gap-3 mb-6">
               <AlertTriangle className="w-6 h-6 text-primary" />
@@ -263,7 +279,13 @@ const Institution = () => {
                 >
                   <div className="flex justify-between">
                     <h3 className="font-semibold">{report.business}</h3>
-                    <span className="text-sm px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">
+                    <span className={`text-sm px-2 py-1 rounded-full ${
+                      report.status === "Pending" 
+                        ? "bg-yellow-100 text-yellow-800"
+                        : report.status === "Resolved"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-blue-100 text-blue-800"
+                    }`}>
                       {report.status}
                     </span>
                   </div>
@@ -287,14 +309,22 @@ const Institution = () => {
                       <p>{report.date}</p>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm" className="w-full">
-                    Detayları Görüntüle
-                  </Button>
+                  {report.status === "Pending" && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full"
+                      onClick={() => handleResolveReport(report.id)}
+                    >
+                      Çözüldü Olarak İşaretle
+                    </Button>
+                  )}
                 </div>
               ))}
             </div>
           </div>
 
+          {/* Sorunlu İşletmeler */}
           <div className="bg-white p-6 rounded-xl shadow-lg">
             <div className="flex items-center gap-3 mb-6">
               <FileText className="w-6 h-6 text-primary" />
@@ -339,44 +369,46 @@ const Institution = () => {
                       <DialogDescription>
                         <div className="space-y-4 mt-4">
                           <div>
-                            <h4 className="font-medium mb-2">İşletme Bilgileri</h4>
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                              <div>
-                                <p className="text-gray-500">Adres</p>
-                                <p>{business.location}</p>
-                              </div>
-                              <div>
-                                <p className="text-gray-500">Son Bildirim</p>
-                                <p>{business.lastReport}</p>
-                              </div>
-                            </div>
+                            <label className="text-sm font-medium">
+                              Denetmen Seçin
+                            </label>
+                            <Select
+                              value={selectedInspector}
+                              onValueChange={setSelectedInspector}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Denetmen seçin" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {inspectors.map((inspector) => (
+                                  <SelectItem key={inspector} value={inspector}>
+                                    {inspector}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
-                          <div>
-                            <h4 className="font-medium mb-2">Şikayet Detayları</h4>
-                            <p className="text-sm">{business.issue}</p>
-                          </div>
-                          <div>
-                            <h4 className="font-medium mb-2">İstatistikler</h4>
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                              <div>
-                                <p className="text-gray-500">Toplam Şikayet</p>
-                                <p>{business.reportCount}</p>
-                              </div>
-                              <div>
-                                <p className="text-gray-500">Durum</p>
-                                <p className="text-red-600">İnceleme Bekliyor</p>
-                              </div>
-                            </div>
-                          </div>
+                          <Button 
+                            className="w-full"
+                            onClick={() => handleStartInspection(business.name, "problem")}
+                          >
+                            Denetimi Başlat
+                          </Button>
                         </div>
                       </DialogDescription>
                     </DialogHeader>
                   </DialogContent>
                 </Dialog>
               ))}
+              {problemBusinesses.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  Sorunlu işletme bulunmamaktadır.
+                </div>
+              )}
             </div>
           </div>
 
+          {/* Acil Bildirimler */}
           <div className="bg-white p-6 rounded-xl shadow-lg">
             <div className="flex items-center gap-3 mb-6">
               <Bell className="w-6 h-6 text-primary" />
@@ -440,6 +472,7 @@ const Institution = () => {
             </Dialog>
           </div>
 
+          {/* Bekleyen Denetimler */}
           <div className="bg-white p-6 rounded-xl shadow-lg">
             <div className="flex items-center gap-3 mb-6">
               <ClipboardCheck className="w-6 h-6 text-primary" />
@@ -461,49 +494,49 @@ const Institution = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div>
+                        <p className="text-gray-500">Denetmen</p>
+                        <p>{inspection.inspector}</p>
+                      </div>
+                      <div>
                         <p className="text-gray-500">Tarih</p>
                         <p>{inspection.date}</p>
                       </div>
                     </div>
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm" className="w-full">
-                        Denetim Başlat
+                        Denetimi Tamamla
                       </Button>
                     </DialogTrigger>
                   </div>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Denetmen Ata</DialogTitle>
+                      <DialogTitle>Denetimi Tamamla</DialogTitle>
                       <DialogDescription>
                         <div className="space-y-4 mt-4">
                           <div>
                             <label className="text-sm font-medium">
-                              Denetmen Seçin
+                              Denetim Sonucu
                             </label>
                             <Select
                               value={selectedInspector}
                               onValueChange={setSelectedInspector}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder="Denetmen seçin" />
+                                <SelectValue placeholder="Sonuç seçin" />
                               </SelectTrigger>
                               <SelectContent>
-                                {inspectors.map((inspector) => (
-                                  <SelectItem key={inspector} value={inspector}>
-                                    {inspector}
-                                  </SelectItem>
-                                ))}
+                                <SelectItem value="Uyarı Verildi">Uyarı Verildi</SelectItem>
+                                <SelectItem value="Ceza Kesildi">Ceza Kesildi</SelectItem>
+                                <SelectItem value="Kapatma Cezası">Kapatma Cezası</SelectItem>
+                                <SelectItem value="Sorun Bulunamadı">Sorun Bulunamadı</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
                           <Button 
                             className="w-full"
-                            onClick={() => {
-                              handleStartInspection(inspection.business, "pending");
-                              setDialogOpen(false);
-                            }}
+                            onClick={() => handleStartInspection(inspection.business, "pending")}
                           >
-                            Denetimi Başlat
+                            Denetimi Tamamla
                           </Button>
                         </div>
                       </DialogDescription>
@@ -511,9 +544,15 @@ const Institution = () => {
                   </DialogContent>
                 </Dialog>
               ))}
+              {inspections.filter(i => i.status === "Pending").length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  Bekleyen denetim bulunmamaktadır.
+                </div>
+              )}
             </div>
           </div>
 
+          {/* Geçmiş Denetimler */}
           <div className="bg-white p-6 rounded-xl shadow-lg">
             <div className="flex items-center gap-3 mb-6">
               <History className="w-6 h-6 text-primary" />
@@ -537,6 +576,10 @@ const Institution = () => {
                       <p>{inspection.inspector}</p>
                     </div>
                     <div>
+                      <p className="text-gray-500">Tarih</p>
+                      <p>{inspection.date}</p>
+                    </div>
+                    <div>
                       <p className="text-gray-500">Sonuç</p>
                       <p>{inspection.result}</p>
                     </div>
@@ -546,6 +589,11 @@ const Institution = () => {
                   </Button>
                 </div>
               ))}
+              {inspections.filter(i => i.status === "Completed").length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  Tamamlanmış denetim bulunmamaktadır.
+                </div>
+              )}
             </div>
           </div>
         </div>
