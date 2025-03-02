@@ -2,20 +2,28 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
-  Badge, 
-  Button, 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle,
+  Badge
+} from "@/components/ui/badge";
+import {
+  Button
+} from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card";
+import {
   Tabs,
   TabsContent,
   TabsList,
-  TabsTrigger,
+  TabsTrigger
+} from "@/components/ui/tabs";
+import {
   ScrollArea
-} from "@/components/ui";
+} from "@/components/ui/scroll-area";
 import { 
   Map, 
   MessageSquare, 
