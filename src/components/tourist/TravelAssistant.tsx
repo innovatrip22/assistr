@@ -10,12 +10,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 import { toast } from "sonner";
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-  apiKey: 'dummy-key-for-ui-demo',
-  dangerouslyAllowBrowser: true
-});
 
 const TravelAssistant = () => {
   const [userLocation, setUserLocation] = useState<{
@@ -84,25 +78,64 @@ const TravelAssistant = () => {
     setIsTyping(true);
     
     try {
-      const antalyaKeywords = ['plaj', 'deniz', 'yüzmek', 'otel', 'müze', 'tarihi', 'ören yeri', 'yemek', 'restoran', 'hava', 'iklim', 'ulaşım', 'taksi'];
-      const isAntalyaRelated = antalyaKeywords.some(keyword => inputMessage.toLowerCase().includes(keyword));
-      
+      const antalyaTopics = {
+        'plaj': [
+          "Antalya'da en popüler plajlar Konyaaltı, Lara ve Kaputaş plajlarıdır. Konyaaltı şehir merkezine en yakın olanıdır ve 7 km uzunluğundadır.",
+          "Lara Plajı, Antalya'nın doğusunda yer alan geniş ve kumlu bir plajdır. Birçok lüks otel bu bölgede bulunur.",
+          "Kaputaş Plajı Antalya'nın en güzel plajlarından biridir. Kaş yakınlarında yer alır ve turkuaz rengi deniziyle ünlüdür."
+        ],
+        'müze': [
+          "Antalya Müzesi, Türkiye'nin en büyük müzelerinden biridir ve Roma, Bizans, Selçuklu dönemlerine ait eserler sergiler.",
+          "Kaleiçi'ndeki Suna-İnan Kıraç Müzesi, geleneksel Antalya evlerini ve yaşam tarzını sergileyen bir etnografya müzesidir.",
+          "Side Müzesi, antik Side kentinde bulunan ve Roma dönemine ait heykellerin sergilendiği önemli bir müzedir."
+        ],
+        'tarihi': [
+          "Antalya'daki Perge Antik Kenti, Helenistik ve Roma dönemlerine ait kalıntılarıyla ünlüdür. Stadyumu ve tiyatrosu görülmeye değer.",
+          "Aspendos Antik Tiyatrosu, dünyanın en iyi korunmuş Roma tiyatrolarından biridir ve hala etkinlikler için kullanılabilmektedir.",
+          "Phaselis Antik Kenti, üç ayrı limana sahip, ormanla çevrili, deniz kenarında yer alan etkileyici bir arkeolojik alandır."
+        ],
+        'yemek': [
+          "Antalya mutfağında piyaz (kuru fasulye salatası), şiş köfte ve tandır kebabı öne çıkan lezzetlerdir.",
+          "Deniz kenarındaki restoranlarda taze balık çeşitleri, özellikle levrek ve çipura tadabilirsiniz.",
+          "Kaleiçi'nde yer alan geleneksel restoranlarda Akdeniz mutfağının tüm lezzetlerini bulabilirsiniz."
+        ],
+        'hava': [
+          "Antalya'da Akdeniz iklimi hakimdir. Yazlar sıcak ve kurak (30-40°C), kışlar ılık ve yağışlı (10-15°C) geçer.",
+          "Antalya yılda ortalama 300 gün güneşli gün sayısıyla Türkiye'nin en çok güneş alan şehirlerinden biridir.",
+          "En ideal ziyaret zamanı Nisan-Mayıs ve Eylül-Ekim aylarıdır, bu dönemlerde hava ne çok sıcak ne de soğuktur."
+        ],
+        'ulaşım': [
+          "Antalya şehir içi ulaşımda tramvay, otobüs ve dolmuşlar yaygın olarak kullanılır. Tramvay özellikle turistik bölgeleri kapsar.",
+          "Havalimanından şehir merkezine ulaşım için HAVAŞ servisleri veya taksiler kullanılabilir.",
+          "Antalya'dan çevre ilçelere ulaşım için düzenli otobüs seferleri mevcuttur."
+        ],
+        'alışveriş': [
+          "Kaleiçi'nde geleneksel el sanatları, halılar ve hediyelik eşyalar satın alabilirsiniz.",
+          "MarkAntalya ve TerraCity, şehirdeki modern alışveriş merkezleridir.",
+          "Antalya'da her mahallede açık pazar kurulur, taze meyve ve sebzeler uygun fiyata bulunabilir."
+        ]
+      };
+
       let aiResponse;
+      let matchFound = false;
       
-      if (isAntalyaRelated) {
-        const responses = [
-          "Antalya'da Kaleiçi tarihi bir bölge olup, dar sokakları, taş evleri ve deniz manzarasıyla ünlüdür. Osmanlı ve Roma döneminden kalma yapıları görebilirsiniz.",
-          "Konyaaltı Plajı, Antalya'nın en popüler plajlarından biridir. Mavi bayraklı bu plaj, temiz kumsalı ve berrak deniziyle misafirlerini bekliyor.",
-          "Antalya'da hava genellikle sıcak ve güneşlidir. Yaz aylarında sıcaklık 40°C'ye kadar çıkabilir, kış aylarında ise 10-15°C civarındadır.",
-          "Antalya Müzesi, bölgenin zengin tarihini yansıtan önemli eserlere ev sahipliği yapmaktadır. Özellikle Roma ve Helenistik döneme ait heykeller görülmeye değer.",
-          "Antalya'da yeme-içme için Kaleiçi'ndeki restoranları deneyebilirsiniz. Özellikle balık restoranları ve yerel Akdeniz mutfağı lezzetleri sunulmaktadır.",
-          "Antalya'da ulaşım için toplu taşıma araçları, taksiler ve araç kiralama hizmetleri mevcuttur. Şehir içi ulaşım için tramvay oldukça kullanışlıdır.",
-          "Düden Şelalesi, Antalya merkezine yakın bir doğa harikasıdır. Hem üst hem de denize dökülen alt şelalesi görülmeye değer güzelliktedir."
+      for (const [topic, responses] of Object.entries(antalyaTopics)) {
+        if (inputMessage.toLowerCase().includes(topic)) {
+          aiResponse = responses[Math.floor(Math.random() * responses.length)];
+          matchFound = true;
+          break;
+        }
+      }
+      
+      if (!matchFound) {
+        const generalResponses = [
+          "Antalya, Türkiye'nin güneyinde, Akdeniz kıyısında yer alan turistik bir şehirdir. Tarihi kalıntıları, plajları ve doğal güzellikleriyle ünlüdür.",
+          "Antalya'da gezebileceğiniz yerler arasında Kaleiçi, Düden Şelalesi, Perge, Aspendos ve Phaselis bulunmaktadır.",
+          "Antalya'nın farklı bölgeleri hakkında daha spesifik bilgi isterseniz sorabilirsiniz. Plajlar, tarihi yerler, müzeler veya yeme-içme mekanları hakkında yardımcı olabilirim.",
+          "Antalya gezi planınız için size özel bir rota oluşturabilirim. Kaç gün kalacağınızı ve ilgi alanlarınızı belirtirseniz yardımcı olabilirim."
         ];
         
-        aiResponse = responses[Math.floor(Math.random() * responses.length)];
-      } else {
-        aiResponse = "Antalya hakkında daha spesifik sorular sorabilirsiniz. Plajlar, tarihi yerler, müzeler, hava durumu, ulaşım veya yeme-içme mekanları hakkında yardımcı olabilirim.";
+        aiResponse = generalResponses[Math.floor(Math.random() * generalResponses.length)];
       }
       
       await new Promise(resolve => setTimeout(resolve, 1500));

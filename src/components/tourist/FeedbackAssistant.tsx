@@ -1,23 +1,99 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Send } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { MessageSquare, Send, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { addFeedback } from "@/services/dataService";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const FeedbackAssistant = () => {
   const [message, setMessage] = useState("");
-  const { toast } = useToast();
+  const [chatHistory, setChatHistory] = useState<{role: string, content: string}[]>([
+    {role: 'assistant', content: 'Merhaba! Size nasıl yardımcı olabilirim? Görüş veya şikayetlerinizi iletebilirsiniz.'}
+  ]);
+  const [isTyping, setIsTyping] = useState(false);
+  const [formData, setFormData] = useState({
+    institution: "Turizm Ofisi",
+    subject: "",
+    complaint: ""
+  });
 
-  const handleSubmit = () => {
-    if (message.trim()) {
-      toast({
-        title: "Şikayet Alındı",
-        description: "En kısa sürede size dönüş yapılacaktır.",
-      });
-      setMessage("");
+  const generateResponse = async (userMessage: string) => {
+    setIsTyping(true);
+    
+    try {
+      // Simulate AI response generation with a delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const keywords = ['şikayet', 'sorun', 'memnun değilim', 'kötü', 'yardım', 'bilgi', 'teşekkür', 'öneri'];
+      const isKeywordPresent = keywords.some(keyword => userMessage.toLowerCase().includes(keyword));
+      
+      let aiResponse;
+      
+      if (isKeywordPresent) {
+        const responses = [
+          "Şikayetinizi aldım ve ilgili birimlere ileteceğim. En kısa sürede size dönüş yapılacaktır.",
+          "Görüşleriniz bizim için çok değerli. İlgili birimlerle paylaşacağım ve gerekli işlemler yapılacaktır.",
+          "Sorunuzu ilgili uzmanlara ilettim. Size en kısa sürede dönüş yapılacaktır.",
+          "Antalya Belediyesi olarak geri bildiriminiz için teşekkür ederiz. Deneyiminizi geliştirmek için çalışacağız.",
+          "Yaşadığınız sorun için özür dileriz. Konuyu ilgili birimlerle paylaşacağım."
+        ];
+        
+        aiResponse = responses[Math.floor(Math.random() * responses.length)];
+      } else {
+        aiResponse = "Antalya Belediyesi olarak size nasıl yardımcı olabilirim? Lütfen görüş veya şikayetlerinizi detaylı bir şekilde anlatın.";
+      }
+      
+      // Save chat message to our database
+      if (userMessage.trim()) {
+        addFeedback({
+          type: 'chat',
+          message: userMessage
+        });
+      }
+      
+      setChatHistory(prev => [...prev, {role: 'assistant', content: aiResponse}]);
+    } catch (error) {
+      console.error("Error generating response:", error);
+      toast.error("Yanıt oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.");
+      setChatHistory(prev => [...prev, {role: 'assistant', content: "Üzgünüm, şu anda yanıt veremiyorum. Lütfen daha sonra tekrar deneyin."}]);
+    } finally {
+      setIsTyping(false);
     }
+  };
+
+  const handleSendMessage = () => {
+    if (!message.trim()) return;
+    
+    const userMessage = {role: 'user', content: message};
+    setChatHistory(prev => [...prev, userMessage]);
+    setMessage("");
+    
+    generateResponse(userMessage.content);
+  };
+
+  const handleSubmitComplaint = () => {
+    if (!formData.subject.trim() || !formData.complaint.trim()) {
+      toast.error("Lütfen tüm alanları doldurun");
+      return;
+    }
+    
+    // Save complaint to our database
+    addFeedback({
+      type: 'complaint',
+      message: formData.complaint,
+      institution: formData.institution,
+      subject: formData.subject
+    });
+    
+    toast.success("Şikayetiniz alındı. En kısa sürede size dönüş yapılacaktır.");
+    setFormData({
+      institution: "Turizm Ofisi",
+      subject: "",
+      complaint: ""
+    });
   };
 
   return (
@@ -39,31 +115,46 @@ const FeedbackAssistant = () => {
 
         <TabsContent value="chat">
           <div className="space-y-4">
-            <div className="bg-gray-50 p-4 rounded-lg space-y-4">
-              <div className="flex gap-3">
-                <div className="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                  <MessageSquare className="w-4 h-4 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">
-                    Merhaba! Size nasıl yardımcı olabilirim?
-                  </p>
-                </div>
+            <ScrollArea className="h-[300px] pr-4">
+              <div className="space-y-4">
+                {chatHistory.map((message, index) => (
+                  <div 
+                    key={index} 
+                    className={`flex gap-3 ${message.role === 'assistant' ? 'bg-accent' : 'bg-gray-50'} p-4 rounded-lg`}
+                  >
+                    <div className={`flex-shrink-0 w-8 h-8 ${message.role === 'assistant' ? 'bg-primary' : 'bg-gray-300'} rounded-full flex items-center justify-center`}>
+                      <MessageSquare className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">
+                        {message.content}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                {isTyping && (
+                  <div className="flex gap-3 bg-accent p-4 rounded-lg">
+                    <div className="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                      <Loader2 className="w-4 h-4 text-white animate-spin" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Yanıt yazılıyor...</p>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
+            </ScrollArea>
             <div className="flex gap-2">
               <Input
                 placeholder="Mesajınızı yazın..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
               />
-              <Button onClick={handleSubmit}>
-                <Send className="w-4 h-4" />
+              <Button onClick={handleSendMessage} disabled={isTyping}>
+                {isTyping ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               </Button>
             </div>
-            <p className="text-sm text-gray-500 text-center">
-              Chatbot desteği yakında hizmetinizde olacak.
-            </p>
           </div>
         </TabsContent>
 
@@ -72,19 +163,29 @@ const FeedbackAssistant = () => {
             <div className="grid gap-4">
               <div>
                 <p className="text-sm font-medium mb-2">Şikayet Edilecek Kurum</p>
-                <select className="w-full p-2 border rounded-md">
+                <select 
+                  className="w-full p-2 border rounded-md"
+                  value={formData.institution}
+                  onChange={(e) => setFormData({...formData, institution: e.target.value})}
+                >
                   <option>Turizm Ofisi</option>
                   <option>Belediye</option>
                   <option>Emniyet Müdürlüğü</option>
                   <option>Tüketici Hakları</option>
                 </select>
               </div>
-              <Input placeholder="Konu" />
+              <Input 
+                placeholder="Konu" 
+                value={formData.subject}
+                onChange={(e) => setFormData({...formData, subject: e.target.value})}
+              />
               <textarea
                 className="w-full p-2 border rounded-md h-32"
                 placeholder="Şikayetinizi detaylı bir şekilde açıklayın..."
+                value={formData.complaint}
+                onChange={(e) => setFormData({...formData, complaint: e.target.value})}
               />
-              <Button onClick={handleSubmit}>Şikayet Gönder</Button>
+              <Button onClick={handleSubmitComplaint}>Şikayet Gönder</Button>
             </div>
           </div>
         </TabsContent>
