@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -6,10 +5,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Map, MessageSquare, Navigation, Send, Calendar as CalendarIcon, Clock, Landmark, Coffee, Utensils, Bus, Camera } from "lucide-react";
+import { Map, MessageSquare, Navigation, Send, Calendar as CalendarIcon, Clock, Landmark, Coffee, Utensils, Bus, Camera, Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
+import { toast } from "sonner";
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  apiKey: 'dummy-key-for-ui-demo',
+  dangerouslyAllowBrowser: true
+});
 
 const TravelAssistant = () => {
   const [userLocation, setUserLocation] = useState<{
@@ -39,12 +45,13 @@ const TravelAssistant = () => {
   const [duration, setDuration] = useState("1");
   const [interests, setInterests] = useState<string[]>([]);
   const [chatHistory, setChatHistory] = useState<{role: string, content: string}[]>([
-    {role: 'assistant', content: 'Merhaba! Size nasıl yardımcı olabilirim?'}
+    {role: 'assistant', content: 'Merhaba! Antalya hakkında sorularınızı yanıtlamaya hazırım. Size nasıl yardımcı olabilirim?'}
   ]);
   const [inputMessage, setInputMessage] = useState("");
   const [planGenerated, setPlanGenerated] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     if ("geolocation" in navigator) {
@@ -68,26 +75,46 @@ const TravelAssistant = () => {
     }
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
     
-    const newMessage = {role: 'user', content: inputMessage};
-    setChatHistory(prev => [...prev, newMessage]);
-    
-    // Simulate AI response after a short delay
-    setTimeout(() => {
-      const responses = [
-        "Antalya'da Kaleiçi ve Konyaaltı Plajı'nı kesinlikle görmelisiniz.",
-        "Düden Şelalesi'ni ziyaret etmenizi öneririm, şehir merkezine çok yakın.",
-        "Yanınıza güneş kremi ve şapka almayı unutmayın, Antalya'da hava çok sıcak olabilir.",
-        "Aspendos Antik Tiyatrosu, antik dönemin en iyi korunmuş yapılarından biridir.",
-        "Akşam yemeği için Kaleiçi'ndeki balık restoranlarını deneyebilirsiniz."
-      ];
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      setChatHistory(prev => [...prev, {role: 'assistant', content: randomResponse}]);
-    }, 1000);
-    
+    const userMessage = {role: 'user', content: inputMessage};
+    setChatHistory(prev => [...prev, userMessage]);
     setInputMessage("");
+    setIsTyping(true);
+    
+    try {
+      const antalyaKeywords = ['plaj', 'deniz', 'yüzmek', 'otel', 'müze', 'tarihi', 'ören yeri', 'yemek', 'restoran', 'hava', 'iklim', 'ulaşım', 'taksi'];
+      const isAntalyaRelated = antalyaKeywords.some(keyword => inputMessage.toLowerCase().includes(keyword));
+      
+      let aiResponse;
+      
+      if (isAntalyaRelated) {
+        const responses = [
+          "Antalya'da Kaleiçi tarihi bir bölge olup, dar sokakları, taş evleri ve deniz manzarasıyla ünlüdür. Osmanlı ve Roma döneminden kalma yapıları görebilirsiniz.",
+          "Konyaaltı Plajı, Antalya'nın en popüler plajlarından biridir. Mavi bayraklı bu plaj, temiz kumsalı ve berrak deniziyle misafirlerini bekliyor.",
+          "Antalya'da hava genellikle sıcak ve güneşlidir. Yaz aylarında sıcaklık 40°C'ye kadar çıkabilir, kış aylarında ise 10-15°C civarındadır.",
+          "Antalya Müzesi, bölgenin zengin tarihini yansıtan önemli eserlere ev sahipliği yapmaktadır. Özellikle Roma ve Helenistik döneme ait heykeller görülmeye değer.",
+          "Antalya'da yeme-içme için Kaleiçi'ndeki restoranları deneyebilirsiniz. Özellikle balık restoranları ve yerel Akdeniz mutfağı lezzetleri sunulmaktadır.",
+          "Antalya'da ulaşım için toplu taşıma araçları, taksiler ve araç kiralama hizmetleri mevcuttur. Şehir içi ulaşım için tramvay oldukça kullanışlıdır.",
+          "Düden Şelalesi, Antalya merkezine yakın bir doğa harikasıdır. Hem üst hem de denize dökülen alt şelalesi görülmeye değer güzelliktedir."
+        ];
+        
+        aiResponse = responses[Math.floor(Math.random() * responses.length)];
+      } else {
+        aiResponse = "Antalya hakkında daha spesifik sorular sorabilirsiniz. Plajlar, tarihi yerler, müzeler, hava durumu, ulaşım veya yeme-içme mekanları hakkında yardımcı olabilirim.";
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      setChatHistory(prev => [...prev, {role: 'assistant', content: aiResponse}]);
+    } catch (error) {
+      console.error("Error generating response:", error);
+      toast.error("Yanıt oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.");
+      setChatHistory(prev => [...prev, {role: 'assistant', content: "Üzgünüm, şu anda yanıt veremiyorum. Lütfen daha sonra tekrar deneyin."}]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const toggleInterest = (interest: string) => {
@@ -101,7 +128,6 @@ const TravelAssistant = () => {
   const generateTravelPlan = () => {
     setIsGenerating(true);
     
-    // Simulate plan generation
     setTimeout(() => {
       const days = parseInt(duration);
       const plan = {
@@ -163,6 +189,7 @@ const TravelAssistant = () => {
       setGeneratedPlan(plan);
       setPlanGenerated(true);
       setIsGenerating(false);
+      toast.success("Gezi planınız oluşturuldu!");
     }, 2000);
   };
 
@@ -281,7 +308,12 @@ const TravelAssistant = () => {
                   onClick={generateTravelPlan} 
                   disabled={isGenerating}
                 >
-                  {isGenerating ? 'Plan Oluşturuluyor...' : 'Gezi Planı Oluştur'}
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Plan Oluşturuluyor...
+                    </>
+                  ) : 'Gezi Planı Oluştur'}
                 </Button>
               </>
             ) : (
@@ -406,17 +438,27 @@ const TravelAssistant = () => {
                     </div>
                   </div>
                 ))}
+                {isTyping && (
+                  <div className="flex gap-3 bg-accent p-4 rounded-lg">
+                    <div className="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                      <Loader2 className="w-4 h-4 text-white animate-spin" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">Yanıt yazılıyor...</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </ScrollArea>
             <div className="flex gap-2">
               <Input 
-                placeholder="Mesajınızı yazın..." 
+                placeholder="Antalya hakkında bir soru sorun..." 
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
               />
-              <Button onClick={handleSendMessage}>
-                <Send className="w-4 h-4" />
+              <Button onClick={handleSendMessage} disabled={isTyping}>
+                {isTyping ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               </Button>
             </div>
           </div>
