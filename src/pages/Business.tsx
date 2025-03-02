@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
@@ -118,7 +117,6 @@ const BusinessPanel = () => {
   });
 
   useEffect(() => {
-    // Load businesses
     loadBusinesses();
   }, []);
 
@@ -152,7 +150,14 @@ const BusinessPanel = () => {
   };
 
   const onSubmit = (data: z.infer<typeof businessFormSchema>) => {
-    addBusiness(data);
+    const businessData = {
+      name: data.name,
+      type: data.type,
+      address: data.address,
+      status: data.status,
+    };
+    
+    addBusiness(businessData);
     loadBusinesses();
     form.reset();
     toast({
@@ -178,7 +183,6 @@ const BusinessPanel = () => {
         <h1 className="text-3xl font-bold text-gray-800 mb-8">İşletme Paneli</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Business List */}
           <Card className="lg:col-span-2">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -354,7 +358,7 @@ const BusinessPanel = () => {
                           <TableCell>
                             <Badge 
                               variant={
-                                business.status === "verified" ? "success" : 
+                                business.status === "verified" ? "default" : 
                                 business.status === "flagged" ? "destructive" : "outline"
                               }
                             >
@@ -367,7 +371,7 @@ const BusinessPanel = () => {
                           <TableCell>
                             <div className="flex space-x-1">
                               {business.priceReports > 0 && (
-                                <Badge variant="warning" className="text-xs">
+                                <Badge variant="secondary" className="text-xs">
                                   {business.priceReports} Fiyat
                                 </Badge>
                               )}
@@ -421,7 +425,6 @@ const BusinessPanel = () => {
             </CardContent>
           </Card>
 
-          {/* Right Column - Business Details */}
           <Card>
             <CardHeader>
               <div className="flex items-center gap-3">
@@ -441,7 +444,7 @@ const BusinessPanel = () => {
                     <div className="flex items-center mt-2">
                       <Badge 
                         variant={
-                          selectedBusiness.status === "verified" ? "success" : 
+                          selectedBusiness.status === "verified" ? "default" : 
                           selectedBusiness.status === "flagged" ? "destructive" : "outline"
                         }
                         className="mr-2"
