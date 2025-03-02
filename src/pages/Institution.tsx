@@ -24,6 +24,16 @@ import {
 import {
   ScrollArea
 } from "@/components/ui/scroll-area";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   Map, 
   MessageSquare, 
@@ -31,17 +41,30 @@ import {
   Ban, 
   FileWarning, 
   CheckCircle,
+  ReplyAll,
   X,
   Calendar,
   Clock
 } from "lucide-react";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
-import { getFeedbacks, getReports, updateFeedbackStatus, updateReportStatus } from "@/services/dataService";
+import { 
+  getFeedbacks, 
+  getReports, 
+  updateFeedbackStatus, 
+  updateReportStatus,
+  addFeedbackResponse,
+  addReportResponse
+} from "@/services/dataService";
+import { toast } from "sonner";
 
 const Institution = () => {
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
   const [reports, setReports] = useState<any[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedType, setSelectedType] = useState<'feedback' | 'report' | null>(null);
+  const [responseText, setResponseText] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     // Load feedbacks and reports
@@ -60,6 +83,34 @@ const Institution = () => {
 
   const handleUpdateReportStatus = (id: string, status: 'pending' | 'processed') => {
     updateReportStatus(id, status);
+    loadData();
+  };
+
+  const handleOpenResponseDialog = (id: string, type: 'feedback' | 'report') => {
+    setSelectedId(id);
+    setSelectedType(type);
+    setResponseText("");
+    setDialogOpen(true);
+  };
+
+  const handleSubmitResponse = () => {
+    if (!responseText.trim()) {
+      toast.error("Lütfen bir yanıt girin");
+      return;
+    }
+
+    if (selectedType === 'feedback' && selectedId) {
+      addFeedbackResponse(selectedId, responseText);
+      toast.success("Yanıtınız başarıyla gönderildi");
+    } else if (selectedType === 'report' && selectedId) {
+      addReportResponse(selectedId, responseText);
+      toast.success("Yanıtınız başarıyla gönderildi");
+    }
+
+    setDialogOpen(false);
+    setResponseText("");
+    setSelectedId(null);
+    setSelectedType(null);
     loadData();
   };
 
@@ -139,6 +190,18 @@ const Institution = () => {
                             )}
                           </div>
                           <p className="text-sm text-gray-600 mb-3">{report.description}</p>
+                          
+                          {/* Display response if available */}
+                          {report.response && (
+                            <div className="bg-blue-50 p-2 rounded-md mb-3 border border-blue-200">
+                              <p className="text-sm font-medium text-blue-800">Yanıtınız:</p>
+                              <p className="text-sm text-gray-600">{report.response}</p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                {format(new Date(report.responseTimestamp || ""), 'dd MMM yyyy HH:mm', {locale: tr})}
+                              </p>
+                            </div>
+                          )}
+                          
                           <div className="flex justify-between items-center text-xs text-gray-500">
                             <div className="flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
@@ -146,16 +209,28 @@ const Institution = () => {
                               <Clock className="w-3 h-3 ml-2" />
                               {format(new Date(report.timestamp), 'HH:mm', {locale: tr})}
                             </div>
-                            {report.status === 'pending' && (
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => handleUpdateReportStatus(report.id, 'processed')}
-                              >
-                                <CheckCircle className="w-3 h-3 mr-1" />
-                                İşlendi olarak işaretle
-                              </Button>
-                            )}
+                            <div className="flex gap-2">
+                              {!report.response && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleOpenResponseDialog(report.id, 'report')}
+                                >
+                                  <ReplyAll className="w-3 h-3 mr-1" />
+                                  Yanıtla
+                                </Button>
+                              )}
+                              {report.status === 'pending' && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleUpdateReportStatus(report.id, 'processed')}
+                                >
+                                  <CheckCircle className="w-3 h-3 mr-1" />
+                                  İşlendi
+                                </Button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -202,6 +277,18 @@ const Institution = () => {
                             </Badge>
                           </div>
                           <p className="text-sm text-gray-600 mb-3">{report.description}</p>
+                          
+                          {/* Display response if available */}
+                          {report.response && (
+                            <div className="bg-blue-50 p-2 rounded-md mb-3 border border-blue-200">
+                              <p className="text-sm font-medium text-blue-800">Yanıtınız:</p>
+                              <p className="text-sm text-gray-600">{report.response}</p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                {format(new Date(report.responseTimestamp || ""), 'dd MMM yyyy HH:mm', {locale: tr})}
+                              </p>
+                            </div>
+                          )}
+                          
                           <div className="flex justify-between items-center text-xs text-gray-500">
                             <div className="flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
@@ -209,16 +296,28 @@ const Institution = () => {
                               <Clock className="w-3 h-3 ml-2" />
                               {format(new Date(report.timestamp), 'HH:mm', {locale: tr})}
                             </div>
-                            {report.status === 'pending' && (
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => handleUpdateReportStatus(report.id, 'processed')}
-                              >
-                                <CheckCircle className="w-3 h-3 mr-1" />
-                                İşlendi olarak işaretle
-                              </Button>
-                            )}
+                            <div className="flex gap-2">
+                              {!report.response && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleOpenResponseDialog(report.id, 'report')}
+                                >
+                                  <ReplyAll className="w-3 h-3 mr-1" />
+                                  Yanıtla
+                                </Button>
+                              )}
+                              {report.status === 'pending' && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleUpdateReportStatus(report.id, 'processed')}
+                                >
+                                  <CheckCircle className="w-3 h-3 mr-1" />
+                                  İşlendi
+                                </Button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -264,6 +363,18 @@ const Institution = () => {
                             </Badge>
                           </div>
                           <p className="text-sm text-gray-600 mb-3">{report.description}</p>
+                          
+                          {/* Display response if available */}
+                          {report.response && (
+                            <div className="bg-blue-50 p-2 rounded-md mb-3 border border-blue-200">
+                              <p className="text-sm font-medium text-blue-800">Yanıtınız:</p>
+                              <p className="text-sm text-gray-600">{report.response}</p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                {format(new Date(report.responseTimestamp || ""), 'dd MMM yyyy HH:mm', {locale: tr})}
+                              </p>
+                            </div>
+                          )}
+                          
                           <div className="flex justify-between items-center text-xs text-gray-500">
                             <div className="flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
@@ -271,16 +382,28 @@ const Institution = () => {
                               <Clock className="w-3 h-3 ml-2" />
                               {format(new Date(report.timestamp), 'HH:mm', {locale: tr})}
                             </div>
-                            {report.status === 'pending' && (
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => handleUpdateReportStatus(report.id, 'processed')}
-                              >
-                                <CheckCircle className="w-3 h-3 mr-1" />
-                                İşlendi olarak işaretle
-                              </Button>
-                            )}
+                            <div className="flex gap-2">
+                              {!report.response && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleOpenResponseDialog(report.id, 'report')}
+                                >
+                                  <ReplyAll className="w-3 h-3 mr-1" />
+                                  Yanıtla
+                                </Button>
+                              )}
+                              {report.status === 'pending' && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleUpdateReportStatus(report.id, 'processed')}
+                                >
+                                  <CheckCircle className="w-3 h-3 mr-1" />
+                                  İşlendi
+                                </Button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -334,6 +457,18 @@ const Institution = () => {
                                 </Badge>
                               </div>
                               <p className="text-sm text-gray-600 mb-3">{feedback.message}</p>
+                              
+                              {/* Display response if available */}
+                              {feedback.response && (
+                                <div className="bg-blue-50 p-2 rounded-md mb-3 border border-blue-200">
+                                  <p className="text-sm font-medium text-blue-800">Yanıtınız:</p>
+                                  <p className="text-sm text-gray-600">{feedback.response}</p>
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    {format(new Date(feedback.responseTimestamp || ""), 'dd MMM yyyy HH:mm', {locale: tr})}
+                                  </p>
+                                </div>
+                              )}
+                              
                               <div className="flex justify-between items-center text-xs text-gray-500">
                                 <div className="flex items-center gap-1">
                                   <Calendar className="w-3 h-3" />
@@ -341,16 +476,28 @@ const Institution = () => {
                                   <Clock className="w-3 h-3 ml-2" />
                                   {format(new Date(feedback.timestamp), 'HH:mm', {locale: tr})}
                                 </div>
-                                {feedback.status === 'pending' && (
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm"
-                                    onClick={() => handleUpdateFeedbackStatus(feedback.id, 'processed')}
-                                  >
-                                    <CheckCircle className="w-3 h-3 mr-1" />
-                                    İşlendi olarak işaretle
-                                  </Button>
-                                )}
+                                <div className="flex gap-2">
+                                  {!feedback.response && (
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      onClick={() => handleOpenResponseDialog(feedback.id, 'feedback')}
+                                    >
+                                      <ReplyAll className="w-3 h-3 mr-1" />
+                                      Yanıtla
+                                    </Button>
+                                  )}
+                                  {feedback.status === 'pending' && (
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      onClick={() => handleUpdateFeedbackStatus(feedback.id, 'processed')}
+                                    >
+                                      <CheckCircle className="w-3 h-3 mr-1" />
+                                      İşlendi
+                                    </Button>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           ))}
@@ -384,6 +531,18 @@ const Institution = () => {
                                 </Badge>
                               </div>
                               <p className="text-sm text-gray-600 mb-3">{feedback.message}</p>
+                              
+                              {/* Display response if available */}
+                              {feedback.response && (
+                                <div className="bg-blue-50 p-2 rounded-md mb-3 border border-blue-200">
+                                  <p className="text-sm font-medium text-blue-800">Yanıtınız:</p>
+                                  <p className="text-sm text-gray-600">{feedback.response}</p>
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    {format(new Date(feedback.responseTimestamp || ""), 'dd MMM yyyy HH:mm', {locale: tr})}
+                                  </p>
+                                </div>
+                              )}
+                              
                               <div className="flex justify-between items-center text-xs text-gray-500">
                                 <div className="flex items-center gap-1">
                                   <Calendar className="w-3 h-3" />
@@ -391,16 +550,28 @@ const Institution = () => {
                                   <Clock className="w-3 h-3 ml-2" />
                                   {format(new Date(feedback.timestamp), 'HH:mm', {locale: tr})}
                                 </div>
-                                {feedback.status === 'pending' && (
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm"
-                                    onClick={() => handleUpdateFeedbackStatus(feedback.id, 'processed')}
-                                  >
-                                    <CheckCircle className="w-3 h-3 mr-1" />
-                                    İncelendi olarak işaretle
-                                  </Button>
-                                )}
+                                <div className="flex gap-2">
+                                  {!feedback.response && (
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      onClick={() => handleOpenResponseDialog(feedback.id, 'feedback')}
+                                    >
+                                      <ReplyAll className="w-3 h-3 mr-1" />
+                                      Yanıtla
+                                    </Button>
+                                  )}
+                                  {feedback.status === 'pending' && (
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      onClick={() => handleUpdateFeedbackStatus(feedback.id, 'processed')}
+                                    >
+                                      <CheckCircle className="w-3 h-3 mr-1" />
+                                      İncelendi
+                                    </Button>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           ))}
@@ -418,6 +589,34 @@ const Institution = () => {
           </Card>
         </div>
       </motion.div>
+
+      {/* Response Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Yanıt Gönder</DialogTitle>
+            <DialogDescription>
+              Kullanıcıya gönderilecek yanıtı yazın. Bu yanıt kullanıcının turist panelinde görüntülenecektir.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Textarea
+            value={responseText}
+            onChange={(e) => setResponseText(e.target.value)}
+            placeholder="Yanıtınızı buraya yazın..."
+            className="min-h-[120px]"
+          />
+          
+          <DialogFooter className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              İptal
+            </Button>
+            <Button onClick={handleSubmitResponse}>
+              Yanıt Gönder
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

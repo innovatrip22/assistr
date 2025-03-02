@@ -3,9 +3,9 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageSquare, Send, Loader2 } from "lucide-react";
+import { MessageSquare, Send, Loader2, Bell } from "lucide-react";
 import { toast } from "sonner";
-import { addFeedback } from "@/services/dataService";
+import { addFeedback, getFeedbacks } from "@/services/dataService";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const FeedbackAssistant = () => {
@@ -19,6 +19,13 @@ const FeedbackAssistant = () => {
     subject: "",
     complaint: ""
   });
+  const [myFeedbacks, setMyFeedbacks] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Load past feedbacks from database for a simulated "my feedbacks" feature
+    const allFeedbacks = getFeedbacks();
+    setMyFeedbacks(allFeedbacks.slice(0, 3)); // For demo we'll just take first 3
+  }, []);
 
   const generateResponse = async (userMessage: string) => {
     setIsTyping(true);
@@ -48,10 +55,13 @@ const FeedbackAssistant = () => {
       
       // Save chat message to our database
       if (userMessage.trim()) {
-        addFeedback({
+        const feedback = addFeedback({
           type: 'chat',
           message: userMessage
         });
+        
+        // Update local feedbacks list
+        setMyFeedbacks(prev => [feedback, ...prev]);
       }
       
       setChatHistory(prev => [...prev, {role: 'assistant', content: aiResponse}]);
@@ -81,12 +91,15 @@ const FeedbackAssistant = () => {
     }
     
     // Save complaint to our database
-    addFeedback({
+    const feedback = addFeedback({
       type: 'complaint',
       message: formData.complaint,
       institution: formData.institution,
       subject: formData.subject
     });
+    
+    // Update local feedbacks list
+    setMyFeedbacks(prev => [feedback, ...prev]);
     
     toast.success("Şikayetiniz alındı. En kısa sürede size dönüş yapılacaktır.");
     setFormData({
@@ -110,6 +123,9 @@ const FeedbackAssistant = () => {
           </TabsTrigger>
           <TabsTrigger value="complaint" className="w-full">
             Şikayet Formu
+          </TabsTrigger>
+          <TabsTrigger value="my-feedbacks" className="w-full">
+            Bildirimlerim
           </TabsTrigger>
         </TabsList>
 
@@ -188,6 +204,52 @@ const FeedbackAssistant = () => {
               <Button onClick={handleSubmitComplaint}>Şikayet Gönder</Button>
             </div>
           </div>
+        </TabsContent>
+        
+        <TabsContent value="my-feedbacks">
+          <ScrollArea className="h-[300px] pr-4">
+            {myFeedbacks.length > 0 ? (
+              <div className="space-y-4">
+                {myFeedbacks.map((feedback, index) => (
+                  <div 
+                    key={index} 
+                    className="border rounded-lg p-4"
+                  >
+                    <div className="flex justify-between mb-2">
+                      <div>
+                        <p className="font-medium">
+                          {feedback.type === 'complaint' ? feedback.subject || 'Şikayet' : 'Chatbot Mesajı'}
+                        </p>
+                        {feedback.institution && (
+                          <p className="text-xs text-gray-500">{feedback.institution}</p>
+                        )}
+                      </div>
+                      <div className={`px-2 py-1 rounded-full text-xs ${feedback.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}`}>
+                        {feedback.status === 'pending' ? 'Beklemede' : 'İşlendi'}
+                      </div>
+                    </div>
+                    
+                    <p className="text-sm text-gray-600 mb-2">{feedback.message}</p>
+                    
+                    {feedback.response && (
+                      <div className="bg-blue-50 p-3 rounded-md border border-blue-100">
+                        <div className="flex items-center gap-1 mb-1">
+                          <Bell className="w-4 h-4 text-blue-500" />
+                          <p className="text-sm font-medium text-blue-800">Yanıt:</p>
+                        </div>
+                        <p className="text-sm text-gray-600">{feedback.response}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-10 text-gray-500">
+                <MessageSquare className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>Henüz gönderilen bildiriminiz bulunmuyor</p>
+              </div>
+            )}
+          </ScrollArea>
         </TabsContent>
       </Tabs>
     </div>

@@ -7,15 +7,49 @@ import TravelAssistant from "@/components/tourist/TravelAssistant";
 import EventAssistant from "@/components/tourist/EventAssistant";
 import FeedbackAssistant from "@/components/tourist/FeedbackAssistant";
 import ReportAssistant from "@/components/tourist/ReportAssistant";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Bell } from "lucide-react";
+import { 
+  getUserNotifications, 
+  getFeedbacks, 
+  getReports 
+} from "@/services/dataService";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { format } from "date-fns";
+import { tr } from "date-fns/locale";
 
 const Tourist = () => {
   const [showWelcome, setShowWelcome] = useState(true);
+  const [notifications, setNotifications] = useState({
+    feedbackNotifications: [],
+    reportNotifications: [],
+    total: 0
+  });
+  const [notificationDialogOpen, setNotificationDialogOpen] = useState(false);
 
   useEffect(() => {
     console.log("Tourist dashboard mounted");
     setTimeout(() => setShowWelcome(false), 5000);
+    
+    // Load notifications on mount and every 30 seconds
+    loadNotifications();
+    const intervalId = setInterval(loadNotifications, 30000);
+    
+    return () => clearInterval(intervalId);
   }, []);
+  
+  const loadNotifications = () => {
+    const userNotifications = getUserNotifications();
+    setNotifications(userNotifications);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-6">
@@ -38,6 +72,86 @@ const Tourist = () => {
             </div>
           </div>
         </motion.div>
+      )}
+
+      {/* Notification Icon */}
+      {notifications.total > 0 && (
+        <div className="fixed top-4 right-4 z-50">
+          <Dialog open={notificationDialogOpen} onOpenChange={setNotificationDialogOpen}>
+            <DialogTrigger asChild>
+              <button className="bg-white p-2 rounded-full shadow-md relative">
+                <Bell className="w-6 h-6 text-primary" />
+                <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                  {notifications.total}
+                </Badge>
+              </button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Bildirimler</DialogTitle>
+                <DialogDescription>
+                  Bildirimleriniz ve kurumlardan gelen yanıtlar
+                </DialogDescription>
+              </DialogHeader>
+              
+              <ScrollArea className="max-h-[400px] pr-4">
+                {notifications.reportNotifications.length > 0 && (
+                  <div className="mb-4">
+                    <h3 className="font-medium text-lg mb-2">Rapor Yanıtları</h3>
+                    <div className="space-y-3">
+                      {notifications.reportNotifications.map((report: any, index: number) => (
+                        <div key={index} className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                          <div className="mb-1">
+                            {report.type === 'price' && <span className="text-orange-600 font-medium">Fahiş Fiyat Bildirimi</span>}
+                            {report.type === 'fraud' && <span className="text-red-600 font-medium">Dolandırıcılık Bildirimi</span>}
+                            {report.type === 'emergency' && <span className="text-red-600 font-medium">Acil Durum Bildirimi</span>}
+                          </div>
+                          <p className="text-sm text-gray-600 mb-2">{report.description}</p>
+                          <div className="bg-white p-2 rounded-md border border-blue-100">
+                            <p className="text-sm font-medium text-blue-800">Yanıt:</p>
+                            <p className="text-sm text-gray-600">{report.response}</p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {format(new Date(report.responseTimestamp || ""), 'dd MMM yyyy HH:mm', {locale: tr})}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {notifications.feedbackNotifications.length > 0 && (
+                  <div>
+                    <h3 className="font-medium text-lg mb-2">Geri Bildirim Yanıtları</h3>
+                    <div className="space-y-3">
+                      {notifications.feedbackNotifications.map((feedback: any, index: number) => (
+                        <div key={index} className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                          <div className="mb-1">
+                            {feedback.type === 'complaint' && (
+                              <>
+                                <span className="font-medium">{feedback.subject}</span>
+                                <p className="text-xs text-gray-500">{feedback.institution}</p>
+                              </>
+                            )}
+                            {feedback.type === 'chat' && <span className="font-medium">Chatbot Mesajı</span>}
+                          </div>
+                          <p className="text-sm text-gray-600 mb-2">{feedback.message}</p>
+                          <div className="bg-white p-2 rounded-md border border-blue-100">
+                            <p className="text-sm font-medium text-blue-800">Yanıt:</p>
+                            <p className="text-sm text-gray-600">{feedback.response}</p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {format(new Date(feedback.responseTimestamp || ""), 'dd MMM yyyy HH:mm', {locale: tr})}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </ScrollArea>
+            </DialogContent>
+          </Dialog>
+        </div>
       )}
 
       <motion.div

@@ -8,6 +8,8 @@ type Feedback = {
   institution?: string;
   subject?: string;
   status: 'pending' | 'processed';
+  response?: string;
+  responseTimestamp?: string;
 };
 
 type Report = {
@@ -21,6 +23,8 @@ type Report = {
   normalPrice?: number;
   description: string;
   status: 'pending' | 'processed';
+  response?: string;
+  responseTimestamp?: string;
 };
 
 // In-memory storage (simulates a database)
@@ -48,7 +52,9 @@ const feedbacks: Feedback[] = [
     message: "Tur rehberi bizi fazladan ücretli aktivitelere yönlendirmeye çalıştı.",
     institution: "Antalya Turizm Danışma",
     subject: "Tur Rehberi Şikayeti",
-    status: "processed"
+    status: "processed",
+    response: "Sayın turistimiz, şikayetiniz için teşekkür ederiz. İlgili tur rehberi hakkında inceleme başlattık. Sonucu size bildireceğiz.",
+    responseTimestamp: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString()
   }
 ];
 
@@ -79,7 +85,9 @@ const reports: Report[] = [
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 1).toISOString(),
     location: "Konyaaltı Sahili, Antalya",
     description: "Denizde boğulma tehlikesi geçiren bir turist var. Acil yardım gerekiyor!",
-    status: "pending"
+    status: "processed",
+    response: "Konyaaltı sahiline cankurtaran ekibi gönderilmiştir. Durum kontrol altına alınmıştır.",
+    responseTimestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString()
   }
 ];
 
@@ -113,6 +121,18 @@ export const updateFeedbackStatus = (id: string, status: 'pending' | 'processed'
   return null;
 };
 
+// New method to add response to feedback
+export const addFeedbackResponse = (id: string, response: string) => {
+  const feedback = feedbacks.find(f => f.id === id);
+  if (feedback) {
+    feedback.response = response;
+    feedback.responseTimestamp = new Date().toISOString();
+    feedback.status = 'processed';
+    return feedback;
+  }
+  return null;
+};
+
 // Report methods
 export const addReport = (report: Omit<Report, 'id' | 'timestamp' | 'status'>) => {
   const newReport: Report = {
@@ -136,6 +156,31 @@ export const updateReportStatus = (id: string, status: 'pending' | 'processed') 
     return report;
   }
   return null;
+};
+
+// New method to add response to report
+export const addReportResponse = (id: string, response: string) => {
+  const report = reports.find(r => r.id === id);
+  if (report) {
+    report.response = response;
+    report.responseTimestamp = new Date().toISOString();
+    report.status = 'processed';
+    return report;
+  }
+  return null;
+};
+
+// Helper method to check if user has notifications
+export const getUserNotifications = () => {
+  // Check for any processed feedbacks and reports with responses
+  const feedbackNotifications = feedbacks.filter(f => f.status === 'processed' && f.response);
+  const reportNotifications = reports.filter(r => r.status === 'processed' && r.response);
+  
+  return {
+    feedbackNotifications,
+    reportNotifications,
+    total: feedbackNotifications.length + reportNotifications.length
+  };
 };
 
 // Business methods for the Business panel

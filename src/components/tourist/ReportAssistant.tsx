@@ -1,11 +1,12 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle, Ban, PhoneCall } from "lucide-react";
+import { AlertTriangle, Ban, PhoneCall, Bell } from "lucide-react";
 import { toast } from "sonner";
-import { addReport } from "@/services/dataService";
+import { addReport, getReports } from "@/services/dataService";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const ReportAssistant = () => {
   const [priceReport, setPriceReport] = useState({
@@ -22,6 +23,14 @@ const ReportAssistant = () => {
     datetime: "",
     description: ""
   });
+  
+  const [myReports, setMyReports] = useState<any[]>([]);
+  
+  useEffect(() => {
+    // Load past reports from database for a simulated "my reports" feature
+    const allReports = getReports();
+    setMyReports(allReports.slice(0, 3)); // For demo we'll just take first 3
+  }, []);
 
   const handlePriceReport = () => {
     if (!priceReport.businessName || !priceReport.productName || !priceReport.paidPrice || !priceReport.description) {
@@ -30,7 +39,7 @@ const ReportAssistant = () => {
     }
     
     // Save price report to our database
-    addReport({
+    const report = addReport({
       type: 'price',
       businessName: priceReport.businessName,
       productName: priceReport.productName,
@@ -39,6 +48,9 @@ const ReportAssistant = () => {
       location: priceReport.location,
       description: priceReport.description
     });
+    
+    // Update local reports list
+    setMyReports(prev => [report, ...prev]);
     
     toast.success("Fahiş fiyat bildiriminiz alındı. İlgili birimlere iletilmiştir.");
     setPriceReport({
@@ -58,11 +70,14 @@ const ReportAssistant = () => {
     }
     
     // Save fraud report to our database
-    addReport({
+    const report = addReport({
       type: 'fraud',
       location: fraudReport.location,
       description: fraudReport.description
     });
+    
+    // Update local reports list
+    setMyReports(prev => [report, ...prev]);
     
     toast.success("Dolandırıcılık bildiriminiz alındı. İlgili birimlere iletilmiştir.");
     setFraudReport({
@@ -74,10 +89,13 @@ const ReportAssistant = () => {
 
   const handleEmergencyCall = (number: string) => {
     // Log emergency call
-    addReport({
+    const report = addReport({
       type: 'emergency',
       description: `Acil durum numarası arandı: ${number}`
     });
+    
+    // Update local reports list
+    setMyReports(prev => [report, ...prev]);
     
     // Open phone dialer
     window.location.href = `tel:${number}`;
@@ -107,6 +125,9 @@ const ReportAssistant = () => {
           </TabsTrigger>
           <TabsTrigger value="fraud" className="w-full">
             Dolandırıcılık
+          </TabsTrigger>
+          <TabsTrigger value="my-reports" className="w-full">
+            Bildirimlerim
           </TabsTrigger>
         </TabsList>
 
@@ -203,6 +224,68 @@ const ReportAssistant = () => {
               Dolandırıcılık Bildir
             </Button>
           </div>
+        </TabsContent>
+        
+        <TabsContent value="my-reports">
+          <ScrollArea className="h-[300px] pr-4">
+            {myReports.length > 0 ? (
+              <div className="space-y-4">
+                {myReports.map((report, index) => (
+                  <div 
+                    key={index} 
+                    className="border rounded-lg p-4"
+                  >
+                    <div className="flex justify-between mb-2">
+                      <div>
+                        <p className="font-medium">
+                          {report.type === 'price' && 'Fahiş Fiyat Bildirimi'}
+                          {report.type === 'fraud' && 'Dolandırıcılık Bildirimi'}
+                          {report.type === 'emergency' && 'Acil Durum Bildirimi'}
+                        </p>
+                        {report.location && (
+                          <p className="text-xs text-gray-500">{report.location}</p>
+                        )}
+                      </div>
+                      <div className={`px-2 py-1 rounded-full text-xs ${
+                        report.status === 'pending' 
+                          ? report.type === 'emergency' 
+                            ? 'bg-red-100 text-red-800' 
+                            : 'bg-yellow-100 text-yellow-800'
+                          : 'bg-green-100 text-green-800'
+                      }`}>
+                        {report.status === 'pending' ? 'Beklemede' : 'İşlendi'}
+                      </div>
+                    </div>
+                    
+                    {report.type === 'price' && (
+                      <div className="mb-2 text-sm">
+                        <p><span className="font-medium">İşletme:</span> {report.businessName}</p>
+                        <p><span className="font-medium">Ürün:</span> {report.productName}</p>
+                        <p><span className="font-medium">Fiyat:</span> {report.paidPrice} TL {report.normalPrice ? `(Normal: ${report.normalPrice} TL)` : ''}</p>
+                      </div>
+                    )}
+                    
+                    <p className="text-sm text-gray-600 mb-2">{report.description}</p>
+                    
+                    {report.response && (
+                      <div className="bg-blue-50 p-3 rounded-md border border-blue-100">
+                        <div className="flex items-center gap-1 mb-1">
+                          <Bell className="w-4 h-4 text-blue-500" />
+                          <p className="text-sm font-medium text-blue-800">Yanıt:</p>
+                        </div>
+                        <p className="text-sm text-gray-600">{report.response}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-10 text-gray-500">
+                <AlertTriangle className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>Henüz gönderilen bildiriminiz bulunmuyor</p>
+              </div>
+            )}
+          </ScrollArea>
         </TabsContent>
       </Tabs>
     </div>
