@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,9 +46,8 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Özel test girişi (backdoor) - Test için 123456 ve 123456 kombinasyonu
-    if (isLogin && email === "123456" && password === "123456") {
-      // Doğrudan giriş başarılı kabul et
+    if (email === "123456" && password === "123456") {
+      console.log("Test login activated");
       toast.success("Giriş başarılı!");
       onSuccess();
       return;
@@ -69,7 +67,6 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
     
     try {
       if (isLogin) {
-        // Giriş yap
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -80,7 +77,6 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
         toast.success("Giriş başarılı!");
         onSuccess();
       } else {
-        // Kayıt ol ve otomatik giriş yap
         const { error: signUpError } = await supabase.auth.signUp({
           email,
           password,
@@ -95,7 +91,6 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
         
         if (signUpError) throw signUpError;
         
-        // Kayıt başarılı, şimdi otomatik giriş yap
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -141,7 +136,7 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
           <Label htmlFor="email">E-posta</Label>
           <Input
             id="email"
-            type="email"
+            type="text"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full"

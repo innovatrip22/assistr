@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginCard from "@/components/LoginCard";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import AuthDialog from "@/components/AuthDialog";
 import { useAuth } from "@/hooks/useAuth";
@@ -57,6 +57,7 @@ const Index = () => {
 
       <Dialog open={!!selectedType} onOpenChange={(open) => !open && setSelectedType(null)}>
         <DialogContent className="p-0 border-none max-w-md">
+          <DialogTitle className="sr-only">Giriş / Kayıt</DialogTitle>
           {selectedType && (
             <AuthDialog
               type={selectedType}
