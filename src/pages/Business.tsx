@@ -80,7 +80,7 @@ const Business = () => {
           İşletme Paneli
         </motion.h1>
 
-        <Tabs defaultvalue="dashboard" className="w-full space-y-4">
+        <Tabs defaultValue="dashboard" className="w-full space-y-4">
           <TabsList className="bg-white border rounded-lg shadow-sm">
             <TabsTrigger value="dashboard" className="data-[state=active]:bg-gray-100">
               <Activity className="w-4 h-4 mr-2" />

@@ -10,6 +10,8 @@ export type Business = {
   status: 'verified' | 'unverified' | 'flagged';
   owner_id: string;
   created_at: string;
+  description: string; // Added description property
+  location: string;    // Added location property
   // Additional fields used in the UI
   priceReports?: number;
   fraudReports?: number;
@@ -34,6 +36,8 @@ export const getBusinesses = async (): Promise<Business[]> => {
     // Handle potential null values
     owner_id: business.owner_id || '',
     created_at: business.created_at || new Date().toISOString(),
+    description: business.description || '',
+    location: business.address || '',
     // Add UI specific fields
     priceReports: Math.floor(Math.random() * 5),
     fraudReports: Math.floor(Math.random() * 3),
@@ -52,6 +56,34 @@ export const getBusinessById = async (id: string) => {
     
   if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "no rows returned"
   return data;
+};
+
+// Add the missing functions that are referenced in Business.tsx
+export const getBusinessDetails = async (): Promise<Business> => {
+  // Mocked data for demonstration
+  return {
+    id: "1",
+    name: "Sample Business",
+    type: "restaurant",
+    address: "123 Main St",
+    status: "verified",
+    owner_id: "user-123",
+    created_at: new Date().toISOString(),
+    description: "A sample business description",
+    location: "Antalya, Turkey",
+    priceReports: 2,
+    fraudReports: 0
+  };
+};
+
+export const updateBusinessDetails = async (business: Business): Promise<Business> => {
+  // In a real app, this would update the business in the database
+  console.log("Business updated:", business);
+  return business;
+};
+
+export const getBusiness = async (): Promise<Business | null> => {
+  return getBusinessDetails();
 };
 
 export const addBusiness = async (business: {
