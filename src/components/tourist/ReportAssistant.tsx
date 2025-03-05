@@ -1,4 +1,5 @@
 
+
 import { useState } from "react";
 import { 
   Tabs, 
@@ -7,7 +8,7 @@ import {
   TabsTrigger 
 } from "@/components/ui/tabs";
 import { FraudReportForm, EmergencyReportForm, PriceReportForm } from "@/components/tourist/ReportForms";
-import { addReport } from "@/services";
+import { submitReports } from "@/services";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -25,7 +26,7 @@ const ReportAssistant = () => {
         user_id: user?.id || 'anonymous'
       };
       
-      await addReport(reportData);
+      await submitReports(type, reportData);
       
       toast({
         title: "Rapor Gönderildi",
@@ -63,3 +64,4 @@ const ReportAssistant = () => {
 };
 
 export default ReportAssistant;
+

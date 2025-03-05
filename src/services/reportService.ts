@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 // Export the addReportResponse function if it doesn't exist
@@ -41,4 +42,31 @@ export const getReports = async () => {
 
   if (error) throw error;
   return data;
+};
+
+// Add the missing updateReportStatus function
+export const updateReportStatus = async (id: string, status: 'pending' | 'processed' | 'responded') => {
+  const { data, error } = await supabase
+    .from("reports")
+    .update({ status })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+// Add the addReport function that is used in ReportAssistant.tsx
+export const addReport = async (reportData: any) => {
+  const { error } = await supabase.from("reports").insert([
+    {
+      ...reportData,
+      timestamp: new Date().toISOString(),
+      status: "pending",
+    },
+  ]);
+
+  if (error) throw error;
+  return true;
 };
