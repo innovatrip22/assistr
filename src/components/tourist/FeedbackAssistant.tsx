@@ -1,117 +1,157 @@
+
 import { useState } from "react";
-import { format } from "date-fns";
-import { tr } from "date-fns/locale";
-import { 
-  Button, 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { MessageSquare } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { submitFeedback, getFeedbacks } from "@/services";
+import { addFeedback } from "@/services";
+
+const feedbackSchema = z.object({
+  institution: z.string().min(2, { message: "Kurum adı en az 2 karakter olmalıdır" }),
+  subject: z.string().min(2, { message: "Konu en az 2 karakter olmalıdır" }),
+  message: z.string().min(10, { message: "Mesaj en az 10 karakter olmalıdır" }),
+  rating: z.string(),
+});
 
 const FeedbackAssistant = () => {
-  const [feedbackText, setFeedbackText] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [feedbacks, setFeedbacks] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
   const { user } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useState(() => {
-    loadFeedbacks();
-  }, []);
+  const form = useForm<z.infer<typeof feedbackSchema>>({
+    resolver: zodResolver(feedbackSchema),
+    defaultValues: {
+      institution: "",
+      subject: "",
+      message: "",
+      rating: "5",
+    },
+  });
 
-  const loadFeedbacks = async () => {
-    try {
-      const allFeedbacks = await getFeedbacks();
-      setFeedbacks(allFeedbacks);
-    } catch (error) {
-      console.error("Error loading feedbacks:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (!feedbackText.trim()) {
-      toast.error("Lütfen geri bildiriminizi yazın.");
-      return;
-    }
-
+  const onSubmit = async (values: z.infer<typeof feedbackSchema>) => {
     setIsSubmitting(true);
     try {
-      if (!user?.id) {
-        toast.error("Kullanıcı oturumu bulunamadı.");
-        return;
-      }
+      await addFeedback({
+        ...values,
+        user_id: user?.id || 'anonymous',
+        rating: parseInt(values.rating)
+      });
       
-      await submitFeedback(user.id, feedbackText);
-      toast.success("Geri bildiriminiz başarıyla gönderildi!");
-      setFeedbackText("");
-      loadFeedbacks(); // Reload feedbacks after submitting
-    } catch (error) {
-      console.error("Feedback submission error:", error);
-      toast.error("Geri bildirim gönderilirken bir hata oluştu. Lütfen tekrar deneyin.");
+      toast({
+        title: "Geri Bildirim Gönderildi",
+        description: "Geri bildiriminiz başarıyla gönderildi.",
+      });
+      
+      form.reset();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Geri bildirim gönderilirken hata oluştu",
+        description: error.message,
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (loading) {
-    return <div>Yükleniyor...</div>;
-  }
-
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Geri Bildirim</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <MessageSquare className="w-5 h-5 text-primary" />
+          Geri Bildirim Gönder
+        </CardTitle>
         <CardDescription>
-          Antalya deneyiminizi iyileştirmemize yardımcı olun.
+          Hizmetler ve kurumlar hakkında geri bildirimlerinizi paylaşın
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <Textarea 
-          placeholder="Antalya hakkında ne düşünüyorsunuz?" 
-          value={feedbackText}
-          onChange={(e) => setFeedbackText(e.target.value)}
-        />
-      </CardContent>
-      <CardFooter>
-        <Button disabled={isSubmitting} onClick={handleSubmit}>
-          {isSubmitting ? "Gönderiliyor..." : "Geri Bildirimi Gönder"}
-        </Button>
-      </CardFooter>
-
       <CardContent>
-        <h4 className="text-sm font-bold mb-2">Gönderilen Geri Bildirimler</h4>
-        <div className="space-y-3">
-          {feedbacks.length > 0 ? (
-            feedbacks.map((feedback, index) => (
-              <div key={index} className="p-3 rounded-md bg-gray-50 border border-gray-200">
-                <p className="text-sm text-gray-700">{feedback.message}</p>
-                <div className="text-xs text-gray-500 mt-1">
-                  Gönderildi: {format(new Date(feedback.timestamp), 'dd MMM yyyy HH:mm', {locale: tr})}
-                </div>
-                {feedback.response && (
-                  <div className="mt-2 p-2 rounded-md bg-blue-50 border border-blue-200">
-                    <p className="text-xs font-medium text-blue-800">Yanıt:</p>
-                    <p className="text-sm text-gray-600">{feedback.response}</p>
-                    <div className="text-xs text-gray-500 mt-1">
-                      Yanıtlandı: {format(new Date(feedback.response_timestamp || ""), 'dd MMM yyyy HH:mm', {locale: tr})}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))
-          ) : (
-            <div className="text-gray-500">Henüz geri bildirim gönderilmedi.</div>
-          )}
-        </div>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="institution"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Kurum/Hizmet</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Örn: Belediye, Müze, Sahil" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="subject"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Konu</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Geri bildirim konusu" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="rating"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Değerlendirme</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Değerlendirme puanı seçin" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="1">1 - Çok Kötü</SelectItem>
+                      <SelectItem value="2">2 - Kötü</SelectItem>
+                      <SelectItem value="3">3 - Orta</SelectItem>
+                      <SelectItem value="4">4 - İyi</SelectItem>
+                      <SelectItem value="5">5 - Çok İyi</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="message"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Mesaj</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Lütfen geri bildiriminizi detaylı bir şekilde yazın"
+                      className="min-h-[150px]"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? "Gönderiliyor..." : "Geri Bildirim Gönder"}
+            </Button>
+          </form>
+        </Form>
       </CardContent>
     </Card>
   );

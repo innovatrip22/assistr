@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { 
   Tabs, 
@@ -6,17 +7,26 @@ import {
   TabsTrigger 
 } from "@/components/ui/tabs";
 import { FraudReportForm, EmergencyReportForm, PriceReportForm } from "@/components/tourist/ReportForms";
-import { submitReports, getReports } from "@/services";
+import { addReport } from "@/services";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 const ReportAssistant = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (type: string, data: any) => {
     setIsSubmitting(true);
     try {
-      await submitReports(type, data);
+      const reportData = {
+        ...data,
+        type,
+        user_id: user?.id || 'anonymous'
+      };
+      
+      await addReport(reportData);
+      
       toast({
         title: "Rapor Gönderildi",
         description: "Raporunuz başarıyla gönderildi.",

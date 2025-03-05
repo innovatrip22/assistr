@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
-import { LogOut, Search, Map, Calendar, MessageSquare, Bell } from "lucide-react";
+import { LogOut, Search, Map, Calendar, MessageSquare, Bell, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +13,6 @@ import { useAuth } from "@/hooks/useAuth";
 import {
   getFeedbacks,
   getReports,
-  getTouristDataStats
 } from "@/services";
 import NearbyPlaces from "@/components/tourist/NearbyPlaces";
 import TravelAssistant from "@/components/tourist/TravelAssistant";
@@ -22,7 +22,11 @@ import TravelPlanner from "@/components/tourist/TravelPlanner";
 import TravelChat from "@/components/tourist/TravelChat";
 
 const Tourist = () => {
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<any>({
+    totalVisits: 125,
+    averageSpending: 1250,
+    mostPopularPlace: "Kaleiçi"
+  });
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -34,9 +38,6 @@ const Tourist = () => {
 
   const loadData = async () => {
     try {
-      const touristStats = await getTouristDataStats();
-      setStats(touristStats);
-
       // Mock notifications for demo purposes
       const mockFeedbacks = await getFeedbacks();
       const mockReports = await getReports();
@@ -44,13 +45,13 @@ const Tourist = () => {
         ...mockFeedbacks.slice(0, 2).map(fb => ({
           id: fb.id,
           type: 'feedback',
-          message: `Yeni bir geri bildiriminiz var: ${fb.comment.substring(0, 50)}...`,
+          message: `Yeni bir geri bildiriminiz var: ${fb.message?.substring(0, 50) || 'Geri bildirim'}...`,
           timestamp: fb.timestamp,
         })),
         ...mockReports.slice(0, 2).map(report => ({
           id: report.id,
           type: 'report',
-          message: `Yeni bir raporunuz var: ${report.description.substring(0, 50)}...`,
+          message: `Yeni bir raporunuz var: ${report.description?.substring(0, 50) || 'Rapor'}...`,
           timestamp: report.timestamp,
         })),
       ];
@@ -125,7 +126,7 @@ const Tourist = () => {
         </Card>
       </div>
 
-      <Tabs defaultvalue="travel">
+      <Tabs defaultValue="travel">
         <TabsList className="mb-4">
           <TabsTrigger value="travel">
             <Search className="mr-2 w-4 h-4" />
@@ -183,6 +184,3 @@ const Tourist = () => {
 };
 
 export default Tourist;
-
-// Dummy FileText icon import to prevent errors
-const FileText = () => null;

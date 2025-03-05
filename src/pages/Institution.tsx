@@ -2,13 +2,14 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { 
   getFeedbacks, 
   getReports,
-  updateFeedbackResponse,
-  updateReportResponse 
+  addFeedbackResponse,
+  addReportResponse 
 } from "@/services";
 import MapSection from "@/components/institution/MapSection";
 import FeedbackList from "@/components/institution/FeedbackList";

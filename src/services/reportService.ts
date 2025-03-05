@@ -150,3 +150,6 @@ export const getReportsForBusiness = async (businessName: string) => {
   if (error) throw error;
   return data || [];
 };
+
+// For compatibility with old code
+export const submitReports = addReport;
