@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { User } from "@supabase/supabase-js";
 
 // Feedback methods
 export const addFeedback = async (feedback: {
@@ -31,7 +32,7 @@ export const getFeedbacks = async (userId?: string) => {
   
   const { data, error } = await query;
   if (error) throw error;
-  return data;
+  return data || [];
 };
 
 export const updateFeedbackStatus = async (id: string, status: 'pending' | 'processed') => {
@@ -62,7 +63,7 @@ export const addFeedbackResponse = async (id: string, response: string) => {
   
   // Bildirim oluştur
   const feedback = data;
-  if (feedback.user_id) {
+  if (feedback?.user_id) {
     await supabase
       .from('notifications')
       .insert({
@@ -108,7 +109,7 @@ export const getReports = async (userId?: string) => {
   
   const { data, error } = await query;
   if (error) throw error;
-  return data;
+  return data || [];
 };
 
 export const updateReportStatus = async (id: string, status: 'pending' | 'processed') => {
@@ -139,7 +140,7 @@ export const addReportResponse = async (id: string, response: string) => {
   
   // Bildirim oluştur
   const report = data;
-  if (report.user_id) {
+  if (report?.user_id) {
     await supabase
       .from('notifications')
       .insert({
@@ -173,14 +174,14 @@ export const getUserNotifications = async (userId: string) => {
   const { data: feedbackNotifications, error: feedbackError } = await supabase
     .from('feedbacks')
     .select('*')
-    .in('id', feedbackIds);
+    .in('id', feedbackIds.length ? feedbackIds : ['00000000-0000-0000-0000-000000000000']);
     
   if (feedbackError) throw feedbackError;
   
   const { data: reportNotifications, error: reportError } = await supabase
     .from('reports')
     .select('*')
-    .in('id', reportIds);
+    .in('id', reportIds.length ? reportIds : ['00000000-0000-0000-0000-000000000000']);
     
   if (reportError) throw reportError;
   
@@ -198,7 +199,7 @@ export const getBusinesses = async () => {
     .select('*');
     
   if (error) throw error;
-  return data;
+  return data || [];
 };
 
 export const getBusinessById = async (id: string) => {
@@ -248,7 +249,7 @@ export const getReportsForBusiness = async (businessName: string) => {
     .eq('business_name', businessName);
     
   if (error) throw error;
-  return data;
+  return data || [];
 };
 
 // Chat methods
@@ -286,5 +287,5 @@ export const getChatHistory = async (userId: string) => {
     .order('created_at', { ascending: false });
     
   if (error) throw error;
-  return data;
+  return data || [];
 };

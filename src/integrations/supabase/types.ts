@@ -9,7 +9,192 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      businesses: {
+        Row: {
+          address: string
+          created_at: string | null
+          id: string
+          name: string
+          status: string | null
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          address: string
+          created_at?: string | null
+          id?: string
+          name: string
+          status?: string | null
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          address?: string
+          created_at?: string | null
+          id?: string
+          name?: string
+          status?: string | null
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      chat_history: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string
+          response: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message: string
+          response: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string
+          response?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      feedbacks: {
+        Row: {
+          id: string
+          institution: string | null
+          message: string
+          response: string | null
+          response_timestamp: string | null
+          status: string | null
+          subject: string | null
+          timestamp: string | null
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          institution?: string | null
+          message: string
+          response?: string | null
+          response_timestamp?: string | null
+          status?: string | null
+          subject?: string | null
+          timestamp?: string | null
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          institution?: string | null
+          message?: string
+          response?: string | null
+          response_timestamp?: string | null
+          status?: string | null
+          subject?: string | null
+          timestamp?: string | null
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          related_id: string
+          related_to: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          related_id: string
+          related_to: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          related_id?: string
+          related_to?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          id: string
+          user_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          id: string
+          user_type: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          user_type?: string
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          business_name: string | null
+          description: string
+          id: string
+          location: string | null
+          normal_price: number | null
+          paid_price: number | null
+          product_name: string | null
+          response: string | null
+          response_timestamp: string | null
+          status: string | null
+          timestamp: string | null
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          business_name?: string | null
+          description: string
+          id?: string
+          location?: string | null
+          normal_price?: number | null
+          paid_price?: number | null
+          product_name?: string | null
+          response?: string | null
+          response_timestamp?: string | null
+          status?: string | null
+          timestamp?: string | null
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          business_name?: string | null
+          description?: string
+          id?: string
+          location?: string | null
+          normal_price?: number | null
+          paid_price?: number | null
+          product_name?: string | null
+          response?: string | null
+          response_timestamp?: string | null
+          status?: string | null
+          timestamp?: string | null
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

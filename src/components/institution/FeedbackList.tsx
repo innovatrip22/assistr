@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MessageSquare, Calendar, CheckCircle, Clock, ReplyAll } from "lucide-react";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
@@ -30,12 +30,36 @@ interface FeedbackListProps {
 }
 
 const FeedbackList = ({ onOpenResponseDialog, loadData }: FeedbackListProps) => {
-  const feedbacks = getFeedbacks();
+  const [feedbacks, setFeedbacks] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleUpdateFeedbackStatus = (id: string, status: 'pending' | 'processed') => {
-    updateFeedbackStatus(id, status);
-    loadData();
+  useEffect(() => {
+    loadFeedbacks();
+  }, []);
+
+  const loadFeedbacks = async () => {
+    try {
+      const data = await getFeedbacks();
+      setFeedbacks(data);
+    } catch (error) {
+      console.error("Error loading feedbacks:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleUpdateFeedbackStatus = async (id: string, status: 'pending' | 'processed') => {
+    try {
+      await updateFeedbackStatus(id, status);
+      loadData();
+    } catch (error) {
+      console.error("Error updating status:", error);
+    }
+  };
+
+  if (loading) {
+    return <div>Yükleniyor...</div>;
+  }
 
   return (
     <Card className="col-span-1 lg:col-span-2">
@@ -82,7 +106,7 @@ const FeedbackList = ({ onOpenResponseDialog, loadData }: FeedbackListProps) => 
                             <p className="text-sm font-medium text-blue-800">Yanıtınız:</p>
                             <p className="text-sm text-gray-600">{feedback.response}</p>
                             <p className="text-xs text-gray-500 mt-1">
-                              {format(new Date(feedback.responseTimestamp || ""), 'dd MMM yyyy HH:mm', {locale: tr})}
+                              {format(new Date(feedback.response_timestamp || ""), 'dd MMM yyyy HH:mm', {locale: tr})}
                             </p>
                           </div>
                         )}
@@ -155,7 +179,7 @@ const FeedbackList = ({ onOpenResponseDialog, loadData }: FeedbackListProps) => 
                             <p className="text-sm font-medium text-blue-800">Yanıtınız:</p>
                             <p className="text-sm text-gray-600">{feedback.response}</p>
                             <p className="text-xs text-gray-500 mt-1">
-                              {format(new Date(feedback.responseTimestamp || ""), 'dd MMM yyyy HH:mm', {locale: tr})}
+                              {format(new Date(feedback.response_timestamp || ""), 'dd MMM yyyy HH:mm', {locale: tr})}
                             </p>
                           </div>
                         )}

@@ -27,39 +27,46 @@ const FeedbackAssistant = () => {
     complaint: ""
   });
   const [myFeedbacks, setMyFeedbacks] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const { user, userType } = useAuth();
 
   useEffect(() => {
     if (user) {
       loadFeedbacks();
       loadChatHistory();
+    } else {
+      setLoading(false);
     }
   }, [user]);
 
   const loadFeedbacks = async () => {
     try {
-      const feedbacks = await getFeedbacks(user.id);
+      const feedbacks = await getFeedbacks(user?.id);
       setMyFeedbacks(feedbacks);
     } catch (error) {
       console.error("Error loading feedbacks:", error);
       toast.error("Geri bildirimler yüklenirken hata oluştu");
+    } finally {
+      setLoading(false);
     }
   };
 
   const loadChatHistory = async () => {
     try {
-      const history = await getChatHistory(user.id);
-      
-      if (history.length > 0) {
-        const formattedHistory = history.flatMap(entry => [
-          { role: "user", content: entry.message },
-          { role: "assistant", content: entry.response }
-        ]).reverse();
+      if (user?.id) {
+        const history = await getChatHistory(user.id);
         
-        setChatHistory([
-          { role: 'assistant', content: 'Merhaba! Size nasıl yardımcı olabilirim? Görüş veya şikayetlerinizi iletebilirsiniz.' },
-          ...formattedHistory
-        ]);
+        if (history.length > 0) {
+          const formattedHistory = history.flatMap(entry => [
+            { role: "user", content: entry.message },
+            { role: "assistant", content: entry.response }
+          ]).reverse();
+          
+          setChatHistory([
+            { role: 'assistant', content: 'Merhaba! Size nasıl yardımcı olabilirim? Görüş veya şikayetlerinizi iletebilirsiniz.' },
+            ...formattedHistory
+          ]);
+        }
       }
     } catch (error) {
       console.error("Error loading chat history:", error);
@@ -104,6 +111,11 @@ const FeedbackAssistant = () => {
       return;
     }
     
+    if (!user) {
+      toast.error("Lütfen önce giriş yapın");
+      return;
+    }
+    
     try {
       // Gerçek veritabanına geri bildirim kaydet
       await addFeedback({
@@ -128,6 +140,10 @@ const FeedbackAssistant = () => {
       toast.error("Şikayet gönderilirken bir hata oluştu. Lütfen tekrar deneyin.");
     }
   };
+
+  if (loading && user) {
+    return <div>Yükleniyor...</div>;
+  }
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-lg">

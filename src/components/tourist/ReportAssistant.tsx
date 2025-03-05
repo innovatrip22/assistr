@@ -7,6 +7,7 @@ import { AlertTriangle, Ban, PhoneCall, Bell } from "lucide-react";
 import { toast } from "sonner";
 import { addReport, getReports } from "@/services/dataService";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useAuth } from "@/hooks/useAuth";
 
 const ReportAssistant = () => {
   const [priceReport, setPriceReport] = useState({
@@ -25,80 +26,127 @@ const ReportAssistant = () => {
   });
   
   const [myReports, setMyReports] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
   
   useEffect(() => {
-    // Load past reports from database for a simulated "my reports" feature
-    const allReports = getReports();
-    setMyReports(allReports.slice(0, 3)); // For demo we'll just take first 3
-  }, []);
+    if (user) {
+      loadReports();
+    }
+  }, [user]);
+  
+  const loadReports = async () => {
+    try {
+      if (user) {
+        const reports = await getReports(user.id);
+        setMyReports(reports.slice(0, 3)); // For demo we'll just take first 3
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error("Error loading reports:", error);
+      setLoading(false);
+    }
+  };
 
-  const handlePriceReport = () => {
+  const handlePriceReport = async () => {
     if (!priceReport.businessName || !priceReport.productName || !priceReport.paidPrice || !priceReport.description) {
       toast.error("Lütfen gerekli alanları doldurun");
       return;
     }
     
-    // Save price report to our database
-    const report = addReport({
-      type: 'price',
-      businessName: priceReport.businessName,
-      productName: priceReport.productName,
-      paidPrice: Number(priceReport.paidPrice),
-      normalPrice: Number(priceReport.normalPrice),
-      location: priceReport.location,
-      description: priceReport.description
-    });
-    
-    // Update local reports list
-    setMyReports(prev => [report, ...prev]);
-    
-    toast.success("Fahiş fiyat bildiriminiz alındı. İlgili birimlere iletilmiştir.");
-    setPriceReport({
-      businessName: "",
-      productName: "",
-      paidPrice: "",
-      normalPrice: "",
-      location: "",
-      description: ""
-    });
+    try {
+      if (!user) {
+        toast.error("Lütfen önce giriş yapın");
+        return;
+      }
+      
+      // Save price report to our database
+      const report = await addReport({
+        type: 'price',
+        business_name: priceReport.businessName,
+        product_name: priceReport.productName,
+        paid_price: Number(priceReport.paidPrice),
+        normal_price: Number(priceReport.normalPrice),
+        location: priceReport.location,
+        description: priceReport.description,
+        user_id: user.id
+      });
+      
+      // Update local reports list
+      setMyReports(prev => [report, ...prev]);
+      
+      toast.success("Fahiş fiyat bildiriminiz alındı. İlgili birimlere iletilmiştir.");
+      setPriceReport({
+        businessName: "",
+        productName: "",
+        paidPrice: "",
+        normalPrice: "",
+        location: "",
+        description: ""
+      });
+    } catch (error) {
+      console.error("Error submitting report:", error);
+      toast.error("Rapor gönderilirken bir hata oluştu");
+    }
   };
 
-  const handleFraudReport = () => {
+  const handleFraudReport = async () => {
     if (!fraudReport.location || !fraudReport.description) {
       toast.error("Lütfen gerekli alanları doldurun");
       return;
     }
     
-    // Save fraud report to our database
-    const report = addReport({
-      type: 'fraud',
-      location: fraudReport.location,
-      description: fraudReport.description
-    });
-    
-    // Update local reports list
-    setMyReports(prev => [report, ...prev]);
-    
-    toast.success("Dolandırıcılık bildiriminiz alındı. İlgili birimlere iletilmiştir.");
-    setFraudReport({
-      location: "",
-      datetime: "",
-      description: ""
-    });
+    try {
+      if (!user) {
+        toast.error("Lütfen önce giriş yapın");
+        return;
+      }
+      
+      // Save fraud report to our database
+      const report = await addReport({
+        type: 'fraud',
+        location: fraudReport.location,
+        description: fraudReport.description,
+        user_id: user.id
+      });
+      
+      // Update local reports list
+      setMyReports(prev => [report, ...prev]);
+      
+      toast.success("Dolandırıcılık bildiriminiz alındı. İlgili birimlere iletilmiştir.");
+      setFraudReport({
+        location: "",
+        datetime: "",
+        description: ""
+      });
+    } catch (error) {
+      console.error("Error submitting report:", error);
+      toast.error("Rapor gönderilirken bir hata oluştu");
+    }
   };
 
-  const handleEmergencyCall = (number: string) => {
-    // Log emergency call
-    const report = addReport({
-      type: 'emergency',
-      description: `Acil durum numarası arandı: ${number}`
-    });
-    
-    // Update local reports list
-    setMyReports(prev => [report, ...prev]);
-    
-    // Open phone dialer
-    window.location.href = `tel:${number}`;
+  const handleEmergencyCall = async (number: string) => {
+    try {
+      if (!user) {
+        toast.error("Lütfen önce giriş yapın");
+        return;
+      }
+      
+      // Log emergency call
+      const report = await addReport({
+        type: 'emergency',
+        description: `Acil durum numarası arandı: ${number}`,
+        user_id: user.id
+      });
+      
+      // Update local reports list
+      setMyReports(prev => [report, ...prev]);
+      
+      // Open phone dialer
+      window.location.href = `tel:${number}`;
+    } catch (error) {
+      console.error("Error logging emergency call:", error);
+    }
   };
 
   const emergencyNumbers = [
@@ -107,6 +155,10 @@ const ReportAssistant = () => {
     { name: "İtfaiye", number: "110" },
     { name: "Jandarma", number: "156" },
   ];
+
+  if (loading && user) {
+    return <div>Yükleniyor...</div>;
+  }
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-lg">
@@ -259,9 +311,9 @@ const ReportAssistant = () => {
                     
                     {report.type === 'price' && (
                       <div className="mb-2 text-sm">
-                        <p><span className="font-medium">İşletme:</span> {report.businessName}</p>
-                        <p><span className="font-medium">Ürün:</span> {report.productName}</p>
-                        <p><span className="font-medium">Fiyat:</span> {report.paidPrice} TL {report.normalPrice ? `(Normal: ${report.normalPrice} TL)` : ''}</p>
+                        <p><span className="font-medium">İşletme:</span> {report.business_name}</p>
+                        <p><span className="font-medium">Ürün:</span> {report.product_name}</p>
+                        <p><span className="font-medium">Fiyat:</span> {report.paid_price} TL {report.normal_price ? `(Normal: ${report.normal_price} TL)` : ''}</p>
                       </div>
                     )}
                     

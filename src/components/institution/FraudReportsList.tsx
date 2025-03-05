@@ -1,4 +1,5 @@
 
+import { useState, useEffect } from "react";
 import { FileWarning, Calendar, CheckCircle, Clock, ReplyAll } from "lucide-react";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
@@ -23,12 +24,36 @@ interface FraudReportsListProps {
 }
 
 const FraudReportsList = ({ onOpenResponseDialog, loadData }: FraudReportsListProps) => {
-  const reports = getReports().filter(report => report.type === 'fraud');
+  const [reports, setReports] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleUpdateReportStatus = (id: string, status: 'pending' | 'processed') => {
-    updateReportStatus(id, status);
-    loadData();
+  useEffect(() => {
+    loadReports();
+  }, []);
+
+  const loadReports = async () => {
+    try {
+      const allReports = await getReports();
+      setReports(allReports.filter(report => report.type === 'fraud'));
+    } catch (error) {
+      console.error("Error loading reports:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleUpdateReportStatus = async (id: string, status: 'pending' | 'processed') => {
+    try {
+      await updateReportStatus(id, status);
+      loadData();
+    } catch (error) {
+      console.error("Error updating status:", error);
+    }
+  };
+
+  if (loading) {
+    return <div>Yükleniyor...</div>;
+  }
 
   return (
     <Card>
@@ -66,7 +91,7 @@ const FraudReportsList = ({ onOpenResponseDialog, loadData }: FraudReportsListPr
                       <p className="text-sm font-medium text-blue-800">Yanıtınız:</p>
                       <p className="text-sm text-gray-600">{report.response}</p>
                       <p className="text-xs text-gray-500 mt-1">
-                        {format(new Date(report.responseTimestamp || ""), 'dd MMM yyyy HH:mm', {locale: tr})}
+                        {format(new Date(report.response_timestamp || ""), 'dd MMM yyyy HH:mm', {locale: tr})}
                       </p>
                     </div>
                   )}

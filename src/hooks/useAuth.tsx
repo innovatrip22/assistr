@@ -31,17 +31,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // İlk yükleme sırasında oturum kontrolü
     const checkUser = async () => {
       try {
-        const { data } = await supabase.auth.getSession();
+        const { data: sessionData } = await supabase.auth.getSession();
         
-        if (data.session) {
-          setUser(data.session.user);
+        if (sessionData.session) {
+          setUser(sessionData.session.user);
           
           // Kullanıcı tipini öğren
           const { data: profileData } = await supabase
             .from('profiles')
             .select('user_type')
-            .eq('id', data.session.user.id)
-            .single();
+            .eq('id', sessionData.session.user.id)
+            .maybeSingle();
             
           if (profileData) {
             setUserType(profileData.user_type as UserType);
@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             .from('profiles')
             .select('user_type')
             .eq('id', session.user.id)
-            .single();
+            .maybeSingle();
             
           if (profileData) {
             setUserType(profileData.user_type as UserType);
