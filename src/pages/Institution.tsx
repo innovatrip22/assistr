@@ -1,15 +1,20 @@
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/hooks/useAuth";
 import { 
   getFeedbacks, 
-  getReports
-} from "@/services/dataService";
+  getReports,
+  updateFeedbackResponse,
+  updateReportResponse 
+} from "@/services";
 import MapSection from "@/components/institution/MapSection";
-import PriceReportsList from "@/components/institution/PriceReportsList";
-import FraudReportsList from "@/components/institution/FraudReportsList";
-import EmergencyReportsList from "@/components/institution/EmergencyReportsList";
 import FeedbackList from "@/components/institution/FeedbackList";
+import EmergencyReportsList from "@/components/institution/EmergencyReportsList";
+import FraudReportsList from "@/components/institution/FraudReportsList";
+import PriceReportsList from "@/components/institution/PriceReportsList";
 import ResponseDialog from "@/components/institution/ResponseDialog";
 
 const Institution = () => {
