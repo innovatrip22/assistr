@@ -5,8 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageSquare, Send, Loader2, Bell } from "lucide-react";
 import { toast } from "sonner";
-import { addFeedback, getFeedbacks } from "@/services/dataService";
+import { 
+  addFeedback, 
+  getFeedbacks,
+  sendMessageToAI,
+  saveChatHistory,
+  getChatHistory
+} from "@/services/dataService";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useAuth } from "@/hooks/useAuth";
 
 const FeedbackAssistant = () => {
   const [message, setMessage] = useState("");
@@ -20,52 +27,59 @@ const FeedbackAssistant = () => {
     complaint: ""
   });
   const [myFeedbacks, setMyFeedbacks] = useState<any[]>([]);
+  const { user, userType } = useAuth();
 
   useEffect(() => {
-    // Load past feedbacks from database for a simulated "my feedbacks" feature
-    const allFeedbacks = getFeedbacks();
-    setMyFeedbacks(allFeedbacks.slice(0, 3)); // For demo we'll just take first 3
-  }, []);
+    if (user) {
+      loadFeedbacks();
+      loadChatHistory();
+    }
+  }, [user]);
+
+  const loadFeedbacks = async () => {
+    try {
+      const feedbacks = await getFeedbacks(user.id);
+      setMyFeedbacks(feedbacks);
+    } catch (error) {
+      console.error("Error loading feedbacks:", error);
+      toast.error("Geri bildirimler yüklenirken hata oluştu");
+    }
+  };
+
+  const loadChatHistory = async () => {
+    try {
+      const history = await getChatHistory(user.id);
+      
+      if (history.length > 0) {
+        const formattedHistory = history.flatMap(entry => [
+          { role: "user", content: entry.message },
+          { role: "assistant", content: entry.response }
+        ]).reverse();
+        
+        setChatHistory([
+          { role: 'assistant', content: 'Merhaba! Size nasıl yardımcı olabilirim? Görüş veya şikayetlerinizi iletebilirsiniz.' },
+          ...formattedHistory
+        ]);
+      }
+    } catch (error) {
+      console.error("Error loading chat history:", error);
+    }
+  };
 
   const generateResponse = async (userMessage: string) => {
     setIsTyping(true);
     
     try {
-      // Simulate AI response generation with a delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // OpenAI API üzerinden gerçek bir yanıt al
+      const aiResponse = await sendMessageToAI(userMessage, userType || 'tourist');
       
-      const keywords = ['şikayet', 'sorun', 'memnun değilim', 'kötü', 'yardım', 'bilgi', 'teşekkür', 'öneri'];
-      const isKeywordPresent = keywords.some(keyword => userMessage.toLowerCase().includes(keyword));
-      
-      let aiResponse;
-      
-      if (isKeywordPresent) {
-        const responses = [
-          "Şikayetinizi aldım ve ilgili birimlere ileteceğim. En kısa sürede size dönüş yapılacaktır.",
-          "Görüşleriniz bizim için çok değerli. İlgili birimlerle paylaşacağım ve gerekli işlemler yapılacaktır.",
-          "Sorunuzu ilgili uzmanlara ilettim. Size en kısa sürede dönüş yapılacaktır.",
-          "Antalya Belediyesi olarak geri bildiriminiz için teşekkür ederiz. Deneyiminizi geliştirmek için çalışacağız.",
-          "Yaşadığınız sorun için özür dileriz. Konuyu ilgili birimlerle paylaşacağım."
-        ];
-        
-        aiResponse = responses[Math.floor(Math.random() * responses.length)];
-      } else {
-        aiResponse = "Antalya Belediyesi olarak size nasıl yardımcı olabilirim? Lütfen görüş veya şikayetlerinizi detaylı bir şekilde anlatın.";
-      }
-      
-      // Save chat message to our database
-      if (userMessage.trim()) {
-        const feedback = addFeedback({
-          type: 'chat',
-          message: userMessage
-        });
-        
-        // Update local feedbacks list
-        setMyFeedbacks(prev => [feedback, ...prev]);
+      // Chat geçmişini kaydet
+      if (user) {
+        await saveChatHistory(user.id, userMessage, aiResponse);
       }
       
       setChatHistory(prev => [...prev, {role: 'assistant', content: aiResponse}]);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating response:", error);
       toast.error("Yanıt oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.");
       setChatHistory(prev => [...prev, {role: 'assistant', content: "Üzgünüm, şu anda yanıt veremiyorum. Lütfen daha sonra tekrar deneyin."}]);
@@ -84,29 +98,35 @@ const FeedbackAssistant = () => {
     generateResponse(userMessage.content);
   };
 
-  const handleSubmitComplaint = () => {
+  const handleSubmitComplaint = async () => {
     if (!formData.subject.trim() || !formData.complaint.trim()) {
       toast.error("Lütfen tüm alanları doldurun");
       return;
     }
     
-    // Save complaint to our database
-    const feedback = addFeedback({
-      type: 'complaint',
-      message: formData.complaint,
-      institution: formData.institution,
-      subject: formData.subject
-    });
-    
-    // Update local feedbacks list
-    setMyFeedbacks(prev => [feedback, ...prev]);
-    
-    toast.success("Şikayetiniz alındı. En kısa sürede size dönüş yapılacaktır.");
-    setFormData({
-      institution: "Turizm Ofisi",
-      subject: "",
-      complaint: ""
-    });
+    try {
+      // Gerçek veritabanına geri bildirim kaydet
+      await addFeedback({
+        type: 'complaint',
+        message: formData.complaint,
+        institution: formData.institution,
+        subject: formData.subject,
+        user_id: user.id
+      });
+      
+      // Geri bildirimleri yeniden yükle
+      await loadFeedbacks();
+      
+      toast.success("Şikayetiniz alındı. En kısa sürede size dönüş yapılacaktır.");
+      setFormData({
+        institution: "Turizm Ofisi",
+        subject: "",
+        complaint: ""
+      });
+    } catch (error) {
+      console.error("Error submitting complaint:", error);
+      toast.error("Şikayet gönderilirken bir hata oluştu. Lütfen tekrar deneyin.");
+    }
   };
 
   return (

@@ -1,263 +1,290 @@
 
-// Simple in-memory database to store form submissions
-type Feedback = {
-  id: string;
+import { supabase } from "@/integrations/supabase/client";
+
+// Feedback methods
+export const addFeedback = async (feedback: {
   type: 'chat' | 'complaint';
-  timestamp: string;
   message: string;
   institution?: string;
   subject?: string;
-  status: 'pending' | 'processed';
-  response?: string;
-  responseTimestamp?: string;
+  user_id: string;
+}) => {
+  const { data, error } = await supabase
+    .from('feedbacks')
+    .insert([feedback])
+    .select()
+    .single();
+    
+  if (error) throw error;
+  return data;
 };
 
-type Report = {
-  id: string;
-  type: 'price' | 'fraud' | 'emergency';
-  timestamp: string;
-  location?: string;
-  businessName?: string;
-  productName?: string;
-  paidPrice?: number;
-  normalPrice?: number;
-  description: string;
-  status: 'pending' | 'processed';
-  response?: string;
-  responseTimestamp?: string;
-};
-
-// In-memory storage (simulates a database)
-const feedbacks: Feedback[] = [
-  {
-    id: "f1",
-    type: "complaint",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
-    message: "Otelde sunulan hizmet ile web sitesinde belirtilen hizmetler farklıydı.",
-    institution: "Antalya Turizm Müdürlüğü",
-    subject: "Otel Hizmet Şikayeti",
-    status: "pending"
-  },
-  {
-    id: "f2",
-    type: "chat",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
-    message: "Antalya'da güvenle ziyaret edilebilecek plajlar hangileridir?",
-    status: "pending"
-  },
-  {
-    id: "f3",
-    type: "complaint",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString(),
-    message: "Tur rehberi bizi fazladan ücretli aktivitelere yönlendirmeye çalıştı.",
-    institution: "Antalya Turizm Danışma",
-    subject: "Tur Rehberi Şikayeti",
-    status: "processed",
-    response: "Sayın turistimiz, şikayetiniz için teşekkür ederiz. İlgili tur rehberi hakkında inceleme başlattık. Sonucu size bildireceğiz.",
-    responseTimestamp: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString()
+export const getFeedbacks = async (userId?: string) => {
+  let query = supabase
+    .from('feedbacks')
+    .select('*')
+    .order('timestamp', { ascending: false });
+    
+  if (userId) {
+    query = query.eq('user_id', userId);
   }
-];
+  
+  const { data, error } = await query;
+  if (error) throw error;
+  return data;
+};
 
-const reports: Report[] = [
-  {
-    id: "r1",
-    type: "price",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-    location: "Kaleiçi, Antalya",
-    businessName: "Manzara Restoran",
-    productName: "Deniz Mahsülleri Tabağı",
-    paidPrice: 950,
-    normalPrice: 450,
-    description: "Menüde 450 TL olarak gördüğüm ürün hesap geldiğinde 950 TL olarak fatura edildi.",
-    status: "pending"
-  },
-  {
-    id: "r2",
-    type: "fraud",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString(),
-    location: "Lara Plajı, Antalya",
-    description: "Sahilde taksi olduğunu söyleyen kişi çok yüksek ücret aldı ve resmi taksi olmadığı anlaşıldı.",
-    status: "pending"
-  },
-  {
-    id: "r3",
-    type: "emergency",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 1).toISOString(),
-    location: "Konyaaltı Sahili, Antalya",
-    description: "Denizde boğulma tehlikesi geçiren bir turist var. Acil yardım gerekiyor!",
-    status: "processed",
-    response: "Konyaaltı sahiline cankurtaran ekibi gönderilmiştir. Durum kontrol altına alınmıştır.",
-    responseTimestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString()
+export const updateFeedbackStatus = async (id: string, status: 'pending' | 'processed') => {
+  const { data, error } = await supabase
+    .from('feedbacks')
+    .update({ status })
+    .eq('id', id)
+    .select()
+    .single();
+    
+  if (error) throw error;
+  return data;
+};
+
+export const addFeedbackResponse = async (id: string, response: string) => {
+  const { data, error } = await supabase
+    .from('feedbacks')
+    .update({
+      response,
+      response_timestamp: new Date().toISOString(),
+      status: 'processed'
+    })
+    .eq('id', id)
+    .select()
+    .single();
+    
+  if (error) throw error;
+  
+  // Bildirim oluştur
+  const feedback = data;
+  if (feedback.user_id) {
+    await supabase
+      .from('notifications')
+      .insert({
+        user_id: feedback.user_id,
+        related_to: 'feedback',
+        related_id: id
+      });
   }
-];
-
-// Generate unique ID
-const generateId = () => {
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-};
-
-// Feedback methods
-export const addFeedback = (feedback: Omit<Feedback, 'id' | 'timestamp' | 'status'>) => {
-  const newFeedback: Feedback = {
-    ...feedback,
-    id: generateId(),
-    timestamp: new Date().toISOString(),
-    status: 'pending'
-  };
-  feedbacks.push(newFeedback);
-  return newFeedback;
-};
-
-export const getFeedbacks = () => {
-  return [...feedbacks].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-};
-
-export const updateFeedbackStatus = (id: string, status: 'pending' | 'processed') => {
-  const feedback = feedbacks.find(f => f.id === id);
-  if (feedback) {
-    feedback.status = status;
-    return feedback;
-  }
-  return null;
-};
-
-// New method to add response to feedback
-export const addFeedbackResponse = (id: string, response: string) => {
-  const feedback = feedbacks.find(f => f.id === id);
-  if (feedback) {
-    feedback.response = response;
-    feedback.responseTimestamp = new Date().toISOString();
-    feedback.status = 'processed';
-    return feedback;
-  }
-  return null;
+  
+  return data;
 };
 
 // Report methods
-export const addReport = (report: Omit<Report, 'id' | 'timestamp' | 'status'>) => {
-  const newReport: Report = {
-    ...report,
-    id: generateId(),
-    timestamp: new Date().toISOString(),
-    status: 'pending'
-  };
-  reports.push(newReport);
-  return newReport;
+export const addReport = async (report: {
+  type: 'price' | 'fraud' | 'emergency';
+  location?: string;
+  business_name?: string;
+  product_name?: string;
+  paid_price?: number;
+  normal_price?: number;
+  description: string;
+  user_id: string;
+}) => {
+  const { data, error } = await supabase
+    .from('reports')
+    .insert([report])
+    .select()
+    .single();
+    
+  if (error) throw error;
+  return data;
 };
 
-export const getReports = () => {
-  return [...reports].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-};
-
-export const updateReportStatus = (id: string, status: 'pending' | 'processed') => {
-  const report = reports.find(r => r.id === id);
-  if (report) {
-    report.status = status;
-    return report;
+export const getReports = async (userId?: string) => {
+  let query = supabase
+    .from('reports')
+    .select('*')
+    .order('timestamp', { ascending: false });
+    
+  if (userId) {
+    query = query.eq('user_id', userId);
   }
-  return null;
+  
+  const { data, error } = await query;
+  if (error) throw error;
+  return data;
 };
 
-// New method to add response to report
-export const addReportResponse = (id: string, response: string) => {
-  const report = reports.find(r => r.id === id);
-  if (report) {
-    report.response = response;
-    report.responseTimestamp = new Date().toISOString();
-    report.status = 'processed';
-    return report;
+export const updateReportStatus = async (id: string, status: 'pending' | 'processed') => {
+  const { data, error } = await supabase
+    .from('reports')
+    .update({ status })
+    .eq('id', id)
+    .select()
+    .single();
+    
+  if (error) throw error;
+  return data;
+};
+
+export const addReportResponse = async (id: string, response: string) => {
+  const { data, error } = await supabase
+    .from('reports')
+    .update({
+      response,
+      response_timestamp: new Date().toISOString(),
+      status: 'processed'
+    })
+    .eq('id', id)
+    .select()
+    .single();
+    
+  if (error) throw error;
+  
+  // Bildirim oluştur
+  const report = data;
+  if (report.user_id) {
+    await supabase
+      .from('notifications')
+      .insert({
+        user_id: report.user_id,
+        related_to: 'report',
+        related_id: id
+      });
   }
-  return null;
+  
+  return data;
 };
 
 // Helper method to check if user has notifications
-export const getUserNotifications = () => {
-  // Check for any processed feedbacks and reports with responses
-  const feedbackNotifications = feedbacks.filter(f => f.status === 'processed' && f.response);
-  const reportNotifications = reports.filter(r => r.status === 'processed' && r.response);
+export const getUserNotifications = async (userId: string) => {
+  const { data: notifications, error } = await supabase
+    .from('notifications')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('is_read', false);
+    
+  if (error) throw error;
+  
+  const feedbackIds = notifications
+    ?.filter(n => n.related_to === 'feedback')
+    .map(n => n.related_id) || [];
+    
+  const reportIds = notifications
+    ?.filter(n => n.related_to === 'report')
+    .map(n => n.related_id) || [];
+    
+  const { data: feedbackNotifications, error: feedbackError } = await supabase
+    .from('feedbacks')
+    .select('*')
+    .in('id', feedbackIds);
+    
+  if (feedbackError) throw feedbackError;
+  
+  const { data: reportNotifications, error: reportError } = await supabase
+    .from('reports')
+    .select('*')
+    .in('id', reportIds);
+    
+  if (reportError) throw reportError;
   
   return {
-    feedbackNotifications,
-    reportNotifications,
-    total: feedbackNotifications.length + reportNotifications.length
+    feedbackNotifications: feedbackNotifications || [],
+    reportNotifications: reportNotifications || [],
+    total: (feedbackNotifications?.length || 0) + (reportNotifications?.length || 0)
   };
 };
 
-// Business methods for the Business panel
-export type Business = {
-  id: string;
+// Business methods
+export const getBusinesses = async () => {
+  const { data, error } = await supabase
+    .from('businesses')
+    .select('*');
+    
+  if (error) throw error;
+  return data;
+};
+
+export const getBusinessById = async (id: string) => {
+  const { data, error } = await supabase
+    .from('businesses')
+    .select('*')
+    .eq('id', id)
+    .single();
+    
+  if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "no rows returned"
+  return data;
+};
+
+export const addBusiness = async (business: {
   name: string;
   type: 'restaurant' | 'hotel' | 'shop' | 'entertainment' | 'other';
   address: string;
-  priceReports: number;
-  fraudReports: number;
-  status: 'verified' | 'unverified' | 'flagged';
-  registrationDate: string;
+  user_id: string;
+}) => {
+  const { data, error } = await supabase
+    .from('businesses')
+    .insert([business])
+    .select()
+    .single();
+    
+  if (error) throw error;
+  return data;
 };
 
-const businesses: Business[] = [
-  {
-    id: "b1",
-    name: "Manzara Restoran",
-    type: "restaurant",
-    address: "Kaleiçi, Antalya",
-    priceReports: 3,
-    fraudReports: 0,
-    status: "verified",
-    registrationDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString()
-  },
-  {
-    id: "b2",
-    name: "Palmiye Otel",
-    type: "hotel",
-    address: "Lara, Antalya",
-    priceReports: 1,
-    fraudReports: 2,
-    status: "flagged",
-    registrationDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 60).toISOString()
-  },
-  {
-    id: "b3",
-    name: "Deniz Hediyelik Eşya",
-    type: "shop",
-    address: "Konyaaltı, Antalya",
-    priceReports: 5,
-    fraudReports: 1,
-    status: "unverified",
-    registrationDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 15).toISOString()
-  }
-];
-
-export const getBusinesses = () => {
-  return [...businesses];
-};
-
-export const getBusinessById = (id: string) => {
-  return businesses.find(b => b.id === id) || null;
-};
-
-export const addBusiness = (business: Omit<Business, 'id' | 'priceReports' | 'fraudReports' | 'registrationDate'>) => {
-  const newBusiness: Business = {
-    ...business,
-    id: generateId(),
-    priceReports: 0,
-    fraudReports: 0,
-    registrationDate: new Date().toISOString()
-  };
-  businesses.push(newBusiness);
-  return newBusiness;
-};
-
-export const updateBusinessStatus = (id: string, status: 'verified' | 'unverified' | 'flagged') => {
-  const business = businesses.find(b => b.id === id);
-  if (business) {
-    business.status = status;
-    return business;
-  }
-  return null;
+export const updateBusinessStatus = async (id: string, status: 'verified' | 'unverified' | 'flagged') => {
+  const { data, error } = await supabase
+    .from('businesses')
+    .update({ status })
+    .eq('id', id)
+    .select()
+    .single();
+    
+  if (error) throw error;
+  return data;
 };
 
 // Method to get reports for specific business
-export const getReportsForBusiness = (businessName: string) => {
-  return reports.filter(r => r.businessName === businessName);
+export const getReportsForBusiness = async (businessName: string) => {
+  const { data, error } = await supabase
+    .from('reports')
+    .select('*')
+    .eq('business_name', businessName);
+    
+  if (error) throw error;
+  return data;
+};
+
+// Chat methods
+export const sendMessageToAI = async (message: string, userType: string) => {
+  try {
+    const response = await supabase.functions.invoke('chat-ai', {
+      body: { message, userType },
+    });
+    
+    return response.data.generatedText;
+  } catch (error) {
+    console.error('AI chat error:', error);
+    throw error;
+  }
+};
+
+export const saveChatHistory = async (userId: string, message: string, response: string) => {
+  const { data, error } = await supabase
+    .from('chat_history')
+    .insert([
+      { user_id: userId, message, response }
+    ])
+    .select()
+    .single();
+    
+  if (error) throw error;
+  return data;
+};
+
+export const getChatHistory = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('chat_history')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+    
+  if (error) throw error;
+  return data;
 };
