@@ -72,22 +72,31 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
         toast.success("Giriş başarılı!");
         onSuccess();
       } else {
-        // Kayıt ol
-        const { error } = await supabase.auth.signUp({
+        // Kayıt ol ve otomatik giriş yap
+        const { error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
             data: {
               user_type: type,
               full_name: fullName
-            }
+            },
+            emailRedirectTo: window.location.origin
           }
         });
         
-        if (error) throw error;
+        if (signUpError) throw signUpError;
         
-        toast.success("Kayıt başarılı! Giriş yapabilirsiniz.");
-        setIsLogin(true);
+        // Kayıt başarılı, şimdi otomatik giriş yap
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (signInError) throw signInError;
+        
+        toast.success("Kayıt ve giriş başarılı!");
+        onSuccess();
       }
     } catch (error: any) {
       console.error("Auth error:", error);
