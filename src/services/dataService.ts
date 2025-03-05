@@ -9,7 +9,7 @@ export type Business = {
   type: 'restaurant' | 'hotel' | 'shop' | 'entertainment' | 'other';
   address: string;
   status: 'verified' | 'unverified' | 'flagged';
-  user_id: string;
+  owner_id: string;
   created_at: string;
   // Additional fields used in the UI
   priceReports?: number;
@@ -193,9 +193,19 @@ export const addReport = async (report: {
     return newReport;
   }
   
+  // Add a title field for the reports table
+  const reportData = {
+    ...report,
+    title: report.type === 'price' 
+      ? `Fahiş fiyat: ${report.business_name || 'Bilinmeyen işletme'}`
+      : report.type === 'fraud'
+      ? 'Dolandırıcılık bildirimi'
+      : 'Acil durum bildirimi'
+  };
+  
   const { data, error } = await supabase
     .from('reports')
-    .insert([report])
+    .insert([reportData])
     .select()
     .single();
     
@@ -337,7 +347,7 @@ export const getBusinesses = async (): Promise<Business[]> => {
     // Cast the status field to ensure it matches the Business type
     status: (business.status || 'unverified') as 'verified' | 'unverified' | 'flagged',
     // Handle potential null values
-    user_id: business.user_id || '',
+    owner_id: business.owner_id || '',
     created_at: business.created_at || new Date().toISOString(),
     // Add UI specific fields
     priceReports: Math.floor(Math.random() * 5),
@@ -365,9 +375,17 @@ export const addBusiness = async (business: {
   address: string;
   user_id: string;
 }) => {
+  // Convert user_id to owner_id for the database
+  const { user_id, ...rest } = business;
+  const businessData = {
+    ...rest,
+    owner_id: user_id,
+    status: 'unverified' as const
+  };
+
   const { data, error } = await supabase
     .from('businesses')
-    .insert([business])
+    .insert([businessData])
     .select()
     .single();
     

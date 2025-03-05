@@ -93,6 +93,7 @@ export type Database = {
           name: string
           owner_id: string
           phone: string | null
+          status: string | null
           type: string
           updated_at: string | null
         }
@@ -105,6 +106,7 @@ export type Database = {
           name: string
           owner_id: string
           phone?: string | null
+          status?: string | null
           type: string
           updated_at?: string | null
         }
@@ -117,8 +119,33 @@ export type Database = {
           name?: string
           owner_id?: string
           phone?: string | null
+          status?: string | null
           type?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      chat_history: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string
+          response: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message: string
+          response: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string
+          response?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -232,6 +259,72 @@ export type Database = {
           },
         ]
       }
+      feedbacks: {
+        Row: {
+          id: string
+          institution: string | null
+          message: string
+          response: string | null
+          response_timestamp: string | null
+          status: string | null
+          subject: string | null
+          timestamp: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          institution?: string | null
+          message: string
+          response?: string | null
+          response_timestamp?: string | null
+          status?: string | null
+          subject?: string | null
+          timestamp?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          institution?: string | null
+          message?: string
+          response?: string | null
+          response_timestamp?: string | null
+          status?: string | null
+          subject?: string | null
+          timestamp?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          related_id: string
+          related_to: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          related_id: string
+          related_to: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          related_id?: string
+          related_to?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       places: {
         Row: {
           address: string | null
@@ -291,6 +384,7 @@ export type Database = {
           phone_number: string | null
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string | null
+          user_type: string | null
         }
         Insert: {
           created_at?: string | null
@@ -299,6 +393,7 @@ export type Database = {
           phone_number?: string | null
           role: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
+          user_type?: string | null
         }
         Update: {
           created_at?: string | null
@@ -307,18 +402,26 @@ export type Database = {
           phone_number?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
+          user_type?: string | null
         }
         Relationships: []
       }
       reports: {
         Row: {
           assigned_to: string | null
+          business_name: string | null
           created_at: string | null
           description: string
           id: string
           location: string | null
+          normal_price: number | null
+          paid_price: number | null
           priority: string
+          product_name: string | null
+          response: string | null
+          response_timestamp: string | null
           status: string
+          timestamp: string | null
           title: string
           type: string
           updated_at: string | null
@@ -326,12 +429,19 @@ export type Database = {
         }
         Insert: {
           assigned_to?: string | null
+          business_name?: string | null
           created_at?: string | null
           description: string
           id?: string
           location?: string | null
+          normal_price?: number | null
+          paid_price?: number | null
           priority?: string
+          product_name?: string | null
+          response?: string | null
+          response_timestamp?: string | null
           status?: string
+          timestamp?: string | null
           title: string
           type: string
           updated_at?: string | null
@@ -339,12 +449,19 @@ export type Database = {
         }
         Update: {
           assigned_to?: string | null
+          business_name?: string | null
           created_at?: string | null
           description?: string
           id?: string
           location?: string | null
+          normal_price?: number | null
+          paid_price?: number | null
           priority?: string
+          product_name?: string | null
+          response?: string | null
+          response_timestamp?: string | null
           status?: string
+          timestamp?: string | null
           title?: string
           type?: string
           updated_at?: string | null

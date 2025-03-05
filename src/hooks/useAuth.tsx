@@ -47,13 +47,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(sessionData.session.user);
           
           // Kullanıcı tipini öğren
-          const { data: profileData } = await supabase
+          const { data: profileData, error } = await supabase
             .from('profiles')
             .select('user_type')
             .eq('id', sessionData.session.user.id)
             .maybeSingle();
             
-          if (profileData) {
+          if (profileData && profileData.user_type) {
             setUserType(profileData.user_type as UserType);
           }
         }
@@ -73,13 +73,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(session.user);
           
           // Kullanıcı tipini öğren
-          const { data: profileData } = await supabase
+          const { data: profileData, error } = await supabase
             .from('profiles')
             .select('user_type')
             .eq('id', session.user.id)
             .maybeSingle();
             
-          if (profileData) {
+          if (profileData && profileData.user_type) {
             setUserType(profileData.user_type as UserType);
           }
         } else {
