@@ -40,7 +40,10 @@ const FeedbackAssistant = () => {
     setIsSubmitting(true);
     try {
       await addFeedback({
-        ...values,
+        type: "complaint", // Setting default type to "complaint"
+        message: values.message,
+        institution: values.institution,
+        subject: values.subject,
         user_id: user?.id || 'anonymous',
         rating: parseInt(values.rating)
       });

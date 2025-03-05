@@ -9,7 +9,7 @@ export type Feedback = {
   institution?: string;
   subject?: string;
   user_id: string;
-  rating?: number; // Add rating field
+  rating?: number;
 };
 
 // Function to add feedback
@@ -53,6 +53,24 @@ export const respondToFeedback = async (
       response_timestamp: new Date().toISOString(),
       status: "responded",
     })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+// Add the missing function addFeedbackResponse (same functionality as respondToFeedback)
+export const addFeedbackResponse = async (id: string, response: string) => {
+  return respondToFeedback(id, response);
+};
+
+// Add the missing updateFeedbackStatus function
+export const updateFeedbackStatus = async (id: string, status: 'pending' | 'processed') => {
+  const { data, error } = await supabase
+    .from("feedbacks")
+    .update({ status })
     .eq("id", id)
     .select()
     .single();

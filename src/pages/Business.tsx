@@ -103,12 +103,14 @@ const Business = () => {
               Bildirimler
             </TabsTrigger>
           </TabsList>
+          
           <div className="flex justify-end">
             <Button variant="destructive" size="sm" onClick={signOut}>
               <LogOut className="w-4 h-4 mr-2" />
               Çıkış Yap
             </Button>
           </div>
+          
           <TabsContent value="dashboard" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card>

@@ -10,8 +10,8 @@ export type Business = {
   status: 'verified' | 'unverified' | 'flagged';
   owner_id: string;
   created_at: string;
-  description: string; // Added description property
-  location: string;    // Added location property
+  description: string;
+  location: string;
   // Additional fields used in the UI
   priceReports?: number;
   fraudReports?: number;
@@ -58,7 +58,7 @@ export const getBusinessById = async (id: string) => {
   return data;
 };
 
-// Add the missing functions that are referenced in Business.tsx
+// Ensure these functions are properly implemented
 export const getBusinessDetails = async (): Promise<Business> => {
   // Mocked data for demonstration
   return {
