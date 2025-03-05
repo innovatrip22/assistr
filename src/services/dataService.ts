@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 
@@ -224,12 +223,20 @@ export const getBusinesses = async (): Promise<Business[]> => {
   // For demo purposes, add some fake metrics to each business
   const businessesWithMetrics = (data || []).map(business => ({
     ...business,
+    // Cast the type field to ensure it matches the Business type
+    type: business.type as 'restaurant' | 'hotel' | 'shop' | 'entertainment' | 'other',
+    // Cast the status field to ensure it matches the Business type
+    status: (business.status || 'unverified') as 'verified' | 'unverified' | 'flagged',
+    // Handle potential null values
+    user_id: business.user_id || '',
+    created_at: business.created_at || new Date().toISOString(),
+    // Add UI specific fields
     priceReports: Math.floor(Math.random() * 5),
     fraudReports: Math.floor(Math.random() * 3),
     registrationDate: business.created_at || new Date().toISOString()
   }));
   
-  return businessesWithMetrics;
+  return businessesWithMetrics as Business[];
 };
 
 export const getBusinessById = async (id: string) => {
