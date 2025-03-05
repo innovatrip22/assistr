@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 
@@ -16,6 +17,64 @@ export type Business = {
   registrationDate?: string;
 }
 
+// Function to check if user is a test user
+const isTestUser = (userId: string) => {
+  return userId === 'test-user';
+};
+
+// Mock data for test users
+const getMockFeedbacks = () => [
+  {
+    id: '1',
+    type: 'complaint',
+    message: 'Hizmet çok yavaştı',
+    institution: 'Turizm Ofisi',
+    subject: 'Kötü hizmet',
+    status: 'processed',
+    timestamp: new Date().toISOString(),
+    user_id: 'test-user',
+    response: 'Şikayetiniz için teşekkür ederiz. Hizmet kalitemizi artırmak için çalışıyoruz.',
+    response_timestamp: new Date().toISOString()
+  },
+  {
+    id: '2',
+    type: 'complaint',
+    message: 'Plaj çok kalabalıktı',
+    institution: 'Belediye',
+    subject: 'Plaj düzeni',
+    status: 'pending',
+    timestamp: new Date().toISOString(),
+    user_id: 'test-user'
+  }
+];
+
+const getMockReports = () => [
+  {
+    id: '1',
+    type: 'price',
+    business_name: 'Sahil Restoran',
+    product_name: 'Su',
+    paid_price: 50,
+    normal_price: 10,
+    location: 'Konyaaltı',
+    description: 'Fahiş fiyatlı su satışı',
+    status: 'processed',
+    timestamp: new Date().toISOString(),
+    user_id: 'test-user',
+    response: 'Bildirimi aldık. İlgili işletmeye ceza kesilmiştir.',
+    response_timestamp: new Date().toISOString()
+  },
+  {
+    id: '2',
+    type: 'fraud',
+    location: 'Kaleiçi',
+    description: 'Sahte bilet satışı yapılıyor',
+    status: 'pending',
+    timestamp: new Date().toISOString(),
+    user_id: 'test-user'
+  }
+];
+
 // Feedback methods
 export const addFeedback = async (feedback: {
   type: 'chat' | 'complaint';
@@ -24,6 +83,20 @@ export const addFeedback = async (feedback: {
   subject?: string;
   user_id: string;
 }) => {
+  // For test users, return mock data
+  if (isTestUser(feedback.user_id)) {
+    const mockFeedbacks = getMockFeedbacks();
+    const newFeedback = {
+      id: `${mockFeedbacks.length + 1}`,
+      ...feedback,
+      status: 'pending',
+      timestamp: new Date().toISOString()
+    };
+    
+    // Return the new mock feedback
+    return newFeedback;
+  }
+  
   const { data, error } = await supabase
     .from('feedbacks')
     .insert([feedback])
@@ -35,6 +108,11 @@ export const addFeedback = async (feedback: {
 };
 
 export const getFeedbacks = async (userId?: string) => {
+  // For test users, return mock data
+  if (userId && isTestUser(userId)) {
+    return getMockFeedbacks();
+  }
+  
   let query = supabase
     .from('feedbacks')
     .select('*')
@@ -101,6 +179,20 @@ export const addReport = async (report: {
   description: string;
   user_id: string;
 }) => {
+  // For test users, return mock data
+  if (isTestUser(report.user_id)) {
+    const mockReports = getMockReports();
+    const newReport = {
+      id: `${mockReports.length + 1}`,
+      ...report,
+      status: 'pending',
+      timestamp: new Date().toISOString()
+    };
+    
+    // Return the new mock report
+    return newReport;
+  }
+  
   const { data, error } = await supabase
     .from('reports')
     .insert([report])
@@ -112,6 +204,11 @@ export const addReport = async (report: {
 };
 
 export const getReports = async (userId?: string) => {
+  // For test users, return mock data
+  if (userId && isTestUser(userId)) {
+    return getMockReports();
+  }
+  
   let query = supabase
     .from('reports')
     .select('*')
@@ -169,6 +266,18 @@ export const addReportResponse = async (id: string, response: string) => {
 
 // Helper method to check if user has notifications
 export const getUserNotifications = async (userId: string) => {
+  // For test users, return mock data
+  if (isTestUser(userId)) {
+    const feedbackNotifications = getMockFeedbacks().filter(fb => fb.response);
+    const reportNotifications = getMockReports().filter(rp => rp.response);
+    
+    return {
+      feedbackNotifications,
+      reportNotifications,
+      total: feedbackNotifications.length + reportNotifications.length
+    };
+  }
+  
   const { data: notifications, error } = await supabase
     .from('notifications')
     .select('*')
@@ -296,6 +405,18 @@ export const sendMessageToAI = async (message: string, userType: string) => {
       body: { message, userType },
     });
     
+    // Add error handling if response or response.data is undefined
+    if (!response || !response.data) {
+      console.error('Invalid response from chat-ai function', response);
+      return "Üzgünüm, şu anda yanıt veremiyorum. Lütfen daha sonra tekrar deneyin.";
+    }
+    
+    // If there's an error in the response, use the error message
+    if (response.data.error) {
+      console.error('Error from chat-ai function:', response.data.error);
+      return response.data.generatedText || "Üzgünüm, şu anda yanıt veremiyorum. Lütfen daha sonra tekrar deneyin.";
+    }
+    
     return response.data.generatedText;
   } catch (error) {
     console.error('AI chat error:', error);
@@ -304,6 +425,11 @@ export const sendMessageToAI = async (message: string, userType: string) => {
 };
 
 export const saveChatHistory = async (userId: string, message: string, response: string) => {
+  // Skip saving for test users
+  if (isTestUser(userId)) {
+    return { id: 'test-chat-id' };
+  }
+  
   const { data, error } = await supabase
     .from('chat_history')
     .insert([
@@ -317,6 +443,11 @@ export const saveChatHistory = async (userId: string, message: string, response:
 };
 
 export const getChatHistory = async (userId: string) => {
+  // For test users, return empty array
+  if (isTestUser(userId)) {
+    return [];
+  }
+  
   const { data, error } = await supabase
     .from('chat_history')
     .select('*')

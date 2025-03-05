@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -118,7 +117,7 @@ const FeedbackAssistant = () => {
     
     try {
       // Gerçek veritabanına geri bildirim kaydet
-      await addFeedback({
+      const feedback = await addFeedback({
         type: 'complaint',
         message: formData.complaint,
         institution: formData.institution,
@@ -126,8 +125,8 @@ const FeedbackAssistant = () => {
         user_id: user.id
       });
       
-      // Geri bildirimleri yeniden yükle
-      await loadFeedbacks();
+      // Add the new feedback to the list
+      setMyFeedbacks(prev => [feedback, ...prev]);
       
       toast.success("Şikayetiniz alındı. En kısa sürede size dönüş yapılacaktır.");
       setFormData({
