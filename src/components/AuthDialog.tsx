@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,7 +53,11 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
       localStorage.setItem("testUserType", type);
       
       toast.success("Giriş başarılı!");
-      onSuccess();
+      
+      // Add a small delay to ensure state updates before navigation
+      setTimeout(() => {
+        onSuccess();
+      }, 100);
       return;
     }
     

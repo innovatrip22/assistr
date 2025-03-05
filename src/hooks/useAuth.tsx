@@ -31,6 +31,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Check for test login first
     const testUserType = localStorage.getItem("testUserType") as UserType;
     if (testUserType) {
+      console.log("Found test login user type:", testUserType);
       setUser({ id: "test-user", email: "test@example.com" });
       setUserType(testUserType);
       setLoading(false);

@@ -19,6 +19,8 @@ const Index = () => {
     // If test login, use the type from localStorage, otherwise use the selected type
     const typeToUse = testUserType || selectedType;
     
+    console.log("Login success, redirecting to:", typeToUse);
+    
     switch (typeToUse) {
       case "institution":
         navigate("/institution");
@@ -35,6 +37,7 @@ const Index = () => {
   // If user is already logged in, redirect to the appropriate page
   useEffect(() => {
     if (!loading && user && userType) {
+      console.log("User already logged in, redirecting to:", userType);
       navigate(`/${userType}`);
     }
   }, [loading, user, userType, navigate]);
