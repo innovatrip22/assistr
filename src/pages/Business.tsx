@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
@@ -83,6 +84,7 @@ import {
   getReportsForBusiness,
   type Business
 } from "@/services/dataService";
+import { useAuth } from "@/hooks/useAuth";
 
 const businessFormSchema = z.object({
   name: z.string().min(3, {
@@ -105,6 +107,8 @@ const BusinessPanel = () => {
   const [businessReports, setBusinessReports] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
 
   const form = useForm<z.infer<typeof businessFormSchema>>({
     resolver: zodResolver(businessFormSchema),
@@ -120,50 +124,99 @@ const BusinessPanel = () => {
     loadBusinesses();
   }, []);
 
-  const loadBusinesses = () => {
-    setBusinesses(getBusinesses());
+  const loadBusinesses = async () => {
+    try {
+      setIsLoading(true);
+      const data = await getBusinesses();
+      setBusinesses(data);
+    } catch (error) {
+      console.error("Error loading businesses:", error);
+      toast({
+        variant: "destructive",
+        title: "Hata",
+        description: "İşletmeler yüklenirken bir hata oluştu.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSelectBusiness = (business: Business) => {
+  const handleSelectBusiness = async (business: Business) => {
     setSelectedBusiness(business);
-    const reports = getReportsForBusiness(business.name);
-    setBusinessReports(reports);
+    try {
+      const reports = await getReportsForBusiness(business.name);
+      setBusinessReports(reports);
+    } catch (error) {
+      console.error("Error loading business reports:", error);
+      toast({
+        variant: "destructive",
+        title: "Hata",
+        description: "İşletme raporları yüklenirken bir hata oluştu.",
+      });
+    }
   };
 
-  const handleUpdateBusinessStatus = (id: string, status: 'verified' | 'unverified' | 'flagged') => {
-    updateBusinessStatus(id, status);
-    loadBusinesses();
-    if (selectedBusiness && selectedBusiness.id === id) {
-      setSelectedBusiness({...selectedBusiness, status});
+  const handleUpdateBusinessStatus = async (id: string, status: 'verified' | 'unverified' | 'flagged') => {
+    try {
+      await updateBusinessStatus(id, status);
+      await loadBusinesses();
+      if (selectedBusiness && selectedBusiness.id === id) {
+        setSelectedBusiness({...selectedBusiness, status});
+      }
+      
+      const statusMessages = {
+        verified: "İşletme doğrulandı.",
+        unverified: "İşletme doğrulanmamış olarak işaretlendi.",
+        flagged: "İşletme riskli olarak işaretlendi."
+      };
+      
+      toast({
+        title: "Durum Güncellendi",
+        description: statusMessages[status],
+      });
+    } catch (error) {
+      console.error("Error updating business status:", error);
+      toast({
+        variant: "destructive",
+        title: "Hata",
+        description: "İşletme durumu güncellenirken bir hata oluştu.",
+      });
+    }
+  };
+
+  const onSubmit = async (data: z.infer<typeof businessFormSchema>) => {
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Hata",
+        description: "İşletme eklemek için giriş yapmalısınız.",
+      });
+      return;
     }
     
-    const statusMessages = {
-      verified: "İşletme doğrulandı.",
-      unverified: "İşletme doğrulanmamış olarak işaretlendi.",
-      flagged: "İşletme riskli olarak işaretlendi."
-    };
-    
-    toast({
-      title: "Durum Güncellendi",
-      description: statusMessages[status],
-    });
-  };
-
-  const onSubmit = (data: z.infer<typeof businessFormSchema>) => {
-    const businessData = {
-      name: data.name,
-      type: data.type,
-      address: data.address,
-      status: data.status,
-    };
-    
-    addBusiness(businessData);
-    loadBusinesses();
-    form.reset();
-    toast({
-      title: "İşletme Eklendi",
-      description: "Yeni işletme başarıyla kaydedildi.",
-    });
+    try {
+      const businessData = {
+        name: data.name,
+        type: data.type,
+        address: data.address,
+        user_id: user.id,
+      };
+      
+      await addBusiness(businessData);
+      await loadBusinesses();
+      form.reset();
+      toast({
+        title: "İşletme Eklendi",
+        description: "Yeni işletme başarıyla kaydedildi.",
+      });
+    } catch (error) {
+      console.error("Error adding business:", error);
+      toast({
+        variant: "destructive",
+        title: "Hata",
+        description: "İşletme eklenirken bir hata oluştu.",
+      });
+    }
   };
 
   const filteredBusinesses = businesses.filter(business => {

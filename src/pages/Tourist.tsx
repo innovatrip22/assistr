@@ -25,6 +25,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
+import { useAuth } from "@/hooks/useAuth";
 
 const Tourist = () => {
   const [showWelcome, setShowWelcome] = useState(true);
@@ -34,21 +35,35 @@ const Tourist = () => {
     total: 0
   });
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     console.log("Tourist dashboard mounted");
     setTimeout(() => setShowWelcome(false), 5000);
     
     // Load notifications on mount and every 30 seconds
-    loadNotifications();
-    const intervalId = setInterval(loadNotifications, 30000);
-    
-    return () => clearInterval(intervalId);
-  }, []);
+    if (user) {
+      loadNotifications();
+      const intervalId = setInterval(() => loadNotifications(), 30000);
+      return () => clearInterval(intervalId);
+    } else {
+      setIsLoading(false);
+    }
+  }, [user]);
   
-  const loadNotifications = () => {
-    const userNotifications = getUserNotifications();
-    setNotifications(userNotifications);
+  const loadNotifications = async () => {
+    if (!user) return;
+    
+    try {
+      setIsLoading(true);
+      const userNotifications = await getUserNotifications(user.id);
+      setNotifications(userNotifications);
+    } catch (error) {
+      console.error("Error loading notifications:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

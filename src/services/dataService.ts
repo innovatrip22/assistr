@@ -2,6 +2,21 @@
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 
+// Define the Business type
+export type Business = {
+  id: string;
+  name: string;
+  type: 'restaurant' | 'hotel' | 'shop' | 'entertainment' | 'other';
+  address: string;
+  status: 'verified' | 'unverified' | 'flagged';
+  user_id: string;
+  created_at: string;
+  // Additional fields used in the UI
+  priceReports?: number;
+  fraudReports?: number;
+  registrationDate?: string;
+}
+
 // Feedback methods
 export const addFeedback = async (feedback: {
   type: 'chat' | 'complaint';
@@ -171,17 +186,23 @@ export const getUserNotifications = async (userId: string) => {
     ?.filter(n => n.related_to === 'report')
     .map(n => n.related_id) || [];
     
-  const { data: feedbackNotifications, error: feedbackError } = await supabase
-    .from('feedbacks')
-    .select('*')
-    .in('id', feedbackIds.length ? feedbackIds : ['00000000-0000-0000-0000-000000000000']);
+  // Handle empty arrays for the in operator
+  const { data: feedbackNotifications, error: feedbackError } = feedbackIds.length 
+    ? await supabase
+        .from('feedbacks')
+        .select('*')
+        .in('id', feedbackIds)
+    : { data: [], error: null };
     
   if (feedbackError) throw feedbackError;
   
-  const { data: reportNotifications, error: reportError } = await supabase
-    .from('reports')
-    .select('*')
-    .in('id', reportIds.length ? reportIds : ['00000000-0000-0000-0000-000000000000']);
+  // Handle empty arrays for the in operator
+  const { data: reportNotifications, error: reportError } = reportIds.length 
+    ? await supabase
+        .from('reports')
+        .select('*')
+        .in('id', reportIds)
+    : { data: [], error: null };
     
   if (reportError) throw reportError;
   
@@ -193,13 +214,22 @@ export const getUserNotifications = async (userId: string) => {
 };
 
 // Business methods
-export const getBusinesses = async () => {
+export const getBusinesses = async (): Promise<Business[]> => {
   const { data, error } = await supabase
     .from('businesses')
     .select('*');
     
   if (error) throw error;
-  return data || [];
+  
+  // For demo purposes, add some fake metrics to each business
+  const businessesWithMetrics = (data || []).map(business => ({
+    ...business,
+    priceReports: Math.floor(Math.random() * 5),
+    fraudReports: Math.floor(Math.random() * 3),
+    registrationDate: business.created_at || new Date().toISOString()
+  }));
+  
+  return businessesWithMetrics;
 };
 
 export const getBusinessById = async (id: string) => {
