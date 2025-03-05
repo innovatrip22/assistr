@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { addFeedbackResponse, addReportResponse } from "@/services/dataService";
+import { addFeedbackResponse, addReportResponse } from "@/services";
 import { toast } from "sonner";
 
 interface ResponseDialogProps {

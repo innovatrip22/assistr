@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageSquare, Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { sendMessageToAI } from "@/services/dataService";
+import { sendMessageToAI } from "@/services";
 import { useAuth } from "@/hooks/useAuth";
 
 type ChatMessage = {
