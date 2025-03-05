@@ -28,6 +28,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check for test login first
+    const testUserType = localStorage.getItem("testUserType") as UserType;
+    if (testUserType) {
+      setUser({ id: "test-user", email: "test@example.com" });
+      setUserType(testUserType);
+      setLoading(false);
+      return;
+    }
+
     // İlk yükleme sırasında oturum kontrolü
     const checkUser = async () => {
       try {
@@ -87,7 +96,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     try {
+      // Clear test login if exists
+      localStorage.removeItem("testUserType");
+      
       await supabase.auth.signOut();
+      setUser(null);
+      setUserType(null);
+      
       toast({
         title: "Çıkış yapıldı",
         description: "Başarıyla çıkış yaptınız.",

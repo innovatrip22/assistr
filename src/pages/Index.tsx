@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginCard from "@/components/LoginCard";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -12,10 +12,14 @@ const Index = () => {
     "institution" | "business" | "tourist" | null
   >(null);
   const navigate = useNavigate();
-  const { user, userType } = useAuth();
+  const { user, userType, loading } = useAuth();
 
   const handleLoginSuccess = () => {
-    switch (selectedType) {
+    const testUserType = localStorage.getItem("testUserType");
+    // If test login, use the type from localStorage, otherwise use the selected type
+    const typeToUse = testUserType || selectedType;
+    
+    switch (typeToUse) {
       case "institution":
         navigate("/institution");
         break;
@@ -28,10 +32,16 @@ const Index = () => {
     }
   };
 
-  // Eğer kullanıcı zaten giriş yapmışsa, ilgili sayfaya yönlendir
-  if (user && userType) {
-    navigate(`/${userType}`);
-    return null;
+  // If user is already logged in, redirect to the appropriate page
+  useEffect(() => {
+    if (!loading && user && userType) {
+      navigate(`/${userType}`);
+    }
+  }, [loading, user, userType, navigate]);
+
+  // Don't render anything while checking auth status
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen">Yükleniyor...</div>;
   }
 
   return (

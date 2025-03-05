@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,6 +49,10 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
     
     if (email === "123456" && password === "123456") {
       console.log("Test login activated");
+      
+      // Set user type in local storage for test login
+      localStorage.setItem("testUserType", type);
+      
       toast.success("Giriş başarılı!");
       onSuccess();
       return;
