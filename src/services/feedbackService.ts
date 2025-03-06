@@ -48,7 +48,12 @@ export const getFeedbacks = async () => {
     console.error("Error getting feedbacks:", error);
     throw error;
   }
-  return data;
+  
+  // Ensuring type safety by mapping the response
+  return data.map(item => ({
+    ...item,
+    type: item.type as "chat" | "complaint" | "suggestion" | "praise"
+  })) as Feedback[];
 };
 
 // Function to get feedbacks for a specific institution
@@ -63,7 +68,12 @@ export const getInstitutionFeedbacks = async (institution: string) => {
     console.error("Error getting institution feedbacks:", error);
     throw error;
   }
-  return data;
+  
+  // Ensuring type safety by mapping the response
+  return data.map(item => ({
+    ...item,
+    type: item.type as "chat" | "complaint" | "suggestion" | "praise"
+  })) as Feedback[];
 };
 
 // Function to respond to feedback
@@ -86,7 +96,12 @@ export const respondToFeedback = async (
     console.error("Error responding to feedback:", error);
     throw error;
   }
-  return data;
+  
+  // Ensuring type safety
+  return {
+    ...data,
+    type: data.type as "chat" | "complaint" | "suggestion" | "praise"
+  } as Feedback;
 };
 
 // Add the addFeedbackResponse (same functionality as respondToFeedback)
@@ -107,7 +122,12 @@ export const updateFeedbackStatus = async (id: string, status: 'pending' | 'proc
     console.error("Error updating feedback status:", error);
     throw error;
   }
-  return data;
+  
+  // Ensuring type safety
+  return {
+    ...data,
+    type: data.type as "chat" | "complaint" | "suggestion" | "praise"
+  } as Feedback;
 };
 
 // Get feedback statistics

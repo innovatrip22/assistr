@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { addFeedback } from "@/services";
+import { v4 as uuidv4 } from "uuid";
 
 const feedbackSchema = z.object({
   institution: z.string().min(2, { message: "Kurum adı en az 2 karakter olmalıdır" }),
@@ -41,12 +42,15 @@ const FeedbackAssistant = () => {
   const onSubmit = async (values: z.infer<typeof feedbackSchema>) => {
     setIsSubmitting(true);
     try {
+      // Generate a random UUID if the user is using test login
+      const userId = user?.id === 'test-user' ? uuidv4() : (user?.id || 'anonymous');
+
       await addFeedback({
-        type: values.type,
+        type: values.type as "chat" | "complaint" | "suggestion" | "praise",
         message: values.message,
         institution: values.institution,
         subject: values.subject,
-        user_id: user?.id || 'anonymous',
+        user_id: userId,
         rating: parseInt(values.rating)
       });
       

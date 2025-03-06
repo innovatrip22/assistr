@@ -10,6 +10,7 @@ import { FraudReportForm, EmergencyReportForm, PriceReportForm } from "@/compone
 import { submitReports } from "@/services";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { v4 as uuidv4 } from "uuid";
 
 const ReportAssistant = () => {
   const { toast } = useToast();
@@ -21,10 +22,13 @@ const ReportAssistant = () => {
   const handleSubmit = async (type: string, data: any) => {
     setIsSubmitting(true);
     try {
+      // Generate a random UUID if the user is using test login
+      const userId = user?.id === 'test-user' ? uuidv4() : (user?.id || 'anonymous');
+      
       const reportData = {
         ...data,
         type,
-        user_id: user?.id || 'anonymous',
+        user_id: userId,
         has_audio: audioData !== null,
         has_photo: data.photo !== null
       };
