@@ -1,80 +1,131 @@
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import LoginCard from "@/components/LoginCard";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import AuthDialog from "@/components/auth/AuthDialog";
-import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Building, User, Briefcase } from "lucide-react";
 
 const Index = () => {
-  const [selectedType, setSelectedType] = useState<
-    "institution" | "business" | "tourist" | null
-  >(null);
-  const [loading, setLoading] = useState(true);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [selectedUserType, setSelectedUserType] = useState<"tourist" | "institution" | "business" | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Check if user has a saved type and redirect accordingly
-    const savedUserType = localStorage.getItem("testUserType");
-    
-    if (savedUserType) {
-      console.log("Found saved user type, navigating to:", savedUserType);
-      navigate(`/${savedUserType}`);
-    }
-    
-    // Set loading to false after check
-    setLoading(false);
-  }, [navigate]);
-
-  // Handle successful login by closing the dialog
-  const handleLoginSuccess = () => {
-    console.log("Login success in Index, closing dialog");
-    setSelectedType(null);
+  const handleOpenAuthDialog = (type: "tourist" | "institution" | "business") => {
+    setSelectedUserType(type);
+    setShowAuthDialog(true);
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-background flex-col gap-4">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        <p className="text-muted-foreground">Yükleniyor...</p>
-      </div>
-    );
-  }
+  const handleCloseAuthDialog = () => {
+    setShowAuthDialog(false);
+    setSelectedUserType(null);
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuthDialog(false);
+    if (selectedUserType) {
+      navigate(`/${selectedUserType}`);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-4">
-      <div className="max-w-4xl w-full">
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col justify-center items-center p-4">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="text-center mb-10"
+      >
+        <h1 className="text-4xl font-bold text-primary mb-2">Antalya Turizm Portalı</h1>
+        <p className="text-gray-600 max-w-md mx-auto">
+          Antalya'yı ziyaret eden turistler, işletmeler ve kurumlar için tek durak hizmet noktası
+        </p>
+      </motion.div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl w-full">
+        {/* Tourist Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-4xl font-bold text-gray-800 text-center mb-12"
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center"
         >
-          Hoş Geldiniz
-        </motion.h1>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {["institution", "business", "tourist"].map((type) => (
-            <LoginCard
-              key={type}
-              type={type as "institution" | "business" | "tourist"}
-              onClick={() => setSelectedType(type as any)}
-            />
-          ))}
-        </div>
+          <div className="bg-blue-100 p-3 rounded-full mb-4">
+            <User size={28} className="text-primary" />
+          </div>
+          <h2 className="text-xl font-semibold mb-2">Turist Girişi</h2>
+          <p className="text-gray-500 text-center mb-4">
+            Geri bildirim ve şikayet gönderin, seyahat planlayın, turistik yerler keşfedin
+          </p>
+          <Button 
+            onClick={() => handleOpenAuthDialog("tourist")} 
+            className="w-full mt-auto"
+          >
+            Turist Olarak Devam Et
+          </Button>
+        </motion.div>
+
+        {/* Institution Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center"
+        >
+          <div className="bg-amber-100 p-3 rounded-full mb-4">
+            <Building size={28} className="text-amber-600" />
+          </div>
+          <h2 className="text-xl font-semibold mb-2">Kurum Girişi</h2>
+          <p className="text-gray-500 text-center mb-4">
+            Geri bildirimleri yönetin, raporlara yanıt verin, şehir haritasını görüntüleyin
+          </p>
+          <Button 
+            onClick={() => handleOpenAuthDialog("institution")} 
+            className="w-full mt-auto bg-amber-600 hover:bg-amber-700"
+          >
+            Kurum Olarak Devam Et
+          </Button>
+        </motion.div>
+
+        {/* Business Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="bg-white rounded-xl shadow-md p-6 flex flex-col items-center"
+        >
+          <div className="bg-green-100 p-3 rounded-full mb-4">
+            <Briefcase size={28} className="text-green-600" />
+          </div>
+          <h2 className="text-xl font-semibold mb-2">İşletme Girişi</h2>
+          <p className="text-gray-500 text-center mb-4">
+            İşletme profilinizi yönetin, müşteri geri bildirimlerine erişin, istatistikleri görüntüleyin
+          </p>
+          <Button 
+            onClick={() => handleOpenAuthDialog("business")} 
+            className="w-full mt-auto bg-green-600 hover:bg-green-700"
+          >
+            İşletme Olarak Devam Et
+          </Button>
+        </motion.div>
       </div>
 
-      <Dialog open={!!selectedType} onOpenChange={(open) => !open && setSelectedType(null)}>
-        <DialogContent className="p-0 border-none max-w-md">
-          <DialogTitle className="sr-only">Giriş</DialogTitle>
-          {selectedType && (
-            <AuthDialog
-              type={selectedType}
-              onClose={() => setSelectedType(null)}
-              onSuccess={handleLoginSuccess}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.6 }}
+        className="mt-10 text-gray-500 text-center text-sm"
+      >
+        Antalya Turizm Portalı &copy; {new Date().getFullYear()} | Tüm Hakları Saklıdır
+      </motion.p>
+
+      {showAuthDialog && selectedUserType && (
+        <AuthDialog 
+          type={selectedUserType} 
+          onClose={handleCloseAuthDialog} 
+          onSuccess={handleAuthSuccess} 
+        />
+      )}
     </div>
   );
 };
