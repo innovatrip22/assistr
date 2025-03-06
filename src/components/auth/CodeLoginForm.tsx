@@ -65,10 +65,6 @@ const CodeLoginForm = ({
         
         // Call onSuccess to close dialog
         onSuccess();
-        
-        // Direct navigation to the appropriate dashboard page
-        console.log("Redirecting to dashboard:", `/${type}`);
-        navigate(`/${type}`);
       } catch (error: any) {
         console.error("Auth error:", error);
         toast.error(error.message || "Kod ile giriş sırasında bir hata oluştu");

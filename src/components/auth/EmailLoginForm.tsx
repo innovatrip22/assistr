@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 
 interface EmailLoginFormProps {
   type: "institution" | "business" | "tourist";
@@ -26,7 +25,6 @@ const EmailLoginForm = ({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const navigate = useNavigate();
 
   const handleTestLogin = async () => {
     if (email === "123456" && password === "123456") {
@@ -39,10 +37,6 @@ const EmailLoginForm = ({
       
       // Call onSuccess to close dialog
       onSuccess();
-      
-      // Direct navigation to the appropriate dashboard page
-      console.log("Redirecting to dashboard:", `/${type}`);
-      navigate(`/${type}`);
       
       return true;
     }
@@ -86,10 +80,6 @@ const EmailLoginForm = ({
         
         // Call onSuccess to close dialog
         onSuccess();
-        
-        // Direct navigation to the appropriate dashboard page
-        console.log("Redirecting to dashboard:", `/${type}`);
-        navigate(`/${type}`);
       } else {
         console.log("Attempting signup with email:", email);
         const { error: signUpError, data: signUpData } = await supabase.auth.signUp({
@@ -123,10 +113,6 @@ const EmailLoginForm = ({
         
         // Call onSuccess to close dialog
         onSuccess();
-        
-        // Direct navigation to the appropriate dashboard page
-        console.log("Redirecting to dashboard:", `/${type}`);
-        navigate(`/${type}`);
       }
     } catch (error: any) {
       console.error("Auth error:", error);
