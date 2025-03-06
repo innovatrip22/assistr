@@ -29,6 +29,7 @@ const Tourist = () => {
   });
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("travel");
   const navigate = useNavigate();
   const { signOut } = useAuth();
 
@@ -72,6 +73,11 @@ const Tourist = () => {
       console.error("Sign out error:", error);
       toast.error("Çıkış yapılırken bir hata oluştu.");
     }
+  };
+
+  const handleTabChange = (value: string) => {
+    console.log("Tab changed to:", value);
+    setActiveTab(value);
   };
 
   if (loading) {
@@ -126,8 +132,8 @@ const Tourist = () => {
         </Card>
       </div>
 
-      <Tabs defaultValue="travel">
-        <TabsList className="mb-4">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+        <TabsList className="mb-4 w-full grid grid-cols-7">
           <TabsTrigger value="travel">
             <Search className="mr-2 w-4 h-4" />
             Keşfet
@@ -157,27 +163,30 @@ const Tourist = () => {
             Chat
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="travel" className="space-y-4">
-          <TravelAssistant />
-        </TabsContent>
-        <TabsContent value="nearby" className="space-y-4">
-          <NearbyPlaces />
-        </TabsContent>
-        <TabsContent value="plan" className="space-y-4">
-          <TravelPlanner />
-        </TabsContent>
-        <TabsContent value="assistant" className="space-y-4">
-          <TravelAssistant />
-        </TabsContent>
-        <TabsContent value="feedback" className="space-y-4">
-          <FeedbackAssistant />
-        </TabsContent>
-        <TabsContent value="report" className="space-y-4">
-          <ReportAssistant />
-        </TabsContent>
-         <TabsContent value="chat" className="space-y-4">
-          <TravelChat />
-        </TabsContent>
+
+        <div className="border rounded-lg p-6 bg-white">
+          <TabsContent value="travel" className="space-y-4">
+            <TravelAssistant />
+          </TabsContent>
+          <TabsContent value="nearby" className="space-y-4">
+            <NearbyPlaces />
+          </TabsContent>
+          <TabsContent value="plan" className="space-y-4">
+            <TravelPlanner />
+          </TabsContent>
+          <TabsContent value="assistant" className="space-y-4">
+            <TravelAssistant />
+          </TabsContent>
+          <TabsContent value="feedback" className="space-y-4">
+            <FeedbackAssistant />
+          </TabsContent>
+          <TabsContent value="report" className="space-y-4">
+            <ReportAssistant />
+          </TabsContent>
+          <TabsContent value="chat" className="space-y-4">
+            <TravelChat />
+          </TabsContent>
+        </div>
       </Tabs>
     </div>
   );
