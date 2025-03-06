@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     console.log("AuthProvider: Initializing auth check...");
     
-    // Check for test login first
+    // Check for test login first - this is a special case for quick testing
     const testUserType = localStorage.getItem("testUserType") as UserType;
     if (testUserType) {
       console.log("Found test login, setting user type:", testUserType);
@@ -60,38 +60,43 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.log("Found active session for user:", sessionData.session.user.id);
         setUser(sessionData.session.user);
         
-        // Get user type from code-based auth if present
-        const testType = sessionData.session.user.user_metadata?.user_type;
-        if (testType) {
-          console.log("Setting user type from metadata:", testType);
-          setUserType(testType as UserType);
+        // Get user type from metadata if present (for code-based auth)
+        const metadataType = sessionData.session.user.user_metadata?.user_type;
+        if (metadataType) {
+          console.log("Setting user type from metadata:", metadataType);
+          setUserType(metadataType as UserType);
           setLoading(false);
           return;
         }
 
         // Otherwise check profiles table
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('user_type')
-          .eq('id', sessionData.session.user.id)
-          .maybeSingle();
-        
-        if (profileError) {
-          console.error("Profile fetch error:", profileError);
-          setLoading(false);
-          return;
-        }
+        try {
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('user_type')
+            .eq('id', sessionData.session.user.id)
+            .maybeSingle();
           
-        if (profileData?.user_type) {
-          console.log("Setting user type from profile:", profileData.user_type);
-          setUserType(profileData.user_type as UserType);
-        } else {
-          console.log("No user type found in profile");
+          if (profileError) {
+            console.error("Profile fetch error:", profileError);
+            setLoading(false);
+            return;
+          }
+            
+          if (profileData?.user_type) {
+            console.log("Setting user type from profile:", profileData.user_type);
+            setUserType(profileData.user_type as UserType);
+          } else {
+            console.log("No user type found in profile");
+          }
+        } catch (profileFetchError) {
+          console.error("Error fetching profile:", profileFetchError);
         }
         
       } catch (error) {
         console.error("Auth check error:", error);
       } finally {
+        // Ensure loading is set to false in all cases
         setLoading(false);
       }
     };
@@ -113,33 +118,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         setUser(session.user);
         
-        // Get user type from code-based auth if present
-        const testType = session.user.user_metadata?.user_type;
-        if (testType) {
-          console.log("Setting user type from metadata:", testType);
-          setUserType(testType as UserType);
+        // Get user type from metadata if present (for code-based auth)
+        const metadataType = session.user.user_metadata?.user_type;
+        if (metadataType) {
+          console.log("Setting user type from metadata:", metadataType);
+          setUserType(metadataType as UserType);
           setLoading(false);
           return;
         }
 
         // Otherwise check profiles table
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('user_type')
-          .eq('id', session.user.id)
-          .maybeSingle();
-        
-        if (profileError) {
-          console.error("Profile fetch error on auth change:", profileError);
-          setLoading(false);
-          return;
-        }
+        try {
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('user_type')
+            .eq('id', session.user.id)
+            .maybeSingle();
           
-        if (profileData?.user_type) {
-          console.log("User type updated to:", profileData.user_type);
-          setUserType(profileData.user_type as UserType);
-        } else {
-          console.log("No profile data on auth change");
+          if (profileError) {
+            console.error("Profile fetch error on auth change:", profileError);
+            setLoading(false);
+            return;
+          }
+            
+          if (profileData?.user_type) {
+            console.log("User type updated to:", profileData.user_type);
+            setUserType(profileData.user_type as UserType);
+          } else {
+            console.log("No profile data on auth change");
+          }
+        } catch (profileFetchError) {
+          console.error("Error fetching profile on auth change:", profileFetchError);
         }
         
         setLoading(false);

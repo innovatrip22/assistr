@@ -33,9 +33,9 @@ const LoginCard = ({ type, onClick }: LoginCardProps) => {
   const getDescription = () => {
     switch (type) {
       case "institution":
-        return "Yetkililer için giriş (E-posta veya kod ile)";
+        return "Yetkililer için giriş (E-posta veya kod: INST123)";
       case "business":
-        return "İşletme sahipleri için giriş (E-posta veya kod ile)";
+        return "İşletme sahipleri için giriş (E-posta veya kod: BUS123)";
       case "tourist":
         return "Turistler için giriş (E-posta ile)";
     }

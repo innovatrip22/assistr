@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginCard from "@/components/LoginCard";
@@ -27,6 +28,12 @@ const Index = () => {
       navigate(`/${userType}`);
     }
   }, [loading, user, userType, navigate, selectedType]);
+
+  // Handle successful login by closing the dialog
+  const handleLoginSuccess = () => {
+    console.log("Login success, closing dialog");
+    setSelectedType(null);
+  };
 
   if (loading) {
     console.log("Index: Showing loading state");
