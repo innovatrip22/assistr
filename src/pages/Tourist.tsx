@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
-import { LogOut, Search, Map, Calendar, MessageSquare, Bell, FileText } from "lucide-react";
+import { Map, MessageSquare, Calendar, Bell, Navigation, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,14 +22,9 @@ import TravelPlanner from "@/components/tourist/TravelPlanner";
 import TravelChat from "@/components/tourist/TravelChat";
 
 const Tourist = () => {
-  const [stats, setStats] = useState<any>({
-    totalVisits: 125,
-    averageSpending: 1250,
-    mostPopularPlace: "Kaleiçi"
-  });
+  const [activeTab, setActiveTab] = useState("nearby");
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("travel");
   const navigate = useNavigate();
   const { signOut } = useAuth();
 
@@ -39,22 +34,28 @@ const Tourist = () => {
 
   const loadData = async () => {
     try {
-      // Mock notifications for demo purposes
+      // Fetch tourist-specific notifications
       const mockFeedbacks = await getFeedbacks();
       const mockReports = await getReports();
       const newNotifications = [
-        ...mockFeedbacks.slice(0, 2).map(fb => ({
-          id: fb.id,
-          type: 'feedback',
-          message: `Yeni bir geri bildiriminiz var: ${fb.message?.substring(0, 50) || 'Geri bildirim'}...`,
-          timestamp: fb.timestamp,
-        })),
-        ...mockReports.slice(0, 2).map(report => ({
-          id: report.id,
-          type: 'report',
-          message: `Yeni bir raporunuz var: ${report.description?.substring(0, 50) || 'Rapor'}...`,
-          timestamp: report.timestamp,
-        })),
+        ...mockFeedbacks
+          .filter(fb => fb.response) // Only show feedbacks with responses
+          .slice(0, 2)
+          .map(fb => ({
+            id: fb.id,
+            type: 'feedback',
+            message: `Geri bildiriminize yanıt: ${fb.response?.substring(0, 50) || ''}...`,
+            timestamp: fb.timestamp,
+          })),
+        ...mockReports
+          .filter(report => report.response) // Only show reports with responses
+          .slice(0, 2)
+          .map(report => ({
+            id: report.id,
+            type: 'report',
+            message: `Raporunuza yanıt: ${report.response?.substring(0, 50) || ''}...`,
+            timestamp: report.timestamp,
+          })),
       ];
       setNotifications(newNotifications);
     } catch (error) {
@@ -76,7 +77,6 @@ const Tourist = () => {
   };
 
   const handleTabChange = (value: string) => {
-    console.log("Tab changed to:", value);
     setActiveTab(value);
   };
 
@@ -91,67 +91,30 @@ const Tourist = () => {
         <div className="flex items-center gap-4">
           <Badge variant="outline">
             <Bell className="mr-2 w-4 h-4" />
-            {notifications.length} Bildirim
+            {notifications.length} Yanıt
           </Badge>
           <Button variant="destructive" size="sm" onClick={handleSignOut}>
-            <LogOut className="mr-2 w-4 h-4" />
             Çıkış Yap
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Toplam Ziyaret</CardTitle>
-            <CardDescription>Bu ayki ziyaret sayısı</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalVisits || 0}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Ortalama Harcama</CardTitle>
-            <CardDescription>Turist başına ortalama harcama</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.averageSpending || 0}₺</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>En Popüler Yer</CardTitle>
-            <CardDescription>Bu ay en çok ziyaret edilen yer</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.mostPopularPlace || "Yok"}</div>
-          </CardContent>
-        </Card>
-      </div>
-
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="mb-4 w-full grid grid-cols-7">
-          <TabsTrigger value="travel">
-            <Search className="mr-2 w-4 h-4" />
-            Keşfet
-          </TabsTrigger>
+        <TabsList className="mb-4 w-full grid grid-cols-6">
           <TabsTrigger value="nearby">
-            <Map className="mr-2 w-4 h-4" />
-            Yakınında
+            <Navigation className="mr-2 w-4 h-4" />
+            Yakındakiler
           </TabsTrigger>
           <TabsTrigger value="plan">
             <Calendar className="mr-2 w-4 h-4" />
-            Planla
+            Gezi Planı
           </TabsTrigger>
           <TabsTrigger value="assistant">
-            <MessageSquare className="mr-2 w-4 h-4" />
+            <Map className="mr-2 w-4 h-4" />
             Asistan
           </TabsTrigger>
           <TabsTrigger value="feedback">
-            <Bell className="mr-2 w-4 h-4" />
+            <MessageSquare className="mr-2 w-4 h-4" />
             Geri Bildirim
           </TabsTrigger>
           <TabsTrigger value="report">
@@ -160,34 +123,50 @@ const Tourist = () => {
           </TabsTrigger>
           <TabsTrigger value="chat">
             <MessageSquare className="mr-2 w-4 h-4" />
-            Chat
+            Sohbet
           </TabsTrigger>
         </TabsList>
 
         <div className="border rounded-lg p-6 bg-white">
-          <TabsContent value="travel" className="space-y-4">
-            <TravelAssistant />
-          </TabsContent>
-          <TabsContent value="nearby" className="space-y-4">
+          <TabsContent value="nearby" className="mt-0">
             <NearbyPlaces />
           </TabsContent>
-          <TabsContent value="plan" className="space-y-4">
+          <TabsContent value="plan" className="mt-0">
             <TravelPlanner />
           </TabsContent>
-          <TabsContent value="assistant" className="space-y-4">
+          <TabsContent value="assistant" className="mt-0">
             <TravelAssistant />
           </TabsContent>
-          <TabsContent value="feedback" className="space-y-4">
+          <TabsContent value="feedback" className="mt-0">
             <FeedbackAssistant />
           </TabsContent>
-          <TabsContent value="report" className="space-y-4">
+          <TabsContent value="report" className="mt-0">
             <ReportAssistant />
           </TabsContent>
-          <TabsContent value="chat" className="space-y-4">
+          <TabsContent value="chat" className="mt-0">
             <TravelChat />
           </TabsContent>
         </div>
       </Tabs>
+
+      {/* Notifications Section */}
+      {notifications.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold mb-4">Son Yanıtlar</h2>
+          <div className="grid gap-4">
+            {notifications.map((notification) => (
+              <Card key={notification.id}>
+                <CardContent className="pt-6">
+                  <p className="text-sm text-gray-600">{notification.message}</p>
+                  <p className="text-xs text-gray-400 mt-2">
+                    {format(new Date(notification.timestamp), 'dd MMM yyyy HH:mm', {locale: tr})}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
