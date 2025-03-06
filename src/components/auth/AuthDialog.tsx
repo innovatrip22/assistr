@@ -1,11 +1,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import AuthMethodSelector from "./AuthMethodSelector";
-import CodeLoginForm from "./CodeLoginForm";
-import EmailLoginForm from "./EmailLoginForm";
-import AuthDialogHeader from "./AuthDialogHeader";
 import { useNavigate } from "react-router-dom";
+import AuthDialogHeader from "./AuthDialogHeader";
 
 interface AuthDialogProps {
   type: "institution" | "business" | "tourist";
@@ -15,38 +12,19 @@ interface AuthDialogProps {
 
 const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [authMethod, setAuthMethod] = useState<"email" | "code">(
-    type === "tourist" ? "email" : "email"
-  );
   const navigate = useNavigate();
 
-  const getTitle = () => {
-    const titles = {
-      institution: {
-        email: "Kurum Girişi/Kaydı",
-        code: "Kurum Kod Girişi"
-      },
-      business: {
-        email: "İşletme Girişi/Kaydı",
-        code: "İşletme Kod Girişi"
-      },
-      tourist: {
-        email: "Turist Girişi/Kaydı",
-        code: ""
-      }
-    };
-
-    return titles[type][authMethod];
-  };
-
-  // Enhanced success handler to ensure navigation happens
-  const handleAuthSuccess = () => {
-    console.log("Auth success in dialog, type:", type);
-    // Call the parent's onSuccess to close dialog
+  const handleContinue = () => {
+    console.log("Direct access granted, type:", type);
+    
+    // Store user type for the session
+    localStorage.setItem("testUserType", type);
+    
+    // Close dialog
     onSuccess();
     
-    // Direct navigation 
-    console.log("Navigating directly to:", `/${type}`);
+    // Navigate to appropriate dashboard
+    console.log("Navigating to dashboard:", `/${type}`);
     navigate(`/${type}`);
   };
 
@@ -56,31 +34,20 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
       animate={{ opacity: 1, y: 0 }}
       className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md"
     >
-      <AuthDialogHeader title={getTitle()} />
+      <AuthDialogHeader title={`${type.charAt(0).toUpperCase() + type.slice(1)} Girişi`} />
       
-      <AuthMethodSelector 
-        authMethod={authMethod} 
-        onChange={setAuthMethod} 
-        userType={type} 
-      />
+      <p className="text-gray-500 mb-6 text-center">
+        {type === "tourist" ? "Turist" : type === "institution" ? "Kurum" : "İşletme"} 
+        {" "}olarak devam etmek için aşağıdaki butona tıklayın.
+      </p>
       
-      {authMethod === "code" ? (
-        <CodeLoginForm 
-          type={type as "institution" | "business"} 
-          onClose={onClose} 
-          onSuccess={handleAuthSuccess}
-          isLoading={isLoading}
-          setIsLoading={setIsLoading}
-        />
-      ) : (
-        <EmailLoginForm 
-          type={type} 
-          onClose={onClose} 
-          onSuccess={handleAuthSuccess}
-          isLoading={isLoading}
-          setIsLoading={setIsLoading}
-        />
-      )}
+      <button
+        onClick={handleContinue}
+        className="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 transition"
+        disabled={isLoading}
+      >
+        {isLoading ? "İşleniyor..." : "Devam Et"}
+      </button>
     </motion.div>
   );
 };

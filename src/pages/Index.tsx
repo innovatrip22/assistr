@@ -5,48 +5,39 @@ import LoginCard from "@/components/LoginCard";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import AuthDialog from "@/components/auth/AuthDialog";
-import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
 
 const Index = () => {
   const [selectedType, setSelectedType] = useState<
     "institution" | "business" | "tourist" | null
   >(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { user, userType, loading } = useAuth();
 
   useEffect(() => {
-    console.log("Index: Auth state changed:", {
-      loading,
-      user: user?.id,
-      userType,
-      selectedType
-    });
-
-    if (!loading && user && userType) {
-      console.log("Redirecting to dashboard:", userType);
-      navigate(`/${userType}`);
+    // Check if user has a saved type and redirect accordingly
+    const savedUserType = localStorage.getItem("testUserType");
+    
+    if (savedUserType) {
+      console.log("Found saved user type, navigating to:", savedUserType);
+      navigate(`/${savedUserType}`);
     }
-  }, [loading, user, userType, navigate, selectedType]);
+    
+    // Set loading to false after check
+    setLoading(false);
+  }, [navigate]);
 
-  // Handle successful login by closing the dialog and navigating
+  // Handle successful login by closing the dialog
   const handleLoginSuccess = () => {
     console.log("Login success in Index, closing dialog");
     setSelectedType(null);
-    
-    // Check if we have user and userType already
-    if (user && userType) {
-      console.log("User already logged in, navigating to:", userType);
-      navigate(`/${userType}`);
-    }
   };
 
   if (loading) {
-    console.log("Index: Showing loading state");
     return (
       <div className="flex items-center justify-center min-h-screen bg-background flex-col gap-4">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        <p className="text-muted-foreground">Kullanıcı bilgileri kontrol ediliyor...</p>
+        <p className="text-muted-foreground">Yükleniyor...</p>
       </div>
     );
   }
@@ -74,7 +65,7 @@ const Index = () => {
 
       <Dialog open={!!selectedType} onOpenChange={(open) => !open && setSelectedType(null)}>
         <DialogContent className="p-0 border-none max-w-md">
-          <DialogTitle className="sr-only">Giriş / Kayıt</DialogTitle>
+          <DialogTitle className="sr-only">Giriş</DialogTitle>
           {selectedType && (
             <AuthDialog
               type={selectedType}

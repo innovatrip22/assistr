@@ -1,7 +1,6 @@
 
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
 
 interface AuthRequiredProps {
   children: React.ReactNode;
@@ -9,13 +8,22 @@ interface AuthRequiredProps {
 }
 
 const AuthRequired = ({ children, userType }: AuthRequiredProps) => {
-  const { user, userType: currentUserType, loading } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [currentUserType, setCurrentUserType] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Get the saved user type from localStorage
+    const savedUserType = localStorage.getItem("testUserType");
+    setCurrentUserType(savedUserType);
+    setLoading(false);
+  }, []);
 
   if (loading) {
     return <div className="flex items-center justify-center h-screen">Yükleniyor...</div>;
   }
 
-  if (!user) {
+  // If there's no saved user type or it doesn't match the required type, redirect to home
+  if (!currentUserType) {
     return <Navigate to="/" />;
   }
 
