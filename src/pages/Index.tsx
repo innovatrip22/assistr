@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import LoginCard from "@/components/LoginCard";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
-import AuthDialog from "@/components/AuthDialog";
+import AuthDialog from "@/components/auth/AuthDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
 
