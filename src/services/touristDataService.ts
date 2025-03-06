@@ -1,5 +1,5 @@
 
-// Mock tourist data stats
+// Mock tourist data stats for KKTC
 export const getTouristDataStats = async () => {
   // In a real application, this would fetch data from an API
   return {

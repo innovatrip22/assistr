@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { LogOut, Activity, ShoppingBag, Settings, MessageSquare, BellRing, BarChart3, FileText, Users, MapPin, Calendar, BadgePercent } from "lucide-react";
+import { LogOut, Activity, ShoppingBag, Settings, MessageSquare, BellRing, BarChart3, FileText, Users, MapPin, Calendar, BadgePercent, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -18,6 +18,9 @@ import BusinessNotifications from "@/components/business/BusinessNotifications";
 import BusinessReservations from "@/components/business/BusinessReservations";
 import BusinessPromotions from "@/components/business/BusinessPromotions";
 import BusinessEmployees from "@/components/business/BusinessEmployees";
+import BusinessEvents from "@/components/business/BusinessEvents";
+import BusinessFeedback from "@/components/business/BusinessFeedback";
+import BusinessLiveChat from "@/components/business/BusinessLiveChat";
 import type { Business } from "@/services";
 
 const Business = () => {
@@ -59,12 +62,12 @@ const Business = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-3xl font-bold text-gray-800 mb-6"
         >
-          İşletme Paneli
+          KKTC İşletme Paneli
         </motion.h1>
 
         <Tabs defaultValue="dashboard" className="w-full space-y-4">
           <div className="flex justify-between items-center">
-            <TabsList className="bg-white border rounded-lg shadow-sm">
+            <TabsList className="bg-white border rounded-lg shadow-sm overflow-x-auto">
               <TabsTrigger value="dashboard" className="data-[state=active]:bg-gray-100">
                 <Activity className="w-4 h-4 mr-2" />
                 Panel
@@ -77,6 +80,10 @@ const Business = () => {
                 <Calendar className="w-4 h-4 mr-2" />
                 Rezervasyonlar
               </TabsTrigger>
+              <TabsTrigger value="events" className="data-[state=active]:bg-gray-100">
+                <Calendar className="w-4 h-4 mr-2" />
+                Etkinlikler
+              </TabsTrigger>
               <TabsTrigger value="promotions" className="data-[state=active]:bg-gray-100">
                 <BadgePercent className="w-4 h-4 mr-2" />
                 Promosyonlar
@@ -84,6 +91,14 @@ const Business = () => {
               <TabsTrigger value="employees" className="data-[state=active]:bg-gray-100">
                 <Users className="w-4 h-4 mr-2" />
                 Personel
+              </TabsTrigger>
+              <TabsTrigger value="feedback" className="data-[state=active]:bg-gray-100">
+                <FileText className="w-4 h-4 mr-2" />
+                Geri Bildirimler
+              </TabsTrigger>
+              <TabsTrigger value="livechat" className="data-[state=active]:bg-gray-100">
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Canlı Destek
               </TabsTrigger>
               <TabsTrigger value="messages" className="data-[state=active]:bg-gray-100">
                 <MessageSquare className="w-4 h-4 mr-2" />
@@ -117,12 +132,24 @@ const Business = () => {
             <BusinessReservations />
           </TabsContent>
 
+          <TabsContent value="events">
+            <BusinessEvents />
+          </TabsContent>
+
           <TabsContent value="promotions">
             <BusinessPromotions />
           </TabsContent>
 
           <TabsContent value="employees">
             <BusinessEmployees />
+          </TabsContent>
+          
+          <TabsContent value="feedback">
+            <BusinessFeedback />
+          </TabsContent>
+          
+          <TabsContent value="livechat">
+            <BusinessLiveChat />
           </TabsContent>
 
           <TabsContent value="messages">

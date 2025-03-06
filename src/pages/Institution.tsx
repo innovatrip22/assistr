@@ -81,7 +81,7 @@ const Institution = () => {
         className="max-w-7xl mx-auto"
       >
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Kurum Paneli</h1>
+          <h1 className="text-3xl font-bold text-gray-800">KKTC Turizm Kurumu Paneli</h1>
           <div className="flex items-center gap-4">
             <span className="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
               {notifications.total} Yeni Bildirim
