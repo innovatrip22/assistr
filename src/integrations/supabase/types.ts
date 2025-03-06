@@ -264,6 +264,7 @@ export type Database = {
           id: string
           institution: string | null
           message: string
+          rating: number | null
           response: string | null
           response_timestamp: string | null
           status: string | null
@@ -276,6 +277,7 @@ export type Database = {
           id?: string
           institution?: string | null
           message: string
+          rating?: number | null
           response?: string | null
           response_timestamp?: string | null
           status?: string | null
@@ -288,6 +290,7 @@ export type Database = {
           id?: string
           institution?: string | null
           message?: string
+          rating?: number | null
           response?: string | null
           response_timestamp?: string | null
           status?: string | null

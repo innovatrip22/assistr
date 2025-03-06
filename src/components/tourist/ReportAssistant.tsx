@@ -25,7 +25,8 @@ const ReportAssistant = () => {
         ...data,
         type,
         user_id: user?.id || 'anonymous',
-        has_audio: audioData !== null
+        has_audio: audioData !== null,
+        has_photo: data.photo !== null
       };
       
       // Handle file upload if there's a photo

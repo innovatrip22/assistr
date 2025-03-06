@@ -19,6 +19,7 @@ const feedbackSchema = z.object({
   subject: z.string().min(2, { message: "Konu en az 2 karakter olmalıdır" }),
   message: z.string().min(10, { message: "Mesaj en az 10 karakter olmalıdır" }),
   rating: z.string(),
+  type: z.enum(["complaint", "suggestion", "praise"]),
 });
 
 const FeedbackAssistant = () => {
@@ -33,6 +34,7 @@ const FeedbackAssistant = () => {
       subject: "",
       message: "",
       rating: "5",
+      type: "complaint",
     },
   });
 
@@ -40,7 +42,7 @@ const FeedbackAssistant = () => {
     setIsSubmitting(true);
     try {
       await addFeedback({
-        type: "complaint", // Setting default type to "complaint"
+        type: values.type,
         message: values.message,
         institution: values.institution,
         subject: values.subject,
@@ -102,6 +104,29 @@ const FeedbackAssistant = () => {
                   <FormControl>
                     <Input placeholder="Geri bildirim konusu" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Bildirim Türü</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Bildirim türünü seçin" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="complaint">Şikayet</SelectItem>
+                      <SelectItem value="suggestion">Öneri</SelectItem>
+                      <SelectItem value="praise">Teşekkür/Takdir</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
