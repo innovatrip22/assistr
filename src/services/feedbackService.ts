@@ -18,6 +18,16 @@ export type Feedback = {
 
 // Function to add feedback
 export const addFeedback = async (feedback: Feedback) => {
+  // Check if we have a valid UUID for user_id
+  // Regular UUID v4 pattern
+  const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  
+  // Ensure user_id is a valid UUID to prevent RLS issues
+  if (!uuidPattern.test(feedback.user_id)) {
+    console.error("Invalid UUID format for user_id:", feedback.user_id);
+    throw new Error("Invalid user ID format");
+  }
+
   const { data, error } = await supabase
     .from("feedbacks")
     .insert([
