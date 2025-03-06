@@ -38,24 +38,41 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
 
-    // İlk yükleme sırasında oturum kontrolü
+    // Initial session check
     const checkUser = async () => {
       try {
-        const { data: sessionData } = await supabase.auth.getSession();
+        console.log("Checking user session...");
+        const { data: sessionData, error } = await supabase.auth.getSession();
         
-        if (sessionData.session) {
+        if (error) {
+          console.error("Session error:", error);
+          setLoading(false);
+          return;
+        }
+        
+        if (sessionData?.session) {
+          console.log("Found active session:", sessionData.session.user.id);
           setUser(sessionData.session.user);
           
-          // Kullanıcı tipini öğren
-          const { data: profileData, error } = await supabase
+          // Get user type
+          const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .select('user_type')
             .eq('id', sessionData.session.user.id)
             .maybeSingle();
+          
+          if (profileError) {
+            console.error("Profile fetch error:", profileError);
+          }
             
           if (profileData && profileData.user_type) {
             setUserType(profileData.user_type as UserType);
+            console.log("User type set to:", profileData.user_type);
+          } else {
+            console.log("No profile data found, user type remains null");
           }
+        } else {
+          console.log("No active session found");
         }
       } catch (error) {
         console.error("Auth check error:", error);
@@ -66,21 +83,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     checkUser();
 
-    // Auth durumu değişikliklerini dinle
+    // Listen for auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log("Auth state changed:", event, session?.user?.id);
+        
         if (session) {
           setUser(session.user);
           
-          // Kullanıcı tipini öğren
+          // Get user type
           const { data: profileData, error } = await supabase
             .from('profiles')
             .select('user_type')
             .eq('id', session.user.id)
             .maybeSingle();
+          
+          if (error) {
+            console.error("Profile fetch error on auth change:", error);
+          }
             
           if (profileData && profileData.user_type) {
             setUserType(profileData.user_type as UserType);
+            console.log("User type updated to:", profileData.user_type);
+          } else {
+            console.log("No profile data on auth change");
           }
         } else {
           setUser(null);

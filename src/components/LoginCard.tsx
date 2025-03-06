@@ -30,6 +30,17 @@ const LoginCard = ({ type, onClick }: LoginCardProps) => {
     }
   };
 
+  const getDescription = () => {
+    switch (type) {
+      case "institution":
+        return "Yetkililer için giriş (E-posta veya kod ile)";
+      case "business":
+        return "İşletme sahipleri için giriş (E-posta veya kod ile)";
+      case "tourist":
+        return "Turistler için giriş (E-posta ile)";
+    }
+  };
+
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
@@ -39,6 +50,7 @@ const LoginCard = ({ type, onClick }: LoginCardProps) => {
     >
       <div className="text-primary">{getIcon()}</div>
       <h2 className="text-xl font-semibold text-gray-800">{getTitle()}</h2>
+      <p className="text-sm text-gray-600 text-center">{getDescription()}</p>
     </motion.div>
   );
 };

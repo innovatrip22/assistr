@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
 import AuthDialog from "@/components/AuthDialog";
 import { useAuth } from "@/hooks/useAuth";
+import { Loader2 } from "lucide-react";
 
 const Index = () => {
   const [selectedType, setSelectedType] = useState<
@@ -13,6 +14,10 @@ const Index = () => {
   >(null);
   const navigate = useNavigate();
   const { user, userType, loading } = useAuth();
+
+  useEffect(() => {
+    console.log("Index: Auth state ->", { loading, user, userType });
+  }, [loading, user, userType]);
 
   const handleLoginSuccess = () => {
     const testUserType = localStorage.getItem("testUserType");
@@ -42,9 +47,14 @@ const Index = () => {
     }
   }, [loading, user, userType, navigate]);
 
-  // Don't render anything while checking auth status
+  // Show loading indicator while checking auth status
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">Yükleniyor...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen flex-col gap-4">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <p>Yükleniyor...</p>
+      </div>
+    );
   }
 
   return (
