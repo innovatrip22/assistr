@@ -31,7 +31,7 @@ const Index = () => {
 
   // Handle successful login by closing the dialog and navigating
   const handleLoginSuccess = () => {
-    console.log("Login success, closing dialog");
+    console.log("Login success in Index, closing dialog");
     setSelectedType(null);
     
     // Check if we have user and userType already

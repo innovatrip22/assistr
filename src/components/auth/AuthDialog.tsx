@@ -45,11 +45,9 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
     // Call the parent's onSuccess to close dialog
     onSuccess();
     
-    // Direct navigation as a failsafe
-    console.log("Attempting direct navigation to:", `/${type}`);
-    setTimeout(() => {
-      navigate(`/${type}`);
-    }, 500);
+    // Direct navigation 
+    console.log("Navigating directly to:", `/${type}`);
+    navigate(`/${type}`);
   };
 
   return (

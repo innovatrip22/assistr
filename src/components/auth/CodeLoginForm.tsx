@@ -68,9 +68,7 @@ const CodeLoginForm = ({
         
         // Direct navigation to the appropriate dashboard page
         console.log("Redirecting to dashboard:", `/${type}`);
-        setTimeout(() => {
-          navigate(`/${type}`);
-        }, 300);
+        navigate(`/${type}`);
       } catch (error: any) {
         console.error("Auth error:", error);
         toast.error(error.message || "Kod ile giriş sırasında bir hata oluştu");

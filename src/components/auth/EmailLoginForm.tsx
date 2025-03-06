@@ -42,9 +42,7 @@ const EmailLoginForm = ({
       
       // Direct navigation to the appropriate dashboard page
       console.log("Redirecting to dashboard:", `/${type}`);
-      setTimeout(() => {
-        navigate(`/${type}`);
-      }, 300);
+      navigate(`/${type}`);
       
       return true;
     }
@@ -83,14 +81,15 @@ const EmailLoginForm = ({
         console.log("Login successful, session data:", data.session?.user.id);
         toast.success("Giriş başarılı!");
         
+        // Set user type in local storage as a fallback
+        localStorage.setItem("testUserType", type);
+        
         // Call onSuccess to close dialog
         onSuccess();
         
         // Direct navigation to the appropriate dashboard page
         console.log("Redirecting to dashboard:", `/${type}`);
-        setTimeout(() => {
-          navigate(`/${type}`);
-        }, 300);
+        navigate(`/${type}`);
       } else {
         console.log("Attempting signup with email:", email);
         const { error: signUpError, data: signUpData } = await supabase.auth.signUp({
@@ -109,12 +108,16 @@ const EmailLoginForm = ({
         
         console.log("Signup successful, user ID:", signUpData.user?.id);
         
+        // After signup, directly sign in
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         
         if (signInError) throw signInError;
+        
+        // Set user type in local storage as a fallback
+        localStorage.setItem("testUserType", type);
         
         toast.success("Kayıt ve giriş başarılı!");
         
@@ -123,9 +126,7 @@ const EmailLoginForm = ({
         
         // Direct navigation to the appropriate dashboard page
         console.log("Redirecting to dashboard:", `/${type}`);
-        setTimeout(() => {
-          navigate(`/${type}`);
-        }, 300);
+        navigate(`/${type}`);
       }
     } catch (error: any) {
       console.error("Auth error:", error);
