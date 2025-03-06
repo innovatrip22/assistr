@@ -27,7 +27,9 @@ const AuthRequired = ({ children, userType }: AuthRequiredProps) => {
     return <Navigate to="/" />;
   }
 
+  // This is the critical change - making sure we're checking for exact match
   if (currentUserType !== userType) {
+    console.log(`Access denied: Required ${userType}, but found ${currentUserType}`);
     return <Navigate to="/" />;
   }
 

@@ -9,11 +9,29 @@ const isTestUser = (userId: string) => {
 };
 
 // Helper method to check if user has notifications
-export const getUserNotifications = async (userId: string) => {
-  // For test users, return mock data
+export const getUserNotifications = async (userId: string, userType?: string) => {
+  // For test users, return mock data based on user type
   if (isTestUser(userId)) {
-    const feedbackNotifications = (await getFeedbacks()).filter(fb => fb.response);
-    const reportNotifications = (await getReports()).filter(rp => rp.response);
+    const allFeedbacks = await getFeedbacks();
+    const allReports = await getReports();
+    
+    // Filter notifications based on user type
+    let feedbackNotifications = [];
+    let reportNotifications = [];
+    
+    if (userType === 'tourist') {
+      // Tourists see responses to their own feedbacks/reports
+      feedbackNotifications = allFeedbacks.filter(fb => fb.response);
+      reportNotifications = allReports.filter(rp => rp.response);
+    } else if (userType === 'institution') {
+      // Institutions see pending feedbacks and reports
+      feedbackNotifications = allFeedbacks.filter(fb => fb.status === 'pending');
+      reportNotifications = allReports.filter(rp => rp.status === 'pending');
+    } else if (userType === 'business') {
+      // Businesses see reports and feedbacks related to them
+      feedbackNotifications = allFeedbacks.filter(fb => fb.businessId === userId || fb.institution === 'business');
+      reportNotifications = allReports.filter(rp => rp.businessId === userId);
+    }
     
     return {
       feedbackNotifications,
@@ -22,6 +40,7 @@ export const getUserNotifications = async (userId: string) => {
     };
   }
   
+  // For real users, use the database
   const { data: notifications, error } = await supabase
     .from('notifications')
     .select('*')

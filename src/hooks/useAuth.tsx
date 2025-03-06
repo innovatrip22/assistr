@@ -1,5 +1,4 @@
-
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -183,6 +182,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Clear test login if exists
       localStorage.removeItem("testUserType");
       
+      // Sign out from Supabase too if we have a real session
       await supabase.auth.signOut();
       setUser(null);
       setUserType(null);
