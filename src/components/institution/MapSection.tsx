@@ -1,6 +1,5 @@
-
 import { useEffect, useRef, useState } from "react";
-import { Map as MapIcon, AlertTriangle, TrendingUp, Traffic, Users } from "lucide-react";
+import { Map as MapIcon, AlertTriangle, TrendingUp, Car } from "lucide-react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { getReports } from "@/services";
@@ -239,7 +238,7 @@ const MapSection = () => {
               </div>
               
               <div className="border rounded-lg p-4 flex items-start gap-3">
-                <Traffic className="w-10 h-10 text-green-500" />
+                <Car className="w-10 h-10 text-green-500" />
                 <div>
                   <h3 className="font-medium">Trafik Yoğunluğu Tahmini</h3>
                   <p className="text-sm text-gray-600">
@@ -262,7 +261,7 @@ const MapSection = () => {
             <div className="h-[400px] rounded-lg overflow-hidden relative">
               <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
                 <div className="text-center">
-                  <Traffic className="w-16 h-16 mx-auto text-gray-400 mb-2" />
+                  <Car className="w-16 h-16 mx-auto text-gray-400 mb-2" />
                   <p className="text-gray-500">Trafik verileri yükleniyor...</p>
                 </div>
               </div>
