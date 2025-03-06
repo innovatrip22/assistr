@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -52,7 +51,7 @@ const TravelPlanner = () => {
     setTimeout(() => {
       const days = parseInt(duration);
       const plan = {
-        title: `${days} Günlük Antalya Gezi Planı`,
+        title: `${days} Günlük KKTC Gezi Planı`,
         date: planDate ? format(planDate, 'dd MMMM yyyy', {locale: tr}) : '',
         interests: interests,
         days: Array.from({length: days}, (_, index) => ({
@@ -60,48 +59,48 @@ const TravelPlanner = () => {
           activities: [
             {
               time: '09:00',
-              activity: index === 0 ? 'Kaleiçi Turu' : index === 1 ? 'Aspendos Antik Tiyatrosu' : 'Olympos Antik Kenti',
+              activity: index === 0 ? 'Girne Limanı' : index === 1 ? 'Bellapais Manastırı' : 'Salamis Harabeleri',
               description: index === 0 
-                ? 'Antalya\'nın tarihi merkezi Kaleiçi\'nde yürüyüş turu. Hadrian Kapısı, Yivli Minare ve tarihi sokaklar.' 
+                ? 'KKTC\'nin en güzel bölgelerinden biri olan Girne Limanı\'nda yürüyüş ve tarihi binalar.' 
                 : index === 1 
-                ? 'Dünyanın en iyi korunmuş antik tiyatrolarından biri olan Aspendos\'u ziyaret.' 
-                : 'Eşsiz doğası ve tarihi kalıntılarıyla ünlü Olympos Antik Kenti\'ni ziyaret.'
+                ? 'Gotik mimarinin en güzel örneklerinden biri olan Bellapais Manastırı\'nı ziyaret.' 
+                : 'Antik dönemden kalma muhteşem Salamis Harabeleri\'ni keşfetme.'
             },
             {
               time: '12:30',
               activity: 'Öğle Yemeği',
               description: index === 0 
-                ? 'Kaleiçi\'ndeki otantik bir restoranda yerel lezzetler.' 
+                ? 'Girne Limanı\'ndaki otantik bir restoranda yerel KKTC lezzetleri.' 
                 : index === 1 
-                ? 'Aspendos çevresindeki yerel bir restoranda öğle yemeği.' 
-                : 'Olympos bölgesindeki bir sahil restoranında balık keyfi.'
+                ? 'Bellapais bölgesindeki tarihi bir restoranda geleneksel yemekler.' 
+                : 'Salamis çevresindeki bir restoranda taze balık keyfi.'
             },
             {
               time: '14:00',
-              activity: index === 0 ? 'Antalya Müzesi' : index === 1 ? 'Düden Şelalesi' : 'Konyaaltı Plajı',
+              activity: index === 0 ? 'St. Hilarion Kalesi' : index === 1 ? 'Karpaz Milli Parkı' : 'Gazimağusa Surları',
               description: index === 0 
-                ? 'Antalya\'nın zengin tarihini anlatan arkeoloji müzesini ziyaret.' 
+                ? 'Eşsiz manzarası ile St. Hilarion Kalesi\'ni ziyaret ve fotoğraf çekimi.' 
                 : index === 1 
-                ? 'Muhteşem Düden Şelalesi\'nde doğa yürüyüşü ve fotoğraf çekimi.' 
-                : 'Antalya\'nın ünlü Konyaaltı Plajı\'nda deniz ve güneş keyfi.'
+                ? 'Muhteşem Karpaz Milli Parkı\'nda doğa yürüyüşü ve yabani eşekleri gözlemleme.' 
+                : 'Venedikliler tarafından inşa edilen tarihi Gazimağusa Surları\'nı keşfetme.'
             },
             {
               time: '17:00',
-              activity: index === 0 ? 'Liman Bölgesi' : index === 1 ? 'Perge Antik Kenti' : 'Old Town Tekne Turu',
+              activity: index === 0 ? 'Girne Kalesi' : index === 1 ? 'Apostolos Andreas Manastırı' : 'Namık Kemal Zindanı',
               description: index === 0 
-                ? 'Antalya Marina ve çevresinde keyifli bir yürüyüş ve alışveriş.' 
+                ? 'Tarihi Girne Kalesi\'ni ve içindeki Batık Gemi Müzesi\'ni ziyaret.' 
                 : index === 1 
-                ? 'Helenistik dönemden kalma etkileyici Perge Antik Kenti ziyareti.' 
-                : 'Tekne ile Antalya kıyılarında günbatımı turu.'
+                ? 'Karpaz Yarımadası\'nın ucundaki önemli dini merkez Apostolos Andreas Manastırı\'nı ziyaret.' 
+                : 'Tarihi öneme sahip Namık Kemal Zindanı ve Gazimağusa\'nın tarihi merkezini keşfetme.'
             },
             {
               time: '20:00',
               activity: 'Akşam Yemeği',
               description: index === 0 
-                ? 'Liman bölgesinde deniz manzaralı bir restoranda akşam yemeği.' 
+                ? 'Girne\'de deniz manzaralı bir restoranda hellim ve şeftali kebabı tadımı.' 
                 : index === 1 
-                ? 'Şehir merkezinde yerel bir restoranda Akdeniz mutfağının lezzetleri.' 
-                : 'Balık restoranında taze deniz ürünleri ziyafeti.'
+                ? 'Yerel bir restoranda KKTC mutfağının özel lezzetleri molehiya ve kolakas.' 
+                : 'Gazimağusa\'da tarihi bir mekanda geleneksel Kıbrıs mezelerini tatma.'
             }
           ]
         }))
