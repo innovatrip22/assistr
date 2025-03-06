@@ -13,7 +13,7 @@ const mockFeedbacks = [
   {
     id: "1",
     user: "Ahmet Y.",
-    type: "complaint",
+    type: "complaint" as const,
     subject: "Hizmet Kalitesi",
     message: "Girne'deki restoranınızda servis biraz yavaştı. Daha hızlı olabilir.",
     rating: 3,
@@ -23,7 +23,7 @@ const mockFeedbacks = [
   {
     id: "2",
     user: "Ayşe K.",
-    type: "suggestion",
+    type: "suggestion" as const,
     subject: "Menü Önerisi",
     message: "KKTC'ye özgü daha fazla yerel yemek eklemenizi öneririm.",
     rating: 4,
@@ -33,7 +33,7 @@ const mockFeedbacks = [
   {
     id: "3",
     user: "Mehmet S.",
-    type: "praise",
+    type: "praise" as const,
     subject: "Personel",
     message: "Resepsiyondaki personel çok yardımcı oldu. Teşekkürler!",
     rating: 5,
@@ -43,7 +43,7 @@ const mockFeedbacks = [
   {
     id: "4",
     user: "Zeynep T.",
-    type: "complaint",
+    type: "complaint" as const,
     subject: "Temizlik",
     message: "Otel odası beklediğim kadar temiz değildi.",
     rating: 2,

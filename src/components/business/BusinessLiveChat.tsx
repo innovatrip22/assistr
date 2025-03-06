@@ -15,7 +15,7 @@ const mockContacts = [
     name: "Ahmet Yılmaz", 
     lastMessage: "Merhaba, odamla ilgili bir sorum var...", 
     time: "10:23", 
-    status: "online",
+    status: "online" as const,
     avatar: "/assets/avatar1.jpg",
     unread: 2
   },
@@ -24,7 +24,7 @@ const mockContacts = [
     name: "Ayşe Kaya", 
     lastMessage: "Rezervasyon yaptırmak istiyorum.", 
     time: "Dün", 
-    status: "offline",
+    status: "offline" as const,
     avatar: "/assets/avatar2.jpg",
     unread: 0
   },
@@ -33,7 +33,7 @@ const mockContacts = [
     name: "Mehmet Şahin", 
     lastMessage: "Teşekkür ederim, iyi günler!", 
     time: "Dün", 
-    status: "offline",
+    status: "offline" as const,
     avatar: "/assets/avatar3.jpg",
     unread: 0
   },
@@ -42,7 +42,7 @@ const mockContacts = [
     name: "Zeynep Türk", 
     lastMessage: "KKTC'ye ilk kez geliyorum ve...", 
     time: "21/07", 
-    status: "online",
+    status: "online" as const,
     avatar: "/assets/avatar4.jpg",
     unread: 0
   }
@@ -52,31 +52,31 @@ const mockContacts = [
 const mockMessages = [
   {
     id: "1",
-    sender: "customer",
+    sender: "customer" as const,
     message: "Merhaba, KKTC'ye ilk kez geliyorum ve işletmenizde konaklayacağım. Havaalanından işletmenize ulaşım konusunda bilgi alabilir miyim?",
     time: "10:15"
   },
   {
     id: "2",
-    sender: "business",
+    sender: "business" as const,
     message: "Merhaba, bizi tercih ettiğiniz için teşekkür ederiz! Ercan Havalimanı'ndan işletmemize ulaşmak için taksi veya havaalanı servisi kullanabilirsiniz. Yaklaşık 45 dakikalık bir yolculuk olacaktır.",
     time: "10:18"
   },
   {
     id: "3",
-    sender: "customer",
+    sender: "customer" as const,
     message: "Havaalanı servisi rezervasyonu yapmam gerekiyor mu?",
     time: "10:20"
   },
   {
     id: "4",
-    sender: "business",
+    sender: "business" as const,
     message: "Evet, servis için rezervasyon yapmanız gerekiyor. Rezervasyon bilgilerinizi bizimle paylaşırsanız sizin için servis ayarlayabiliriz.",
     time: "10:22"
   },
   {
     id: "5",
-    sender: "customer",
+    sender: "customer" as const,
     message: "Harika, teşekkür ederim! Uçuşum yarın saat 14:00'te Ercan Havalimanı'na iniş yapacak.",
     time: "10:23"
   }
