@@ -20,10 +20,10 @@ serve(async (req) => {
 
     // Sistem mesajı kullanıcı tipine göre ayarla
     const systemMessage = userType === 'tourist' 
-      ? 'Antalya turizm asistanısın. Turistlere nazik ve yardımcı bir şekilde bilgi vermelisin. Sadece Antalya bölgesi hakkında bilgi verebilirsin.'
+      ? 'KKTC turizm asistanısın. Turistlere nazik ve yardımcı bir şekilde bilgi vermelisin. Sadece KKTC bölgesi hakkında bilgi verebilirsin.'
       : userType === 'institution'
-      ? 'Antalya belediyesi görevlisi için bir asistansın. Kurumsal dil kullan ve prosedürler hakkında bilgi ver. Verilen rapor ve şikayetlere nasıl yaklaşılmalı konusunda tavsiyelerde bulun.'
-      : 'Antalya\'daki işletmeler için bir asistansın. İşletme sahiplerine rehberlik et ve turistlerle ilişkiler konusunda tavsiyelerde bulun.';
+      ? 'KKTC belediyesi görevlisi için bir asistansın. Kurumsal dil kullan ve prosedürler hakkında bilgi ver. Verilen rapor ve şikayetlere nasıl yaklaşılmalı konusunda tavsiyelerde bulun.'
+      : 'KKTC\'deki işletmeler için bir asistansın. İşletme sahiplerine rehberlik et ve turistlerle ilişkiler konusunda tavsiyelerde bulun.';
 
     let generatedText;
     
@@ -60,10 +60,10 @@ serve(async (req) => {
     } else {
       // Fallback response if no API key is available
       const topics = {
-        'plaj': 'Antalya\'da en popüler plajlar Konyaaltı, Lara ve Kaputaş plajlarıdır.',
-        'müze': 'Antalya Müzesi, Türkiye\'nin en büyük müzelerinden biridir.',
-        'yemek': 'Antalya mutfağında piyaz, şiş köfte ve tandır kebabı öne çıkar.',
-        'hava': 'Antalya\'da yazlar sıcak ve kurak, kışlar ılık ve yağışlı geçer.'
+        'plaj': 'KKTC\'de en popüler plajlar Altın Kum, Glapsides ve Alagadi plajlarıdır.',
+        'müze': 'KKTC\'deki önemli müzeler arasında Mevlevi Tekke Müzesi ve St. Barnabas Manastırı bulunmaktadır.',
+        'yemek': 'KKTC mutfağında hellim, şeftali kebabı ve molehiya öne çıkar.',
+        'hava': 'KKTC\'de yazlar sıcak ve kurak, kışlar ılık ve yağışlı geçer.'
       };
       
       // Simple keyword matching for fallback responses
@@ -77,7 +77,7 @@ serve(async (req) => {
       }
       
       if (!matched) {
-        generatedText = "Antalya, Türkiye'nin güneyinde, Akdeniz kıyısında yer alan turistik bir şehirdir. Size nasıl yardımcı olabilirim?";
+        generatedText = "KKTC, Akdeniz'in kuzeydoğusunda yer alan turistik bir bölgedir. Size nasıl yardımcı olabilirim?";
       }
     }
 

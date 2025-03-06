@@ -36,9 +36,9 @@ const Index = () => {
         transition={{ duration: 0.5 }}
         className="text-center mb-10"
       >
-        <h1 className="text-4xl font-bold text-primary mb-2">Antalya Turizm Portalı</h1>
+        <h1 className="text-4xl font-bold text-primary mb-2">KKTC Turizm Portalı</h1>
         <p className="text-gray-600 max-w-md mx-auto">
-          Antalya'yı ziyaret eden turistler, işletmeler ve kurumlar için tek durak hizmet noktası
+          KKTC'yi ziyaret eden turistler, işletmeler ve kurumlar için tek durak hizmet noktası
         </p>
       </motion.div>
 
@@ -77,7 +77,7 @@ const Index = () => {
           </div>
           <h2 className="text-xl font-semibold mb-2">Kurum Girişi</h2>
           <p className="text-gray-500 text-center mb-4">
-            Geri bildirimleri yönetin, raporlara yanıt verin, şehir haritasını görüntüleyin
+            Geri bildirimleri yönetin, raporlara yanıt verin, bölge haritasını görüntüleyin
           </p>
           <Button 
             onClick={() => handleOpenAuthDialog("institution")} 
@@ -116,7 +116,7 @@ const Index = () => {
         transition={{ duration: 0.5, delay: 0.6 }}
         className="mt-10 text-gray-500 text-center text-sm"
       >
-        Antalya Turizm Portalı &copy; {new Date().getFullYear()} | Tüm Hakları Saklıdır
+        KKTC Turizm Portalı &copy; {new Date().getFullYear()} | Tüm Hakları Saklıdır
       </motion.p>
 
       {showAuthDialog && selectedUserType && (

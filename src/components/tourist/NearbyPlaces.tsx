@@ -18,19 +18,19 @@ const NearbyPlaces = () => {
   const [userLocation, setUserLocation] = useState<LocationType>(null);
   const [nearbyPlaces, setNearbyPlaces] = useState<PlaceType[]>([
     {
-      name: "Antalya Havalimanı",
-      distance: "12.5 km",
-      duration: "20 dakika",
+      name: "Ercan Havalimanı",
+      distance: "15.3 km",
+      duration: "22 dakika",
     },
     {
-      name: "Kaleiçi",
-      distance: "2.3 km",
-      duration: "8 dakika",
+      name: "Girne Limanı",
+      distance: "3.8 km",
+      duration: "10 dakika",
     },
     {
-      name: "Konyaaltı Plajı",
-      distance: "5.1 km",
-      duration: "15 dakika",
+      name: "Salamis Harabeleri",
+      distance: "8.5 km",
+      duration: "18 dakika",
     },
   ]);
 
@@ -49,7 +49,7 @@ const NearbyPlaces = () => {
     if (userLocation) {
       window.open(
         `https://www.google.com/maps/dir/${userLocation.latitude},${userLocation.longitude}/${encodeURIComponent(
-          place + " Antalya"
+          place + " KKTC"
         )}`,
         "_blank"
       );

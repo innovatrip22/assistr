@@ -15,7 +15,7 @@ type ChatMessage = {
 
 const TravelChat = () => {
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
-    {role: 'assistant', content: 'Merhaba! Antalya hakkında sorularınızı yanıtlamaya hazırım. Size nasıl yardımcı olabilirim?'}
+    {role: 'assistant', content: 'Merhaba! KKTC hakkında sorularınızı yanıtlamaya hazırım. Size nasıl yardımcı olabilirim?'}
   ]);
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -82,7 +82,7 @@ const TravelChat = () => {
       </ScrollArea>
       <div className="flex gap-2">
         <Input 
-          placeholder="Antalya hakkında bir soru sorun..." 
+          placeholder="KKTC hakkında bir soru sorun..." 
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}

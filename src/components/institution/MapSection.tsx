@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import { Map as MapIcon, AlertTriangle, TrendingUp, Car, UserRound } from "lucide-react";
 import mapboxgl from "mapbox-gl";
@@ -29,7 +30,7 @@ const MapSection = () => {
   const [activeTab, setActiveTab] = useState("heatmap");
   const [predictionData, setPredictionData] = useState({
     trafficLevel: "Normal",
-    touristCount: "5,420",
+    touristCount: "3,250",
     emergencyRisk: "Düşük",
     crowdPrediction: "Orta"
   });
@@ -40,8 +41,8 @@ const MapSection = () => {
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: "mapbox://styles/mapbox/light-v11",
-        center: [30.7133, 36.8969], // Antalya koordinatları
-        zoom: 12
+        center: [33.9216, 35.1856], // KKTC koordinatları
+        zoom: 11
       });
 
       map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
@@ -81,11 +82,11 @@ const MapSection = () => {
 
     // Örnek veri noktaları - gerçek uygulamada bu veriler API'den gelebilir
     const points = [
-      [30.7133, 36.8969, 100], // Antalya merkez - yüksek yoğunluk
-      [30.6890, 36.8850, 80],  // Başka bir nokta - orta yoğunluk
-      [30.7350, 36.9100, 60],  // Başka bir nokta - düşük yoğunluk
-      [30.7000, 36.9200, 90],  // Başka bir nokta - orta-yüksek yoğunluk
-      [30.6500, 36.8800, 70]   // Başka bir nokta - orta yoğunluk
+      [33.9216, 35.1856, 100], // Lefkoşa - yüksek yoğunluk
+      [33.3597, 35.3446, 80],  // Girne - orta yoğunluk
+      [33.9360, 35.2850, 60],  // Gönyeli - düşük yoğunluk
+      [33.8790, 35.1170, 90],  // Lefkoşa merkez - orta-yüksek yoğunluk
+      [34.0741, 35.1182, 70]   // Gazimağusa - orta yoğunluk
     ];
 
     // Kaynak ekleme
@@ -150,10 +151,10 @@ const MapSection = () => {
       <CardHeader>
         <div className="flex items-center gap-3">
           <MapIcon className="w-6 h-6 text-primary" />
-          <CardTitle>Antalya Haritası</CardTitle>
+          <CardTitle>KKTC Haritası</CardTitle>
         </div>
         <CardDescription>
-          Şehir genelindeki raporlar, yoğunluk ve tahminler
+          Bölge genelindeki raporlar, yoğunluk ve tahminler
         </CardDescription>
       </CardHeader>
       
@@ -228,8 +229,8 @@ const MapSection = () => {
                 <div>
                   <h3 className="font-medium">Bölgedeki Tahmini Turist Sayısı</h3>
                   <p className="text-sm text-gray-600">
-                    Antalya merkez ve çevresinde bugün için tahmini turist sayısı.
-                    Değişim: Dünden %5 artış.
+                    KKTC bölgesi genelinde bugün için tahmini turist sayısı.
+                    Değişim: Dünden %3 artış.
                   </p>
                   <Badge variant="secondary" className="mt-2">
                     {predictionData.touristCount}
@@ -242,7 +243,7 @@ const MapSection = () => {
                 <div>
                   <h3 className="font-medium">Trafik Yoğunluğu Tahmini</h3>
                   <p className="text-sm text-gray-600">
-                    Şehir içi ve turistik bölgelerde trafik yoğunluğu tahminleri.
+                    Bölge içi ve turistik noktalarda trafik yoğunluğu tahminleri.
                     Trafik akışının normal seyretmesi bekleniyor.
                   </p>
                   <Badge variant="outline" className="mt-2 border-green-500 text-green-500">
