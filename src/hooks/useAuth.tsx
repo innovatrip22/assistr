@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -28,10 +27,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("AuthProvider: Initializing auth check...");
+    
     // Check for test login first
     const testUserType = localStorage.getItem("testUserType") as UserType;
     if (testUserType) {
-      console.log("Found test login user type:", testUserType);
+      console.log("Found test login, setting user type:", testUserType);
       setUser({ id: "test-user", email: "test@example.com" });
       setUserType(testUserType);
       setLoading(false);
@@ -45,35 +46,49 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const { data: sessionData, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error("Session error:", error);
+          console.error("Session check error:", error);
           setLoading(false);
           return;
         }
-        
-        if (sessionData?.session) {
-          console.log("Found active session:", sessionData.session.user.id);
-          setUser(sessionData.session.user);
-          
-          // Get user type
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('user_type')
-            .eq('id', sessionData.session.user.id)
-            .maybeSingle();
-          
-          if (profileError) {
-            console.error("Profile fetch error:", profileError);
-          }
-            
-          if (profileData && profileData.user_type) {
-            setUserType(profileData.user_type as UserType);
-            console.log("User type set to:", profileData.user_type);
-          } else {
-            console.log("No profile data found, user type remains null");
-          }
-        } else {
+
+        if (!sessionData?.session) {
           console.log("No active session found");
+          setLoading(false);
+          return;
         }
+
+        console.log("Found active session for user:", sessionData.session.user.id);
+        setUser(sessionData.session.user);
+        
+        // Get user type from code-based auth if present
+        const testType = sessionData.session.user.user_metadata?.user_type;
+        if (testType) {
+          console.log("Setting user type from metadata:", testType);
+          setUserType(testType as UserType);
+          setLoading(false);
+          return;
+        }
+
+        // Otherwise check profiles table
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('user_type')
+          .eq('id', sessionData.session.user.id)
+          .maybeSingle();
+        
+        if (profileError) {
+          console.error("Profile fetch error:", profileError);
+          setLoading(false);
+          return;
+        }
+          
+        if (profileData?.user_type) {
+          console.log("Setting user type from profile:", profileData.user_type);
+          setUserType(profileData.user_type as UserType);
+        } else {
+          console.log("No user type found in profile");
+        }
+        
       } catch (error) {
         console.error("Auth check error:", error);
       } finally {
@@ -83,40 +98,56 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     checkUser();
 
-    // Listen for auth state changes
+    // Auth state listener
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log("Auth state changed:", event, session?.user?.id);
         
-        if (session) {
-          setUser(session.user);
-          
-          // Get user type
-          const { data: profileData, error } = await supabase
-            .from('profiles')
-            .select('user_type')
-            .eq('id', session.user.id)
-            .maybeSingle();
-          
-          if (error) {
-            console.error("Profile fetch error on auth change:", error);
-          }
-            
-          if (profileData && profileData.user_type) {
-            setUserType(profileData.user_type as UserType);
-            console.log("User type updated to:", profileData.user_type);
-          } else {
-            console.log("No profile data on auth change");
-          }
-        } else {
+        if (!session) {
+          console.log("No session in auth change, clearing user");
           setUser(null);
           setUserType(null);
+          setLoading(false);
+          return;
         }
+
+        setUser(session.user);
+        
+        // Get user type from code-based auth if present
+        const testType = session.user.user_metadata?.user_type;
+        if (testType) {
+          console.log("Setting user type from metadata:", testType);
+          setUserType(testType as UserType);
+          setLoading(false);
+          return;
+        }
+
+        // Otherwise check profiles table
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('user_type')
+          .eq('id', session.user.id)
+          .maybeSingle();
+        
+        if (profileError) {
+          console.error("Profile fetch error on auth change:", profileError);
+          setLoading(false);
+          return;
+        }
+          
+        if (profileData?.user_type) {
+          console.log("User type updated to:", profileData.user_type);
+          setUserType(profileData.user_type as UserType);
+        } else {
+          console.log("No profile data on auth change");
+        }
+        
         setLoading(false);
       }
     );
 
     return () => {
+      console.log("Cleaning up auth listener");
       authListener.subscription.unsubscribe();
     };
   }, []);

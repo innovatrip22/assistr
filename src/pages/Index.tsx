@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginCard from "@/components/LoginCard";
@@ -16,43 +15,25 @@ const Index = () => {
   const { user, userType, loading } = useAuth();
 
   useEffect(() => {
-    console.log("Index: Auth state ->", { loading, user, userType });
-  }, [loading, user, userType]);
+    console.log("Index: Auth state changed:", {
+      loading,
+      user: user?.id,
+      userType,
+      selectedType
+    });
 
-  const handleLoginSuccess = () => {
-    const testUserType = localStorage.getItem("testUserType");
-    // If test login, use the type from localStorage, otherwise use the selected type
-    const typeToUse = testUserType || selectedType;
-    
-    console.log("Login success, redirecting to:", typeToUse);
-    
-    switch (typeToUse) {
-      case "institution":
-        navigate("/institution");
-        break;
-      case "business":
-        navigate("/business");
-        break;
-      case "tourist":
-        navigate("/tourist");
-        break;
-    }
-  };
-
-  // If user is already logged in, redirect to the appropriate page
-  useEffect(() => {
     if (!loading && user && userType) {
-      console.log("User already logged in, redirecting to:", userType);
+      console.log("Redirecting to dashboard:", userType);
       navigate(`/${userType}`);
     }
-  }, [loading, user, userType, navigate]);
+  }, [loading, user, userType, navigate, selectedType]);
 
-  // Show loading indicator while checking auth status
   if (loading) {
+    console.log("Index: Showing loading state");
     return (
-      <div className="flex items-center justify-center min-h-screen flex-col gap-4">
+      <div className="flex items-center justify-center min-h-screen bg-background flex-col gap-4">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        <p>Yükleniyor...</p>
+        <p className="text-muted-foreground">Kullanıcı bilgileri kontrol ediliyor...</p>
       </div>
     );
   }
