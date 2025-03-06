@@ -29,8 +29,10 @@ export const getUserNotifications = async (userId: string, userType?: string) =>
       reportNotifications = allReports.filter(rp => rp.status === 'pending');
     } else if (userType === 'business') {
       // Businesses see reports and feedbacks related to them
-      feedbackNotifications = allFeedbacks.filter(fb => fb.businessId === userId || fb.institution === 'business');
-      reportNotifications = allReports.filter(rp => rp.businessId === userId);
+      // Use institution field instead of businessId for feedbacks
+      feedbackNotifications = allFeedbacks.filter(fb => fb.institution === userId || fb.institution === 'business');
+      // Use business_name field instead of businessId for reports
+      reportNotifications = allReports.filter(rp => rp.business_name === userId);
     }
     
     return {
