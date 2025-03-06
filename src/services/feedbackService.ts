@@ -47,6 +47,27 @@ export const addFeedback = async (feedback: Feedback) => {
   return data;
 };
 
+// Function to get unique institutions from existing feedbacks
+export const getUniqueInstitutions = async () => {
+  const { data, error } = await supabase
+    .from("feedbacks")
+    .select("institution")
+    .not("institution", "is", null)
+    .order("institution");
+
+  if (error) {
+    console.error("Error getting institutions:", error);
+    throw error;
+  }
+  
+  // Filter out duplicates and null values
+  const uniqueInstitutions = [...new Set(data.map(item => item.institution))]
+    .filter(Boolean)
+    .sort();
+  
+  return uniqueInstitutions as string[];
+};
+
 // Function to get feedbacks
 export const getFeedbacks = async () => {
   const { data, error } = await supabase

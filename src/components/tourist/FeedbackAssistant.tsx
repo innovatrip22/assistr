@@ -1,9 +1,9 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Plus } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { addFeedback } from "@/services";
+import { addFeedback, getUniqueInstitutions } from "@/services/feedbackService";
 import { v4 as uuidv4 } from "uuid";
 
 const feedbackSchema = z.object({
@@ -27,6 +27,8 @@ const FeedbackAssistant = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [institutions, setInstitutions] = useState<string[]>([]);
+  const [customInstitution, setCustomInstitution] = useState<boolean>(false);
 
   const form = useForm<z.infer<typeof feedbackSchema>>({
     resolver: zodResolver(feedbackSchema),
@@ -38,6 +40,24 @@ const FeedbackAssistant = () => {
       type: "complaint",
     },
   });
+
+  useEffect(() => {
+    const loadInstitutions = async () => {
+      try {
+        const data = await getUniqueInstitutions();
+        setInstitutions(data);
+      } catch (error) {
+        console.error("Error loading institutions:", error);
+        toast({
+          variant: "destructive",
+          title: "Kurumlar yüklenirken hata oluştu",
+          description: "Lütfen daha sonra tekrar deneyin",
+        });
+      }
+    };
+    
+    loadInstitutions();
+  }, [toast]);
 
   const onSubmit = async (values: z.infer<typeof feedbackSchema>) => {
     setIsSubmitting(true);
@@ -60,6 +80,7 @@ const FeedbackAssistant = () => {
       });
       
       form.reset();
+      setCustomInstitution(false);
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -85,19 +106,80 @@ const FeedbackAssistant = () => {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="institution"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Kurum/Hizmet</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Örn: Belediye, Müze, Sahil" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {!customInstitution ? (
+              <div className="space-y-2">
+                <FormField
+                  control={form.control}
+                  name="institution"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Kurum/Hizmet</FormLabel>
+                      <div className="flex space-x-2">
+                        <FormControl>
+                          <Select 
+                            onValueChange={field.onChange} 
+                            value={field.value}
+                          >
+                            <SelectTrigger className="flex-1">
+                              <SelectValue placeholder="Kurum seçin" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {institutions.map((inst) => (
+                                <SelectItem key={inst} value={inst}>
+                                  {inst}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          size="icon"
+                          onClick={() => setCustomInstitution(true)}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Listede olmayan bir kurum için "+" butonuna tıklayın
+                </p>
+              </div>
+            ) : (
+              <FormField
+                control={form.control}
+                name="institution"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Kurum/Hizmet</FormLabel>
+                    <div className="flex space-x-2">
+                      <FormControl>
+                        <Input placeholder="Örn: Belediye, Müze, Sahil" {...field} />
+                      </FormControl>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="icon"
+                        onClick={() => {
+                          form.setValue('institution', '');
+                          setCustomInstitution(false);
+                        }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                          <path d="M18 6 6 18"/>
+                          <path d="m6 6 12 12"/>
+                        </svg>
+                      </Button>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             
             <FormField
               control={form.control}
