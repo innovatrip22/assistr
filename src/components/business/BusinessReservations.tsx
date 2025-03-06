@@ -1,266 +1,211 @@
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { CalendarDays, CheckCircle2, Clock, Users, XCircle, Info, Phone } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, Clock, Info, Check, X, Phone, User, Users, Edit, Trash2, Plus } from "lucide-react";
 
 const mockReservations = [
-  {
-    id: 1,
-    customerName: "Ali Yılmaz",
-    date: new Date(new Date().setDate(new Date().getDate() + 1)),
-    time: "19:00",
-    people: 4,
-    phone: "+90 555 123 4567",
-    status: "pending",
-    notes: "Pencere kenarı tercih ediliyor."
+  { 
+    id: 1, 
+    customerName: "Ahmet Yılmaz", 
+    customerPhone: "+90 555 123 4567", 
+    date: "2023-07-15", 
+    time: "19:30", 
+    partySize: 4, 
+    status: "confirmed", 
+    notes: "Pencere kenarı tercih ediliyor" 
   },
-  {
-    id: 2,
-    customerName: "Ayşe Demir",
-    date: new Date(new Date().setDate(new Date().getDate() + 1)),
-    time: "20:30",
-    people: 2,
-    phone: "+90 555 987 6543",
-    status: "confirmed",
-    notes: ""
+  { 
+    id: 2, 
+    customerName: "Ayşe Demir", 
+    customerPhone: "+90 532 987 6543", 
+    date: "2023-07-15", 
+    time: "20:00", 
+    partySize: 2, 
+    status: "pending", 
+    notes: "" 
   },
-  {
-    id: 3,
-    customerName: "Mehmet Çelik",
-    date: new Date(new Date().setDate(new Date().getDate() + 2)),
-    time: "13:00",
-    people: 6,
-    phone: "+90 555 456 7890",
-    status: "confirmed",
-    notes: "Doğum günü kutlaması."
+  { 
+    id: 3, 
+    customerName: "Mehmet Kaya", 
+    customerPhone: "+90 541 456 7890", 
+    date: "2023-07-16", 
+    time: "13:00", 
+    partySize: 6, 
+    status: "confirmed", 
+    notes: "Doğum günü kutlaması" 
   },
-  {
-    id: 4,
-    customerName: "Zeynep Kaya",
-    date: new Date(new Date().setDate(new Date().getDate() + 3)),
-    time: "18:00",
-    people: 3,
-    phone: "+90 555 789 0123",
-    status: "pending",
-    notes: ""
-  },
-  {
-    id: 5,
-    customerName: "Can Özkan",
-    date: new Date(new Date().setDate(new Date().getDate() + 4)),
-    time: "21:00",
-    people: 8,
-    phone: "+90 555 234 5678",
-    status: "cancelled",
-    notes: "Son dakika iptal."
+  { 
+    id: 4, 
+    customerName: "Zeynep Şahin", 
+    customerPhone: "+90 505 789 0123", 
+    date: "2023-07-16", 
+    time: "14:30", 
+    partySize: 3, 
+    status: "cancelled", 
+    notes: "" 
   }
 ];
 
-const formatDate = (date: Date) => {
-  return date.toLocaleDateString('tr-TR', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  });
-};
-
 const BusinessReservations = () => {
   const [reservations] = useState(mockReservations);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
-  
-  const handleConfirm = (id: number) => {
-    // In a real app, this would update the reservation status
-    alert(`Rezervasyon #${id} onaylandı.`);
-  };
-  
-  const handleCancel = (id: number) => {
-    // In a real app, this would update the reservation status
-    alert(`Rezervasyon #${id} iptal edildi.`);
+  const [isAdding, setIsAdding] = useState(false);
+
+  const toggleAddForm = () => {
+    setIsAdding(!isAdding);
   };
 
-  // Filter reservations by date and status
-  const filteredReservations = reservations.filter(reservation => {
-    const matchesDate = selectedDate 
-      ? reservation.date.toDateString() === selectedDate.toDateString()
-      : true;
-    const matchesStatus = selectedStatus 
-      ? reservation.status === selectedStatus
-      : true;
-    return matchesDate && matchesStatus;
-  });
-
-  // Count reservations by status
-  const statusCounts = {
-    all: reservations.length,
-    pending: reservations.filter(r => r.status === "pending").length,
-    confirmed: reservations.filter(r => r.status === "confirmed").length,
-    cancelled: reservations.filter(r => r.status === "cancelled").length
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "confirmed":
+        return <Badge className="bg-green-500">Onaylandı</Badge>;
+      case "pending":
+        return <Badge variant="outline" className="text-amber-500 border-amber-500">Beklemede</Badge>;
+      case "cancelled":
+        return <Badge variant="destructive">İptal Edildi</Badge>;
+      default:
+        return <Badge>{status}</Badge>;
+    }
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <Card className="lg:col-span-1">
+    <div className="space-y-6">
+      <Card>
         <CardHeader>
-          <CardTitle>Takvim</CardTitle>
-          <CardDescription>Rezervasyonları tarihe göre filtreleyin</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={setSelectedDate}
-            className="rounded-md border"
-          />
-          <div className="mt-4">
-            <Button 
-              variant="outline" 
-              className="w-full" 
-              onClick={() => setSelectedDate(undefined)}
-            >
-              Tüm Tarihleri Göster
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Rezervasyonlar</CardTitle>
+              <CardDescription>Müşteri rezervasyonlarını görüntüleyin ve yönetin</CardDescription>
+            </div>
+            <Button onClick={toggleAddForm}>
+              {isAdding ? (
+                <>
+                  <X className="h-4 w-4 mr-2" />
+                  İptal
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Yeni Rezervasyon
+                </>
+              )}
             </Button>
           </div>
-          
-          <div className="mt-6 space-y-2">
-            <h3 className="text-sm font-medium">Duruma Göre Filtrele</h3>
-            <div className="flex flex-wrap gap-2">
-              <Badge 
-                variant={selectedStatus === null ? "default" : "outline"}
-                className="cursor-pointer"
-                onClick={() => setSelectedStatus(null)}
-              >
-                Tümü ({statusCounts.all})
-              </Badge>
-              <Badge 
-                variant={selectedStatus === "pending" ? "default" : "outline"}
-                className="cursor-pointer"
-                onClick={() => setSelectedStatus("pending")}
-              >
-                Bekleyen ({statusCounts.pending})
-              </Badge>
-              <Badge 
-                variant={selectedStatus === "confirmed" ? "default" : "outline"}
-                className="cursor-pointer"
-                onClick={() => setSelectedStatus("confirmed")}
-              >
-                Onaylı ({statusCounts.confirmed})
-              </Badge>
-              <Badge 
-                variant={selectedStatus === "cancelled" ? "default" : "outline"}
-                className="cursor-pointer"
-                onClick={() => setSelectedStatus("cancelled")}
-              >
-                İptal ({statusCounts.cancelled})
-              </Badge>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="lg:col-span-2">
-        <CardHeader>
-          <CardTitle>Rezervasyonlar</CardTitle>
-          <CardDescription>
-            {selectedDate 
-              ? `${formatDate(selectedDate)} için rezervasyonlar` 
-              : "Tüm rezervasyonlar"}
-            {selectedStatus && ` - ${
-              selectedStatus === "pending" ? "Bekleyen" : 
-              selectedStatus === "confirmed" ? "Onaylı" : 
-              "İptal"
-            }`}
-          </CardDescription>
         </CardHeader>
-        <CardContent>
-          {filteredReservations.length === 0 ? (
-            <div className="text-center py-10">
-              <CalendarDays className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
-              <p className="text-muted-foreground">
-                {selectedDate 
-                  ? `${formatDate(selectedDate)} için rezervasyon bulunamadı.`
-                  : "Rezervasyon bulunamadı."}
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {filteredReservations.map(reservation => (
-                <div 
-                  key={reservation.id}
-                  className="p-4 rounded-lg border flex flex-col md:flex-row md:items-center gap-4"
-                >
-                  <div className="flex-1">
-                    <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <h3 className="font-medium">{reservation.customerName}</h3>
-                      <Badge 
-                        variant={
-                          reservation.status === "confirmed" ? "success" :
-                          reservation.status === "cancelled" ? "destructive" :
-                          "outline"
-                        }
-                      >
-                        {reservation.status === "pending" && "Bekleyen"}
-                        {reservation.status === "confirmed" && "Onaylı"}
-                        {reservation.status === "cancelled" && "İptal"}
-                      </Badge>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+        <CardContent className="space-y-6">
+          {isAdding && (
+            <Card className="border-dashed border-primary">
+              <CardHeader>
+                <CardTitle className="text-lg">Yeni Rezervasyon Ekle</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Müşteri Adı</label>
+                  <Input placeholder="Ahmet Yılmaz" />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-1">Telefon Numarası</label>
+                  <Input placeholder="+90 555 123 4567" />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Tarih</label>
+                    <Input type="date" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Saat</label>
+                    <Input type="time" />
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-1">Kişi Sayısı</label>
+                  <Input type="number" min="1" placeholder="2" />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-1">Notlar</label>
+                  <Input placeholder="Özel istekler veya notlar" />
+                </div>
+              </CardContent>
+              <CardFooter className="flex justify-end gap-2">
+                <Button variant="outline" onClick={toggleAddForm}>İptal</Button>
+                <Button>Rezervasyonu Ekle</Button>
+              </CardFooter>
+            </Card>
+          )}
+
+          <div className="grid grid-cols-1 gap-4">
+            {reservations.map(reservation => (
+              <Card key={reservation.id} className={`
+                border-l-4 
+                ${reservation.status === "confirmed" ? "border-l-green-500" : 
+                  reservation.status === "pending" ? "border-l-amber-500" : 
+                  "border-l-red-500"}
+              `}>
+                <CardContent className="p-4">
+                  <div className="flex flex-col md:flex-row justify-between">
+                    <div className="space-y-2">
                       <div className="flex items-center">
-                        <CalendarDays className="h-4 w-4 mr-2 text-muted-foreground" />
-                        <span>{formatDate(reservation.date)}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-                        <span>Saat: {reservation.time}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Users className="h-4 w-4 mr-2 text-muted-foreground" />
-                        <span>{reservation.people} Kişi</span>
+                        <User className="h-4 w-4 mr-2 text-muted-foreground" />
+                        <span className="font-medium">{reservation.customerName}</span>
                       </div>
                       <div className="flex items-center">
                         <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
-                        <span>{reservation.phone}</span>
+                        <span>{reservation.customerPhone}</span>
                       </div>
+                      <div className="flex items-center">
+                        <Users className="h-4 w-4 mr-2 text-muted-foreground" />
+                        <span>{reservation.partySize} Kişi</span>
+                      </div>
+                      {reservation.notes && (
+                        <div className="flex items-center">
+                          <Info className="h-4 w-4 mr-2 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">{reservation.notes}</span>
+                        </div>
+                      )}
                     </div>
                     
-                    {reservation.notes && (
-                      <div className="mt-2 flex items-start">
-                        <Info className="h-4 w-4 mr-2 text-muted-foreground mt-0.5" />
-                        <span className="text-sm text-muted-foreground">{reservation.notes}</span>
+                    <div className="mt-4 md:mt-0 space-y-2">
+                      <div className="flex justify-between md:justify-end items-center md:mb-2">
+                        <span className="text-muted-foreground md:hidden">Durum:</span>
+                        {getStatusBadge(reservation.status)}
                       </div>
-                    )}
-                  </div>
-                  
-                  {reservation.status === "pending" && (
-                    <div className="flex gap-2 self-end md:self-center">
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                        onClick={() => handleConfirm(reservation.id)}
-                      >
-                        <CheckCircle2 className="h-4 w-4 mr-1" />
-                        Onayla
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                        onClick={() => handleCancel(reservation.id)}
-                      >
-                        <XCircle className="h-4 w-4 mr-1" />
-                        İptal Et
-                      </Button>
+                      <div className="flex items-center">
+                        <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
+                        <span>{new Date(reservation.date).toLocaleDateString('tr-TR')}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
+                        <span>{reservation.time}</span>
+                      </div>
+                      <div className="flex space-x-2 mt-2">
+                        <Button variant="outline" size="sm" className="flex-1">
+                          <Edit className="h-4 w-4 mr-1" />
+                          Düzenle
+                        </Button>
+                        {reservation.status === "pending" ? (
+                          <Button variant="default" size="sm" className="flex-1">
+                            <Check className="h-4 w-4 mr-1" />
+                            Onayla
+                          </Button>
+                        ) : (
+                          <Button variant="destructive" size="sm" className="flex-1">
+                            <X className="h-4 w-4 mr-1" />
+                            İptal
+                          </Button>
+                        )}
+                      </div>
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </CardContent>
       </Card>
     </div>

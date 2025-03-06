@@ -2,7 +2,7 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Activity, TrendingUp, TrendingDown, Users, CreditCard } from "lucide-react";
+import { Activity, TrendingUp, TrendingDown, Users, CreditCard, MapPin } from "lucide-react";
 
 interface BusinessAnalyticsProps {
   touristStats: any;
