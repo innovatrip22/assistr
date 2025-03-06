@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Map as MapIcon, AlertTriangle, TrendingUp, Car } from "lucide-react";
+import { Map as MapIcon, AlertTriangle, TrendingUp, Car, UserRound } from "lucide-react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { getReports } from "@/services";
@@ -224,7 +224,7 @@ const MapSection = () => {
               </div>
               
               <div className="border rounded-lg p-4 flex items-start gap-3">
-                <Users className="w-10 h-10 text-indigo-500" />
+                <UserRound className="w-10 h-10 text-indigo-500" />
                 <div>
                   <h3 className="font-medium">Bölgedeki Tahmini Turist Sayısı</h3>
                   <p className="text-sm text-gray-600">
