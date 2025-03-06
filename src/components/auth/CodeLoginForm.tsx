@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 interface CodeLoginFormProps {
   type: "institution" | "business";
@@ -22,6 +23,7 @@ const CodeLoginForm = ({
   setIsLoading 
 }: CodeLoginFormProps) => {
   const [code, setCode] = useState("");
+  const navigate = useNavigate();
 
   // Demo codes for testing
   const validCodes = {
@@ -47,6 +49,7 @@ const CodeLoginForm = ({
       setIsLoading(true);
       
       try {
+        console.log("Attempting login with code for type:", type);
         const { error } = await supabase.auth.signInWithPassword({
           email: validCodeList[code].email,
           password: validCodeList[code].password,
@@ -54,14 +57,20 @@ const CodeLoginForm = ({
         
         if (error) throw error;
         
+        console.log("Code login successful");
         toast.success("Kod ile giriş başarılı!");
         
         // Set user type in local storage for test login
         localStorage.setItem("testUserType", type);
         
+        // Call onSuccess to close dialog
+        onSuccess();
+        
+        // Direct navigation to the appropriate dashboard page
+        console.log("Redirecting to dashboard:", `/${type}`);
         setTimeout(() => {
-          onSuccess();
-        }, 100);
+          navigate(`/${type}`);
+        }, 300);
       } catch (error: any) {
         console.error("Auth error:", error);
         toast.error(error.message || "Kod ile giriş sırasında bir hata oluştu");

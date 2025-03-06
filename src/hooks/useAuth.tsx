@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -87,7 +88,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             console.log("Setting user type from profile:", profileData.user_type);
             setUserType(profileData.user_type as UserType);
           } else {
-            console.log("No user type found in profile");
+            console.log("No user type found in profile, checking metadata again");
+            // Fallback check in user metadata
+            const userMetadataType = sessionData.session.user.user_metadata?.user_type;
+            if (userMetadataType) {
+              console.log("Found user type in metadata (fallback):", userMetadataType);
+              setUserType(userMetadataType as UserType);
+            } else {
+              console.log("No user type found in profile or metadata");
+            }
           }
         } catch (profileFetchError) {
           console.error("Error fetching profile:", profileFetchError);
@@ -145,7 +154,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             console.log("User type updated to:", profileData.user_type);
             setUserType(profileData.user_type as UserType);
           } else {
-            console.log("No profile data on auth change");
+            console.log("No profile data on auth change, checking metadata again");
+            // Fallback check in user metadata
+            const userMetadataType = session.user.user_metadata?.user_type;
+            if (userMetadataType) {
+              console.log("Found user type in metadata (auth change fallback):", userMetadataType);
+              setUserType(userMetadataType as UserType);
+            } else {
+              console.log("No profile data or metadata user type on auth change");
+            }
           }
         } catch (profileFetchError) {
           console.error("Error fetching profile on auth change:", profileFetchError);

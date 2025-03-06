@@ -29,10 +29,16 @@ const Index = () => {
     }
   }, [loading, user, userType, navigate, selectedType]);
 
-  // Handle successful login by closing the dialog
+  // Handle successful login by closing the dialog and navigating
   const handleLoginSuccess = () => {
     console.log("Login success, closing dialog");
     setSelectedType(null);
+    
+    // Check if we have user and userType already
+    if (user && userType) {
+      console.log("User already logged in, navigating to:", userType);
+      navigate(`/${userType}`);
+    }
   };
 
   if (loading) {

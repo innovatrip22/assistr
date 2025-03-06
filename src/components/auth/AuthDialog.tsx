@@ -5,6 +5,7 @@ import AuthMethodSelector from "./AuthMethodSelector";
 import CodeLoginForm from "./CodeLoginForm";
 import EmailLoginForm from "./EmailLoginForm";
 import AuthDialogHeader from "./AuthDialogHeader";
+import { useNavigate } from "react-router-dom";
 
 interface AuthDialogProps {
   type: "institution" | "business" | "tourist";
@@ -17,6 +18,7 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
   const [authMethod, setAuthMethod] = useState<"email" | "code">(
     type === "tourist" ? "email" : "email"
   );
+  const navigate = useNavigate();
 
   const getTitle = () => {
     const titles = {
@@ -37,6 +39,19 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
     return titles[type][authMethod];
   };
 
+  // Enhanced success handler to ensure navigation happens
+  const handleAuthSuccess = () => {
+    console.log("Auth success in dialog, type:", type);
+    // Call the parent's onSuccess to close dialog
+    onSuccess();
+    
+    // Direct navigation as a failsafe
+    console.log("Attempting direct navigation to:", `/${type}`);
+    setTimeout(() => {
+      navigate(`/${type}`);
+    }, 500);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -55,7 +70,7 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
         <CodeLoginForm 
           type={type as "institution" | "business"} 
           onClose={onClose} 
-          onSuccess={onSuccess}
+          onSuccess={handleAuthSuccess}
           isLoading={isLoading}
           setIsLoading={setIsLoading}
         />
@@ -63,7 +78,7 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
         <EmailLoginForm 
           type={type} 
           onClose={onClose} 
-          onSuccess={onSuccess}
+          onSuccess={handleAuthSuccess}
           isLoading={isLoading}
           setIsLoading={setIsLoading}
         />

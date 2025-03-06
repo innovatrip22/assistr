@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 interface EmailLoginFormProps {
   type: "institution" | "business" | "tourist";
@@ -25,20 +26,26 @@ const EmailLoginForm = ({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const navigate = useNavigate();
 
   const handleTestLogin = async () => {
     if (email === "123456" && password === "123456") {
-      console.log("Test login activated");
+      console.log("Test login activated for user type:", type);
       
       // Set user type in local storage for test login
       localStorage.setItem("testUserType", type);
       
       toast.success("Giriş başarılı!");
       
-      // Add a small delay to ensure state updates before navigation
+      // Call onSuccess to close dialog
+      onSuccess();
+      
+      // Direct navigation to the appropriate dashboard page
+      console.log("Redirecting to dashboard:", `/${type}`);
       setTimeout(() => {
-        onSuccess();
-      }, 100);
+        navigate(`/${type}`);
+      }, 300);
+      
       return true;
     }
     return false;
@@ -65,17 +72,28 @@ const EmailLoginForm = ({
     
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
+        console.log("Attempting login with email:", email);
+        const { error, data } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         
         if (error) throw error;
         
+        console.log("Login successful, session data:", data.session?.user.id);
         toast.success("Giriş başarılı!");
+        
+        // Call onSuccess to close dialog
         onSuccess();
+        
+        // Direct navigation to the appropriate dashboard page
+        console.log("Redirecting to dashboard:", `/${type}`);
+        setTimeout(() => {
+          navigate(`/${type}`);
+        }, 300);
       } else {
-        const { error: signUpError } = await supabase.auth.signUp({
+        console.log("Attempting signup with email:", email);
+        const { error: signUpError, data: signUpData } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -89,6 +107,8 @@ const EmailLoginForm = ({
         
         if (signUpError) throw signUpError;
         
+        console.log("Signup successful, user ID:", signUpData.user?.id);
+        
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -97,7 +117,15 @@ const EmailLoginForm = ({
         if (signInError) throw signInError;
         
         toast.success("Kayıt ve giriş başarılı!");
+        
+        // Call onSuccess to close dialog
         onSuccess();
+        
+        // Direct navigation to the appropriate dashboard page
+        console.log("Redirecting to dashboard:", `/${type}`);
+        setTimeout(() => {
+          navigate(`/${type}`);
+        }, 300);
       }
     } catch (error: any) {
       console.error("Auth error:", error);
