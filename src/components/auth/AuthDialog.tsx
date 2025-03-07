@@ -11,11 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { INSTITUTIONS, verifyInstitutionPassword } from "@/services/feedbackService";
 import { useToast } from "@/hooks/use-toast";
 
-// Define user type as a union to match what's used in AuthRequired
-type UserType = "institution" | "business" | "tourist";
-
 interface AuthDialogProps {
-  type: UserType;
+  type: "institution" | "business" | "tourist";
   onClose: () => void;
   onSuccess: () => void;
 }
@@ -183,7 +180,7 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
                 onClick={() => handleContinue()}
                 disabled={isLoading}
               >
-                {type === "tourist" ? "Turist" : type === "business" ? "İşletme" : "Kurum"} 
+                {type === "tourist" ? "Turist" : "İşletme"} 
                 {" "}olarak hızlı devam et
               </Button>
             </div>
