@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
-import { Map, MessageSquare, Calendar, Bell, Navigation, FileText } from "lucide-react";
+import { Map, MessageSquare, Calendar, Bell, Navigation, FileText, Hotel, Plane, Bus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +20,7 @@ import FeedbackAssistant from "@/components/tourist/FeedbackAssistant";
 import ReportAssistant from "@/components/tourist/ReportAssistant";
 import TravelPlanner from "@/components/tourist/TravelPlanner";
 import TravelChat from "@/components/tourist/TravelChat";
+import HotelReservation from "@/components/tourist/HotelReservation";
 
 const Tourist = () => {
   const [activeTab, setActiveTab] = useState("nearby");
@@ -100,10 +101,18 @@ const Tourist = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="mb-4 w-full grid grid-cols-6">
+        <TabsList className="mb-4 w-full grid grid-cols-8">
           <TabsTrigger value="nearby">
             <Navigation className="mr-2 w-4 h-4" />
             Yakındakiler
+          </TabsTrigger>
+          <TabsTrigger value="hotel">
+            <Hotel className="mr-2 w-4 h-4" />
+            Otel
+          </TabsTrigger>
+          <TabsTrigger value="flights">
+            <Plane className="mr-2 w-4 h-4" />
+            Uçuşlar
           </TabsTrigger>
           <TabsTrigger value="plan">
             <Calendar className="mr-2 w-4 h-4" />
@@ -130,6 +139,20 @@ const Tourist = () => {
         <div className="border rounded-lg p-6 bg-white">
           <TabsContent value="nearby" className="mt-0">
             <NearbyPlaces />
+          </TabsContent>
+          <TabsContent value="hotel" className="mt-0">
+            <HotelReservation />
+          </TabsContent>
+          <TabsContent value="flights" className="mt-0">
+            <div className="flex flex-col items-center justify-center py-10">
+              <Plane className="w-16 h-16 text-muted-foreground mb-4" />
+              <h3 className="text-xl font-medium">Uçuş Bilgileri</h3>
+              <p className="text-muted-foreground mb-4 text-center max-w-md">
+                Uçuş bilgilerinize Otel rezervasyon bölümünden erişebilirsiniz. 
+                Otel rezervasyonunuzla uyumlu uçuş seçenekleri sunulmaktadır.
+              </p>
+              <Button onClick={() => setActiveTab("hotel")}>Otel Rezervasyonuna Git</Button>
+            </div>
           </TabsContent>
           <TabsContent value="plan" className="mt-0">
             <TravelPlanner />
