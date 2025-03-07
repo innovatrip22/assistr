@@ -180,7 +180,7 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
                 onClick={() => handleContinue()}
                 disabled={isLoading}
               >
-                {type === "tourist" ? "Turist" : type === "institution" ? "Kurum" : "İşletme"} 
+                {type === "tourist" ? "Turist" : type === "business" ? "İşletme" : "Kurum"} 
                 {" "}olarak hızlı devam et
               </Button>
             </div>
@@ -242,7 +242,7 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
               onClick={() => handleContinue()}
               disabled={isLoading}
             >
-              {type === "tourist" ? "Turist" : type === "institution" ? "Kurum" : "İşletme"} 
+              {type === "tourist" ? "Turist" : type === "business" ? "İşletme" : "Kurum"} 
               {" "}olarak hızlı devam et
             </Button>
           </div>
