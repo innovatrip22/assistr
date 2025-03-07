@@ -180,7 +180,7 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
                 onClick={() => handleContinue()}
                 disabled={isLoading}
               >
-                {type === "tourist" ? "Turist" : type === "business" ? "İşletme" : "Kurum"} 
+                {type === "tourist" ? "Turist" : "İşletme"} 
                 {" "}olarak hızlı devam et
               </Button>
             </div>
