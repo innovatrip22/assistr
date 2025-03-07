@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -20,6 +20,12 @@ const TravelChat = () => {
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const { userType } = useAuth();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to bottom of messages when new messages are added
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatHistory]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
@@ -30,8 +36,15 @@ const TravelChat = () => {
     setIsTyping(true);
     
     try {
-      // Use the AI service via Edge Function
-      const aiResponse = await sendMessageToAI(inputMessage, userType || 'tourist');
+      // Prepare conversation history for context (last 10 messages)
+      const conversationContext = chatHistory.slice(-10);
+      
+      // Use the AI service via Edge Function with conversation history
+      const aiResponse = await sendMessageToAI(
+        inputMessage, 
+        userType || 'tourist',
+        conversationContext
+      );
       
       setChatHistory(prev => [
         ...prev, 
@@ -78,6 +91,7 @@ const TravelChat = () => {
               </div>
             </div>
           )}
+          <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
       <div className="flex gap-2">

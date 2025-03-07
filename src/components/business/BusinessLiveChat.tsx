@@ -6,7 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageSquare, Send, Phone, Video, User, Clock, Circle } from "lucide-react";
+import { MessageSquare, Send, Phone, Video, User, Clock, Circle, Loader2 } from "lucide-react";
+import { sendMessageToAI } from "@/services";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 // Mock data for chat contacts
 const mockContacts = [
@@ -17,7 +20,8 @@ const mockContacts = [
     time: "10:23", 
     status: "online" as const,
     avatar: "/assets/avatar1.jpg",
-    unread: 2
+    unread: 2,
+    conversation: []
   },
   { 
     id: "2", 
@@ -26,7 +30,8 @@ const mockContacts = [
     time: "Dün", 
     status: "offline" as const,
     avatar: "/assets/avatar2.jpg",
-    unread: 0
+    unread: 0,
+    conversation: []
   },
   { 
     id: "3", 
@@ -35,7 +40,8 @@ const mockContacts = [
     time: "Dün", 
     status: "offline" as const,
     avatar: "/assets/avatar3.jpg",
-    unread: 0
+    unread: 0,
+    conversation: []
   },
   { 
     id: "4", 
@@ -44,12 +50,13 @@ const mockContacts = [
     time: "21/07", 
     status: "online" as const,
     avatar: "/assets/avatar4.jpg",
-    unread: 0
+    unread: 0,
+    conversation: []
   }
 ];
 
-// Mock messages for a conversation
-const mockMessages = [
+// Mock initial messages for a conversation
+const initialMessages = [
   {
     id: "1",
     sender: "customer" as const,
@@ -90,6 +97,7 @@ interface Contact {
   status: "online" | "offline";
   avatar: string;
   unread: number;
+  conversation: Message[];
 }
 
 interface Message {
@@ -99,18 +107,34 @@ interface Message {
   time: string;
 }
 
+type ConversationContext = {
+  role: 'user' | 'assistant';
+  content: string;
+}[];
+
 const BusinessLiveChat = () => {
   const [contacts, setContacts] = useState<Contact[]>(mockContacts);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { userType } = useAuth();
 
   useEffect(() => {
     if (selectedContact) {
       // Load conversation for selected contact
-      // This would normally fetch from an API
-      setMessages(mockMessages);
+      if (selectedContact.conversation.length > 0) {
+        setMessages(selectedContact.conversation);
+      } else {
+        setMessages(initialMessages);
+        // Update the contact's conversation
+        setContacts(contacts.map(contact => 
+          contact.id === selectedContact.id 
+          ? { ...contact, conversation: initialMessages } 
+          : contact
+        ));
+      }
       
       // Mark messages as read
       setContacts(contacts.map(contact => 
@@ -126,28 +150,88 @@ const BusinessLiveChat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSendMessage = () => {
+  // Convert messages to conversation context for AI
+  const prepareConversationContext = (msgs: Message[]): ConversationContext => {
+    return msgs.map(msg => ({
+      role: msg.sender === 'customer' ? 'user' : 'assistant',
+      content: msg.message
+    }));
+  };
+
+  const handleSendMessage = async () => {
     if (newMessage.trim() && selectedContact) {
+      const currentTime = new Date().toTimeString().split(' ')[0].slice(0, 5);
+      
       const newMsg: Message = {
         id: Date.now().toString(),
         sender: "business",
         message: newMessage.trim(),
-        time: new Date().toTimeString().split(' ')[0].slice(0, 5)
+        time: currentTime
       };
       
-      setMessages([...messages, newMsg]);
+      // Add message to the current messages
+      const updatedMessages = [...messages, newMsg];
+      setMessages(updatedMessages);
       setNewMessage("");
       
-      // Update last message in contacts
+      // Update conversation in contacts
       setContacts(contacts.map(contact => 
         contact.id === selectedContact.id 
         ? { 
             ...contact, 
+            conversation: updatedMessages,
             lastMessage: newMessage.trim(),
             time: "Şimdi" 
           } 
         : contact
       ));
+      
+      // Let's simulate customer response using AI
+      setIsTyping(true);
+      try {
+        // Convert messages to conversation context
+        const conversationContext = prepareConversationContext(updatedMessages.slice(-5));
+        
+        // Get AI response based on conversation
+        const aiResponse = await sendMessageToAI(
+          `Sen ${selectedContact.name} rolünü oynayan bir müşterisin. İşletme sahibi şunu söyledi: "${newMessage.trim()}" Yanıtın sadece işletme sahibine cevabın olmalı, fazladan açıklama yapma.`, 
+          'tourist',
+          conversationContext
+        );
+        
+        // Add AI response as customer message
+        const customerResponse: Message = {
+          id: (Date.now() + 1).toString(),
+          sender: "customer",
+          message: aiResponse,
+          time: new Date().toTimeString().split(' ')[0].slice(0, 5)
+        };
+        
+        // Update messages and contacts after a short delay to simulate typing
+        setTimeout(() => {
+          const finalMessages = [...updatedMessages, customerResponse];
+          setMessages(finalMessages);
+          
+          // Update contact
+          setContacts(contacts.map(contact => 
+            contact.id === selectedContact.id 
+            ? { 
+                ...contact, 
+                conversation: finalMessages,
+                lastMessage: aiResponse.substring(0, 30) + (aiResponse.length > 30 ? '...' : ''),
+                time: "Şimdi" 
+              } 
+            : contact
+          ));
+          
+          setIsTyping(false);
+        }, 1500);
+        
+      } catch (error) {
+        console.error("Error generating AI response:", error);
+        toast.error("Yanıt oluşturulurken bir hata oluştu.");
+        setIsTyping(false);
+      }
     }
   };
 
@@ -273,6 +357,16 @@ const BusinessLiveChat = () => {
                       </div>
                     </div>
                   ))}
+                  {isTyping && (
+                    <div className="flex justify-start">
+                      <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 text-gray-800">
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <p className="text-sm">Yazıyor...</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   <div ref={messagesEndRef} />
                 </div>
               </ScrollArea>
@@ -285,9 +379,13 @@ const BusinessLiveChat = () => {
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyDown={handleKeyPress}
                   className="flex-1"
+                  disabled={isTyping}
                 />
-                <Button onClick={handleSendMessage} disabled={!newMessage.trim()}>
-                  <Send className="h-4 w-4" />
+                <Button onClick={handleSendMessage} disabled={!newMessage.trim() || isTyping}>
+                  {isTyping ? 
+                    <Loader2 className="h-4 w-4 animate-spin" /> : 
+                    <Send className="h-4 w-4" />
+                  }
                 </Button>
               </div>
             </CardFooter>

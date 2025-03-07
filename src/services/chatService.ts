@@ -7,10 +7,16 @@ const isTestUser = (userId: string) => {
 };
 
 // Chat methods
-export const sendMessageToAI = async (message: string, userType: string) => {
+export const sendMessageToAI = async (message: string, userType: string, conversationHistory: any[] = []) => {
   try {
+    console.log("Sending message to AI with conversation history:", conversationHistory.length, "messages");
+    
     const response = await supabase.functions.invoke('chat-ai', {
-      body: { message, userType },
+      body: { 
+        message, 
+        userType, 
+        conversation: conversationHistory 
+      },
     });
     
     // Add error handling if response or response.data is undefined
