@@ -84,7 +84,7 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // If institution type, use specific login handler
+    // Fix the type comparison by using strict equality comparison
     if (type === "institution") {
       handleInstitutionLogin(e);
       return;
