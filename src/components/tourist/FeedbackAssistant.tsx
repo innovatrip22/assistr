@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { addFeedback, getUniqueInstitutions } from "@/services/feedbackService";
+import { addFeedback, getUniqueInstitutions, getAllInstitutions } from "@/services/feedbackService";
 import { v4 as uuidv4 } from "uuid";
 
 const feedbackSchema = z.object({
@@ -27,7 +27,7 @@ const FeedbackAssistant = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [institutions, setInstitutions] = useState<string[]>([]);
+  const [institutions, setInstitutions] = useState<{id: string, name: string}[]>([]);
   const [customInstitution, setCustomInstitution] = useState<boolean>(false);
 
   const form = useForm<z.infer<typeof feedbackSchema>>({
@@ -44,8 +44,24 @@ const FeedbackAssistant = () => {
   useEffect(() => {
     const loadInstitutions = async () => {
       try {
-        const data = await getUniqueInstitutions();
-        setInstitutions(data);
+        // Önceki sistemden gelen kurumları yükle
+        const savedInstitutions = await getUniqueInstitutions();
+        
+        // Yeni sabit kurumları al
+        const predefinedInstitutions = getAllInstitutions();
+        
+        // Kurumları birleştir (önce sabit kurumlar)
+        const combinedInstitutions = [
+          ...predefinedInstitutions,
+          ...savedInstitutions
+            .filter(inst => !predefinedInstitutions.some(p => p.name === inst))
+            .map(inst => ({
+              id: inst.toLowerCase().replace(/\s+/g, '-'),
+              name: inst
+            }))
+        ];
+        
+        setInstitutions(combinedInstitutions);
       } catch (error) {
         console.error("Error loading institutions:", error);
         toast({
@@ -125,8 +141,8 @@ const FeedbackAssistant = () => {
                             </SelectTrigger>
                             <SelectContent>
                               {institutions.map((inst) => (
-                                <SelectItem key={inst} value={inst}>
-                                  {inst}
+                                <SelectItem key={inst.id} value={inst.name}>
+                                  {inst.name}
                                 </SelectItem>
                               ))}
                             </SelectContent>

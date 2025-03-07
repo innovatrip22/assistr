@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Map as MapIcon } from "lucide-react";
 import {
   Card,
@@ -27,6 +27,15 @@ const MapSection = () => {
     emergencyRisk: "Düşük",
     crowdPrediction: "Orta"
   });
+  const [institutionName, setInstitutionName] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Giriş yapılan kurumun adını al
+    const savedInstitutionName = localStorage.getItem("institutionName");
+    if (savedInstitutionName) {
+      setInstitutionName(savedInstitutionName);
+    }
+  }, []);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -37,7 +46,9 @@ const MapSection = () => {
       <CardHeader>
         <div className="flex items-center gap-3">
           <MapIcon className="w-6 h-6 text-primary" />
-          <CardTitle>KKTC Haritası</CardTitle>
+          <CardTitle>
+            {institutionName ? `${institutionName} - KKTC Haritası` : "KKTC Haritası"}
+          </CardTitle>
         </div>
         <CardDescription>
           Bölge genelindeki raporlar, yoğunluk ve tahminler

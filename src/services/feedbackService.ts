@@ -16,6 +16,29 @@ export type Feedback = {
   timestamp?: string;
 };
 
+// Institutions enum/map with passwords for each
+export const INSTITUTIONS = {
+  "ELEKTRIK": { name: "KKTC Elektrik Kurumu", password: "elektrik123" },
+  "SU": { name: "KKTC Su İşleri Dairesi", password: "su123" },
+  "DOGALGAZ": { name: "KKTC Doğalgaz Kurumu", password: "dogalgaz123" },
+  "TURIZM": { name: "KKTC Turizm Ofisi", password: "turizm123" },
+  "BELEDIYE": { name: "Girne Belediyesi", password: "belediye123" },
+  "BAKANLIK": { name: "Turizm Bakanlığı", password: "bakanlik123" }
+};
+
+// Function to verify institution password
+export const verifyInstitutionPassword = (institutionKey: string, password: string): boolean => {
+  return INSTITUTIONS[institutionKey as keyof typeof INSTITUTIONS]?.password === password;
+};
+
+// Get a list of all institutions
+export const getAllInstitutions = () => {
+  return Object.entries(INSTITUTIONS).map(([key, value]) => ({
+    id: key,
+    name: value.name
+  }));
+};
+
 // Function to add feedback
 export const addFeedback = async (feedback: Feedback) => {
   // Check if we have a valid UUID for user_id
