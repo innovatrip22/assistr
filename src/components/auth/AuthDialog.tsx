@@ -50,7 +50,7 @@ const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
     setIsLoading(true);
     
     // If institution selected, verify password
-    if (type === "institution" && selectedInstitution) {
+    if (selectedInstitution) {
       // Check if password matches for selected institution
       const isPasswordCorrect = verifyInstitutionPassword(selectedInstitution, password);
       
