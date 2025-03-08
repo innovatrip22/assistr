@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 // Define the Feedback type
@@ -18,12 +17,48 @@ export type Feedback = {
 
 // Institutions enum/map with passwords for each
 export const INSTITUTIONS = {
-  "ELEKTRIK": { name: "KKTC Elektrik Kurumu", password: "elektrik123" },
-  "SU": { name: "KKTC Su İşleri Dairesi", password: "su123" },
-  "DOGALGAZ": { name: "KKTC Doğalgaz Kurumu", password: "dogalgaz123" },
-  "TURIZM": { name: "KKTC Turizm Ofisi", password: "turizm123" },
-  "BELEDIYE": { name: "Girne Belediyesi", password: "belediye123" },
-  "BAKANLIK": { name: "Turizm Bakanlığı", password: "bakanlik123" }
+  ELEKTRIK: {
+    id: "institution",
+    name: "KKTC Elektrik Kurumu",
+    shortName: "Elektrik Kurumu",
+    password: "elektrik123",
+    color: "yellow"
+  },
+  SU: {
+    id: "institution",
+    name: "KKTC Su İşleri Dairesi",
+    shortName: "Su İşleri",
+    password: "su123",
+    color: "blue"
+  },
+  DOGALGAZ: {
+    id: "institution",
+    name: "KKTC Doğalgaz Kurumu",
+    shortName: "Doğalgaz Kurumu",
+    password: "dogalgaz123",
+    color: "red"
+  },
+  TURIZM: {
+    id: "institution",
+    name: "KKTC Turizm Ofisi",
+    shortName: "Turizm Ofisi",
+    password: "turizm123",
+    color: "teal"
+  },
+  BELEDIYE: {
+    id: "institution",
+    name: "Girne Belediyesi",
+    shortName: "Belediye",
+    password: "belediye123",
+    color: "purple"
+  },
+  BAKANLIK: {
+    id: "institution",
+    name: "KKTC Turizm Bakanlığı",
+    shortName: "Turizm Bakanlığı",
+    password: "bakanlik123",
+    color: "green"
+  }
 };
 
 // Function to verify institution password
@@ -236,4 +271,19 @@ export const getFeedbackSummary = async () => {
     totalSuggestions,
     averageRating
   };
+};
+
+// Function to get feedbacks by institution
+export const getFeedbacksByInstitution = async (institution) => {
+  const { data, error } = await supabase
+    .from('feedbacks')
+    .select('*')
+    .eq('institution', institution)
+    .order('timestamp', { ascending: false });
+
+  if (error) {
+    console.error("Error getting feedbacks:", error);
+    throw error;
+  }
+  return data;
 };

@@ -1,19 +1,16 @@
 
-import { motion } from "framer-motion";
+import { CardTitle } from "@/components/ui/card";
 
 interface AuthDialogHeaderProps {
   title: string;
+  onClose?: () => void;
 }
 
-const AuthDialogHeader = ({ title }: AuthDialogHeaderProps) => {
+const AuthDialogHeader = ({ title, onClose }: AuthDialogHeaderProps) => {
   return (
-    <motion.h2 
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="text-2xl font-semibold text-gray-800 mb-6 text-center"
-    >
-      {title}
-    </motion.h2>
+    <div className="flex justify-between items-center">
+      <CardTitle>{title}</CardTitle>
+    </div>
   );
 };
 

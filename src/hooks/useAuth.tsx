@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -182,15 +181,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signInWithEmail = async (email: string, password: string) => {
     try {
-      const { error, data } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
       if (error) throw error;
-      
-      console.log("Login successful, session data:", data.session?.user.id);
-      return data;
     } catch (error: any) {
       console.error("Email sign in error:", error);
       throw error;
