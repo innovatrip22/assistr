@@ -1,257 +1,260 @@
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-import AuthDialogHeader from "./AuthDialogHeader";
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { INSTITUTIONS, verifyInstitutionPassword } from "@/services/feedbackService";
-import { useToast } from "@/hooks/use-toast";
+import { Building, Store, User } from "lucide-react";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import AuthDialogHeader from "./AuthDialogHeader";
+import AuthMethodSelector from "./AuthMethodSelector";
+import EmailLoginForm from "./EmailLoginForm";
+import CodeLoginForm from "./CodeLoginForm";
 
-// Define user type as a union to match what's used in AuthRequired
+type AuthDialogProps = {
+  onClose?: () => void;
+};
+
 type UserType = "institution" | "business" | "tourist";
 
-interface AuthDialogProps {
-  type: UserType;
-  onClose: () => void;
-  onSuccess: () => void;
-}
-
-const AuthDialog = ({ type, onClose, onSuccess }: AuthDialogProps) => {
+const AuthDialog = ({ onClose }: AuthDialogProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [selectedInstitution, setSelectedInstitution] = useState("");
+  const [type, setType] = useState<UserType>("tourist");
+  const [step, setStep] = useState(1);
+  const [method, setMethod] = useState<"email" | "code">("email");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    phone: "",
+    code: "",
+    institutionCode: "",
+  });
+
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { signInWithEmail, signOut } = useAuth();
 
-  const handleContinue = (institutionKey?: string) => {
-    console.log("Direct access granted, type:", type);
-    
-    // Store user type and institution if applicable for the session
-    localStorage.setItem("testUserType", type);
-    if (institutionKey) {
-      localStorage.setItem("institutionKey", institutionKey);
-      localStorage.setItem("institutionName", INSTITUTIONS[institutionKey as keyof typeof INSTITUTIONS].name);
-    }
-    
-    // Close dialog
-    onSuccess();
-    
-    // Navigate to appropriate dashboard
-    console.log("Navigating to dashboard:", `/${type}`);
-    navigate(`/${type}`);
+  const handleTypeChange = (newType: UserType) => {
+    setType(newType);
+    setStep(1);
   };
 
-  const handleInstitutionLogin = (e: React.FormEvent) => {
+  const handleNext = () => {
+    if (step === 1) {
+      setStep(2);
+    }
+  };
+
+  const handleBack = () => {
+    if (step === 2) {
+      setStep(1);
+    }
+  };
+
+  const handleMethodChange = (newMethod: "email" | "code") => {
+    setMethod(newMethod);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleInstitutionLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // If institution selected, verify password
-    if (selectedInstitution) {
-      // Check if password matches for selected institution
-      const isPasswordCorrect = verifyInstitutionPassword(selectedInstitution, password);
+
+    try {
+      // Simulated institution authentication
+      console.log("Institution login with code:", formData.institutionCode);
       
-      if (isPasswordCorrect) {
-        toast({
-          title: "Giriş başarılı",
-          description: `${INSTITUTIONS[selectedInstitution as keyof typeof INSTITUTIONS].name} olarak giriş yapıldı.`,
-        });
-        handleContinue(selectedInstitution);
+      if (formData.institutionCode === "12345") {
+        toast.success("Kurum girişi başarılı");
+        // Redirect to the institution dashboard
+        navigate("/institution");
       } else {
-        toast({
-          variant: "destructive",
-          title: "Giriş başarısız",
-          description: "Kurum şifresi yanlış. Lütfen tekrar deneyin.",
-        });
-        setIsLoading(false);
+        toast.error("Geçersiz kurum kodu");
       }
-    } else {
-      // Simulate authentication process for non-institution logins
-      setTimeout(() => {
-        setIsLoading(false);
-        handleContinue();
-      }, 1000);
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Giriş başarısız");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Fix the type comparison by using strict equality comparison
-    if (type === "institution") {
+    // Fix the type comparison by ensuring type safety
+    if (type === "institution" as UserType) {
       handleInstitutionLogin(e);
       return;
     }
 
-    // Simulate authentication process for other types
-    setTimeout(() => {
+    try {
+      if (method === "email") {
+        // Email login
+        await signInWithEmail(formData.email, formData.password);
+        toast.success("Giriş başarılı");
+        
+        // Redirect based on user type
+        if (type === "business") {
+          navigate("/business");
+        } else {
+          navigate("/tourist");
+        }
+      } else {
+        // Code login (simulate for now)
+        console.log("Code login with phone:", formData.phone, "and code:", formData.code);
+        
+        if (formData.code === "1234") {
+          toast.success("Giriş başarılı");
+          
+          // Redirect based on user type
+          if (type === "business") {
+            navigate("/business");
+          } else {
+            navigate("/tourist");
+          }
+        } else {
+          toast.error("Geçersiz kod");
+        }
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Giriş başarısız");
+    } finally {
       setIsLoading(false);
-      handleContinue();
-    }, 1000);
+    }
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md"
-      style={{
-        backgroundImage: "url('/assets/kktc-bg.jpg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center"
-      }}
-    >
-      <AuthDialogHeader title={`${type.charAt(0).toUpperCase() + type.slice(1)} Girişi`} />
-      
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "login" | "signup")} className="mt-6">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="login">Giriş</TabsTrigger>
-          <TabsTrigger value="signup">Kayıt Ol</TabsTrigger>
-        </TabsList>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <Card className="w-full max-w-md mx-4">
+        <AuthDialogHeader onClose={onClose} />
         
-        <TabsContent value="login" className="mt-4">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {type === "institution" && (
-              <div className="space-y-2">
-                <Label htmlFor="institution">Kurum Seçin</Label>
-                <Select 
-                  value={selectedInstitution} 
-                  onValueChange={setSelectedInstitution}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Kurum seçin" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(INSTITUTIONS).map(([key, value]) => (
-                      <SelectItem key={key} value={key}>
-                        {value.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-            
-            {type !== "institution" && (
-              <div className="space-y-2">
-                <Label htmlFor="email">E-posta</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="ornek@mail.com" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required={type !== "institution"}
-                />
-              </div>
-            )}
-            
-            <div className="space-y-2">
-              <Label htmlFor="password">Şifre</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            
-            <Button 
-              type="submit"
-              className="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 transition"
-              disabled={isLoading || (type === "institution" && !selectedInstitution)}
-            >
-              {isLoading ? "Giriş Yapılıyor..." : "Giriş Yap"}
-            </Button>
-          </form>
+        <Tabs value={type} onValueChange={(value) => handleTypeChange(value as UserType)}>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="tourist" className="flex flex-col py-2 h-20 gap-1">
+              <User className="w-5 h-5" />
+              <span>Turist</span>
+            </TabsTrigger>
+            <TabsTrigger value="business" className="flex flex-col py-2 h-20 gap-1">
+              <Store className="w-5 h-5" />
+              <span>İşletme</span>
+            </TabsTrigger>
+            <TabsTrigger value="institution" className="flex flex-col py-2 h-20 gap-1">
+              <Building className="w-5 h-5" />
+              <span>Kurum</span>
+            </TabsTrigger>
+          </TabsList>
           
-          {type !== "institution" && (
-            <div className="mt-4 text-center">
-              <p className="text-sm text-gray-500">veya</p>
-              <Button 
-                variant="outline"
-                className="w-full mt-2"
-                onClick={() => handleContinue()}
-                disabled={isLoading}
-              >
-                {type === "tourist" ? "Turist" : type === "business" ? "İşletme" : "Kurum"} 
-                {" "}olarak hızlı devam et
-              </Button>
-            </div>
-          )}
-        </TabsContent>
+          <TabsContent value="tourist">
+            {step === 1 ? (
+              <AuthMethodSelector
+                method={method}
+                onMethodChange={handleMethodChange}
+                onNext={handleNext}
+              />
+            ) : (
+              <>
+                {method === "email" ? (
+                  <EmailLoginForm
+                    formData={formData}
+                    onChange={handleChange}
+                    onSubmit={handleSubmit}
+                    isLoading={isLoading}
+                    onBack={handleBack}
+                  />
+                ) : (
+                  <CodeLoginForm
+                    formData={formData}
+                    onChange={handleChange}
+                    onSubmit={handleSubmit}
+                    isLoading={isLoading}
+                    onBack={handleBack}
+                  />
+                )}
+              </>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="business">
+            {step === 1 ? (
+              <AuthMethodSelector
+                method={method}
+                onMethodChange={handleMethodChange}
+                onNext={handleNext}
+              />
+            ) : (
+              <>
+                {method === "email" ? (
+                  <EmailLoginForm
+                    formData={formData}
+                    onChange={handleChange}
+                    onSubmit={handleSubmit}
+                    isLoading={isLoading}
+                    onBack={handleBack}
+                  />
+                ) : (
+                  <CodeLoginForm
+                    formData={formData}
+                    onChange={handleChange}
+                    onSubmit={handleSubmit}
+                    isLoading={isLoading}
+                    onBack={handleBack}
+                  />
+                )}
+              </>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="institution">
+            <CardContent className="space-y-4 pt-6">
+              <CardDescription>
+                Kurumlar için özel giriş sayfası. Lütfen size verilen kurum kodunu girin.
+              </CardDescription>
+              <form onSubmit={handleInstitutionLogin}>
+                <div className="space-y-2">
+                  <Label htmlFor="institutionCode">Kurum Kodu</Label>
+                  <Input
+                    id="institutionCode"
+                    name="institutionCode"
+                    placeholder="Kurum kodunu girin"
+                    required
+                    value={formData.institutionCode}
+                    onChange={handleChange}
+                  />
+                </div>
+                <Button className="w-full mt-4" type="submit" disabled={isLoading}>
+                  {isLoading ? "Giriş yapılıyor..." : "Giriş Yap"}
+                </Button>
+              </form>
+            </CardContent>
+          </TabsContent>
+        </Tabs>
         
-        <TabsContent value="signup" className="mt-4">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Ad Soyad / Kurum Adı</Label>
-              <Input 
-                id="name" 
-                type="text" 
-                placeholder="Ad Soyad / Kurum Adı"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="signup-email">E-posta</Label>
-              <Input 
-                id="signup-email" 
-                type="email" 
-                placeholder="ornek@mail.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="signup-password">Şifre</Label>
-              <Input 
-                id="signup-password" 
-                type="password" 
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            
-            <Button 
-              type="submit"
-              className="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 transition"
-              disabled={isLoading}
-            >
-              {isLoading ? "Kaydediliyor..." : "Kayıt Ol"}
-            </Button>
-          </form>
-          
-          <div className="mt-4 text-center">
-            <p className="text-sm text-gray-500">veya</p>
-            <Button 
-              variant="outline"
-              className="w-full mt-2"
-              onClick={() => handleContinue()}
-              disabled={isLoading}
-            >
-              {type === "tourist" ? "Turist" : type === "business" ? "İşletme" : "Kurum"} 
-              {" "}olarak hızlı devam et
-            </Button>
-          </div>
-        </TabsContent>
-      </Tabs>
-    </motion.div>
+        <CardFooter className="flex flex-col items-center justify-center pt-0">
+          <p className="text-xs text-muted-foreground mt-6">
+            KKTC Turizm Bakanlığı tarafından desteklenmektedir
+          </p>
+        </CardFooter>
+      </Card>
+    </div>
   );
 };
 

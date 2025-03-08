@@ -1,1285 +1,852 @@
 
 import { useState } from "react";
-import { format, addDays } from "date-fns";
-import { tr } from "date-fns/locale";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { toast } from "sonner";
-import { 
-  Hotel, 
-  Plane, 
-  Calendar, 
-  MapPin, 
-  Users, 
-  Search, 
-  CreditCard, 
-  Bookmark, 
-  Car, 
-  Bus,
-  ArrowLeftRight,
-  Loader2
-} from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { format, addDays, differenceInDays } from "date-fns";
+import { tr } from "date-fns/locale";
+import { toast } from "sonner";
+import { 
+  Hotel, 
+  Search, 
+  Calendar as CalendarIcon, 
+  Users, 
+  Plane, 
+  ArrowRight, 
+  Bus, 
+  Car, 
+  Bike, 
+  Timer, 
+  CreditCard, 
+  TicketCheck, 
+  Share2, 
+  MapPin
+} from "lucide-react";
 
-// Mock data for hotels
-const mockHotels = [
+// Dummy data for hotels
+const hotels = [
   {
     id: "h1",
-    name: "Merit Royal Hotel",
-    location: "Girne, KKTC",
+    name: "Merit Royal Hotel & Casino",
+    location: "Girne",
+    price: 2800,
     rating: 5,
-    price: 220,
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop",
-    amenities: ["Havuz", "Spa", "Restoran", "Bar", "Wifi"]
+    image: "https://cf.bstatic.com/xdata/images/hotel/max1024x768/367372905.jpg?k=b27a73cb9cfbddb6a857070991b0be91c40b1cc8d46a48ea0ffc0dbcbfef4e36&o=&hp=1",
+    description: "Lüks bir sahil oteli ve casino",
+    amenities: ["Havuz", "Spa", "Wi-Fi", "Restoran", "Bar"]
   },
   {
     id: "h2",
-    name: "Acapulco Resort",
-    location: "Girne, KKTC",
-    rating: 4.5,
-    price: 180,
-    image: "https://images.unsplash.com/photo-1561501900-3701fa6a0864?q=80&w=2070&auto=format&fit=crop",
-    amenities: ["Havuz", "Plaj", "Restoran", "Bar", "Wifi"]
+    name: "Elexus Hotel & Resort & Spa",
+    location: "Girne",
+    price: 2400,
+    rating: 5,
+    image: "https://cf.bstatic.com/xdata/images/hotel/max1024x768/85995379.jpg?k=cecf46a900e8c0fb3eda662841e7f04c6fdc4cbe2caf0c0b6747de261d037c71&o=&hp=1",
+    description: "Deniz manzaralı lüks otel ve spa",
+    amenities: ["Havuz", "Spa", "Wi-Fi", "Restoran", "Bar", "Fitness"]
   },
   {
     id: "h3",
-    name: "Salamis Bay Conti Resort",
-    location: "Gazimağusa, KKTC",
-    rating: 4,
-    price: 160,
-    image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=2070&auto=format&fit=crop",
-    amenities: ["Havuz", "Plaj", "Restoran", "Bar", "Wifi"]
-  }
-];
-
-// Mock data for existing reservations
-const mockReservations = [
+    name: "Kaya Palazzo Resort & Casino",
+    location: "Girne",
+    price: 2300,
+    rating: 5,
+    image: "https://cf.bstatic.com/xdata/images/hotel/max1024x768/232160914.jpg?k=eef7d586d7ac37f5d3fd540fa267f40e3e9dd8f1bb1c2a03beab60151c78db87&o=&hp=1",
+    description: "Modern tasarımlı resort ve casino",
+    amenities: ["Havuz", "Spa", "Wi-Fi", "Restoran", "Bar", "Plaj"]
+  },
   {
-    id: "RES12345",
-    hotelName: "Merit Royal Hotel",
-    location: "Girne, KKTC",
-    checkIn: "2023-08-15",
-    checkOut: "2023-08-20",
-    guests: 2,
-    roomType: "Deluxe",
-    totalPrice: 1100,
-    status: "confirmed",
-    flightInfo: {
-      outbound: {
-        flightNo: "TK1214",
-        departure: "Istanbul",
-        departureDate: "2023-08-15",
-        departureTime: "09:30",
-        arrival: "Ercan",
-        arrivalTime: "11:30",
-      },
-      inbound: {
-        flightNo: "TK1215",
-        departure: "Ercan",
-        departureDate: "2023-08-20",
-        departureTime: "16:30",
-        arrival: "Istanbul",
-        arrivalTime: "18:30",
-      }
-    },
-    transferBooked: true,
-    transferType: "Özel Transfer"
+    id: "h4",
+    name: "Acapulco Resort Convention Spa",
+    location: "Girne",
+    price: 1900,
+    rating: 4.5,
+    image: "https://cf.bstatic.com/xdata/images/hotel/max1024x768/354451484.jpg?k=67be6540231a5724894dc8b6cf28c773d3907e4777ca80f969fb3b9bb0e9101a&o=&hp=1",
+    description: "Geniş plaj alanına sahip resort",
+    amenities: ["Havuz", "Spa", "Wi-Fi", "Restoran", "Konferans"]
+  },
+  {
+    id: "h5",
+    name: "Cratos Premium Hotel",
+    location: "Girne",
+    price: 2000,
+    rating: 4.5,
+    image: "https://cf.bstatic.com/xdata/images/hotel/max1024x768/194214064.jpg?k=5b30e9be4c9a5fbcb7af40a739d0e44a6e5e43e0d5f4ed9f8c52c70a53fa4f68&o=&hp=1",
+    description: "Premium hizmet veren casino ve resort",
+    amenities: ["Havuz", "Spa", "Wi-Fi", "Restoran", "Casino", "Bar"]
   }
 ];
 
-// Form validation schema
-const reservationSchema = z.object({
-  location: z.string().min(1, { message: "Konum seçiniz" }),
-  checkIn: z.date({ required_error: "Giriş tarihi seçiniz" }),
-  checkOut: z.date({ required_error: "Çıkış tarihi seçiniz" }),
-  guests: z.string().min(1, { message: "Kişi sayısı seçiniz" }),
-  roomType: z.string().optional(),
-});
+// Dummy data for flights that match with hotel dates
+const flights = [
+  { 
+    id: "f1", 
+    airline: "Turkish Airlines", 
+    departure: "İstanbul", 
+    arrival: "Ercan", 
+    departureTime: "08:30", 
+    arrivalTime: "10:10", 
+    price: 1200,
+    logo: "https://www.turkishairlines.com/theme/img/logo.png"
+  },
+  { 
+    id: "f2", 
+    airline: "Pegasus", 
+    departure: "İstanbul", 
+    arrival: "Ercan", 
+    departureTime: "12:45", 
+    arrivalTime: "14:25", 
+    price: 800,
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Pegasus_Airlines_logo.svg/2560px-Pegasus_Airlines_logo.svg.png"
+  },
+  { 
+    id: "f3", 
+    airline: "SunExpress", 
+    departure: "Ankara", 
+    arrival: "Ercan", 
+    departureTime: "15:20", 
+    arrivalTime: "16:50", 
+    price: 950,
+    logo: "https://www.sunexpress.com/static/pics/sunexpress-logo.png"
+  }
+];
 
-const transferSchema = z.object({
-  transferType: z.enum(["private", "shared", "none"], {
-    required_error: "Transfer tipi seçiniz",
-  }),
-  passengers: z.string().min(1, { message: "Yolcu sayısı seçiniz" }),
-});
+// Dummy data for transfers
+const transfers = [
+  { 
+    id: "t1", 
+    type: "Özel Araç", 
+    icon: <Car className="h-5 w-5" />, 
+    price: 400, 
+    duration: "40 dk", 
+    capacity: "1-4 kişi",
+    shared: false,
+    distance: "45 km"
+  },
+  { 
+    id: "t2", 
+    type: "Minibüs", 
+    icon: <Bus className="h-5 w-5" />, 
+    price: 200, 
+    duration: "55 dk", 
+    capacity: "1-8 kişi",
+    shared: false,
+    distance: "45 km"
+  },
+  { 
+    id: "t3", 
+    type: "Paylaşımlı Servis", 
+    icon: <Share2 className="h-5 w-5" />, 
+    price: 100, 
+    duration: "70 dk", 
+    capacity: "Kişi başı",
+    shared: true,
+    distance: "45 km"
+  }
+];
 
-const flightSchema = z.object({
-  departureAirport: z.string().min(1, { message: "Kalkış havalimanı seçiniz" }),
-  arrivalAirport: z.string().min(1, { message: "Varış havalimanı seçiniz" }),
-  departureDate: z.date({ required_error: "Gidiş tarihi seçiniz" }),
-  returnDate: z.date({ required_error: "Dönüş tarihi seçiniz" }),
-  passengers: z.string().min(1, { message: "Yolcu sayısı seçiniz" }),
-});
+// Dummy reservations for lookup
+const reservations = [
+  {
+    code: "RES123456",
+    hotelId: "h1",
+    checkIn: new Date(2023, 6, 15),
+    checkOut: new Date(2023, 6, 20),
+    guests: 2,
+    room: "Deluxe Deniz Manzaralı",
+    status: "confirmed",
+    totalPrice: 14000,
+    flightTo: "f1",
+    flightFrom: "f2",
+    transfer: "t1"
+  },
+  {
+    code: "RES789012",
+    hotelId: "h3",
+    checkIn: new Date(2023, 7, 10),
+    checkOut: new Date(2023, 7, 15),
+    guests: 2,
+    room: "Standart Oda",
+    status: "confirmed",
+    totalPrice: 11500,
+    flightTo: "f2",
+    flightFrom: "f3",
+    transfer: "t3"
+  }
+];
 
 const HotelReservation = () => {
   const [activeTab, setActiveTab] = useState("search");
-  const [searchResults, setSearchResults] = useState<typeof mockHotels | null>(null);
-  const [isSearching, setIsSearching] = useState(false);
-  const [viewReservation, setViewReservation] = useState<(typeof mockReservations)[0] | null>(null);
+  const [checkInDate, setCheckInDate] = useState<Date | undefined>(new Date());
+  const [checkOutDate, setCheckOutDate] = useState<Date | undefined>(addDays(new Date(), 5));
+  const [guests, setGuests] = useState("2");
+  const [searchResults, setSearchResults] = useState<typeof hotels>([]);
+  const [selectedHotel, setSelectedHotel] = useState<(typeof hotels)[0] | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState("");
+  const [reservationStep, setReservationStep] = useState(1);
+  const [selectedFlightTo, setSelectedFlightTo] = useState("");
+  const [selectedFlightFrom, setSelectedFlightFrom] = useState("");
+  const [selectedTransfer, setSelectedTransfer] = useState("");
   const [reservationCode, setReservationCode] = useState("");
-  const [searchingReservation, setSearchingReservation] = useState(false);
-  const [selectedHotel, setSelectedHotel] = useState<(typeof mockHotels)[0] | null>(null);
-  const [bookingStep, setBookingStep] = useState(1);
+  const [foundReservation, setFoundReservation] = useState<typeof reservations[0] | null>(null);
+  const [showFlights, setShowFlights] = useState(false);
+  const [showTransfer, setShowTransfer] = useState(false);
+  
+  // Calculate total days of stay
+  const totalDays = checkInDate && checkOutDate 
+    ? differenceInDays(checkOutDate, checkInDate) 
+    : 0;
 
-  // Form for hotel search
-  const hotelForm = useForm<z.infer<typeof reservationSchema>>({
-    resolver: zodResolver(reservationSchema),
-    defaultValues: {
-      location: "",
-      guests: "2",
-    },
-  });
-
-  // Form for flight booking
-  const flightForm = useForm<z.infer<typeof flightSchema>>({
-    resolver: zodResolver(flightSchema),
-    defaultValues: {
-      departureAirport: "Istanbul",
-      arrivalAirport: "Ercan",
-      passengers: "2",
-    },
-  });
-
-  // Form for transfer booking
-  const transferForm = useForm<z.infer<typeof transferSchema>>({
-    resolver: zodResolver(transferSchema),
-    defaultValues: {
-      transferType: "private",
-      passengers: "2",
-    },
-  });
-
-  // Watch form values to sync
-  const checkInDate = hotelForm.watch("checkIn");
-  const checkOutDate = hotelForm.watch("checkOut");
-  const guestCount = hotelForm.watch("guests");
-
-  // Update flight dates to match hotel dates
-  const updateFlightDates = () => {
-    if (checkInDate) {
-      flightForm.setValue("departureDate", checkInDate);
+  // Calculate total price of the reservation
+  const calculateTotalPrice = () => {
+    let total = 0;
+    
+    // Hotel price
+    if (selectedHotel) {
+      total += selectedHotel.price * totalDays * parseInt(guests);
     }
-    if (checkOutDate) {
-      flightForm.setValue("returnDate", checkOutDate);
+    
+    // Flight prices
+    if (selectedFlightTo) {
+      const flight = flights.find(f => f.id === selectedFlightTo);
+      if (flight) total += flight.price * parseInt(guests);
     }
-    if (guestCount) {
-      flightForm.setValue("passengers", guestCount);
-      transferForm.setValue("passengers", guestCount);
+    
+    if (selectedFlightFrom) {
+      const flight = flights.find(f => f.id === selectedFlightFrom);
+      if (flight) total += flight.price * parseInt(guests);
     }
+    
+    // Transfer price
+    if (selectedTransfer) {
+      const transfer = transfers.find(t => t.id === selectedTransfer);
+      if (transfer) {
+        if (transfer.shared) {
+          total += transfer.price * parseInt(guests);
+        } else {
+          total += transfer.price;
+        }
+      }
+    }
+    
+    return total;
   };
 
-  // Handle search for hotels
-  const onSearchHotels = (data: z.infer<typeof reservationSchema>) => {
-    setIsSearching(true);
-    // Simulate API call
-    setTimeout(() => {
-      setSearchResults(mockHotels);
-      setIsSearching(false);
-    }, 1500);
-  };
-
-  // Handle looking up a reservation
-  const handleReservationLookup = () => {
-    if (!reservationCode) {
-      toast.error("Rezervasyon kodu giriniz.");
+  // Handler for searching hotels
+  const handleSearch = () => {
+    if (!checkInDate || !checkOutDate) {
+      toast.error("Lütfen giriş ve çıkış tarihlerini seçin");
       return;
     }
-
-    setSearchingReservation(true);
-    // Simulate API call
+    
+    // Simulate API call with small delay
     setTimeout(() => {
-      const found = mockReservations.find(res => res.id === reservationCode);
-      if (found) {
-        setViewReservation(found);
-        toast.success("Rezervasyon bulundu.");
-      } else {
-        toast.error("Rezervasyon bulunamadı. Lütfen kodu kontrol ediniz.");
-      }
-      setSearchingReservation(false);
-    }, 1500);
+      setSearchResults(hotels);
+    }, 500);
   };
 
-  // Handle selecting a hotel
-  const handleSelectHotel = (hotel: typeof mockHotels[0]) => {
+  // Handler for selecting a hotel
+  const handleSelectHotel = (hotel: (typeof hotels)[0]) => {
     setSelectedHotel(hotel);
-    setBookingStep(2);
-    updateFlightDates();
+    setReservationStep(1);
+    setShowFlights(false);
+    setShowTransfer(false);
   };
 
-  // Handle booking flight
-  const onBookFlight = (data: z.infer<typeof flightSchema>) => {
-    setBookingStep(3);
+  // Handler for proceeding to flight selection
+  const handleContinueToFlights = () => {
+    setShowFlights(true);
+    setReservationStep(2);
   };
 
-  // Handle booking transfer
-  const onBookTransfer = (data: z.infer<typeof transferSchema>) => {
-    setBookingStep(4);
+  // Handler for proceeding to transfer selection
+  const handleContinueToTransfer = () => {
+    setShowTransfer(true);
+    setReservationStep(3);
   };
 
-  // Handle completing booking
-  const handleCompleteBooking = () => {
-    toast.success("Rezervasyon tamamlandı! Rezervasyon kodunuz: RES" + Math.floor(10000 + Math.random() * 90000));
-    // Reset all
+  // Handler for completing the reservation
+  const handleCompleteReservation = () => {
+    // Generate a random reservation code
+    const newReservationCode = `RES${Math.floor(100000 + Math.random() * 900000)}`;
+    
+    toast.success("Rezervasyon başarıyla tamamlandı!");
+    toast.info(`Rezervasyon kodunuz: ${newReservationCode}`);
+    
+    // Reset form and return to search
+    setReservationStep(1);
     setSelectedHotel(null);
-    setBookingStep(1);
-    setSearchResults(null);
-    hotelForm.reset();
-    flightForm.reset();
-    transferForm.reset();
-    setActiveTab("search");
+    setSelectedRoom("");
+    setSelectedFlightTo("");
+    setSelectedFlightFrom("");
+    setSelectedTransfer("");
+    setShowFlights(false);
+    setShowTransfer(false);
+    setActiveTab("lookup");
+    setReservationCode(newReservationCode);
+  };
+
+  // Handler for looking up a reservation
+  const handleLookupReservation = () => {
+    if (!reservationCode.trim()) {
+      toast.error("Lütfen rezervasyon kodunu girin");
+      return;
+    }
+    
+    const reservation = reservations.find(r => r.code === reservationCode);
+    
+    if (reservation) {
+      setFoundReservation(reservation);
+      toast.success("Rezervasyon bulundu!");
+    } else {
+      setFoundReservation(null);
+      toast.error("Rezervasyon bulunamadı!");
+    }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="bg-white rounded-lg">
       <div className="flex items-center gap-3 mb-6">
-        <Hotel className="w-6 h-6 text-primary" />
-        <h2 className="text-xl font-semibold">Otel & Seyahat Rezervasyonları</h2>
+        <Hotel className="h-6 w-6 text-primary" />
+        <h2 className="text-xl font-semibold">Otel Rezervasyonu</h2>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-4">
-          <TabsTrigger value="search">
-            <Search className="mr-2 h-4 w-4" />
+        <TabsList className="grid grid-cols-2 mb-4">
+          <TabsTrigger value="search" className="flex items-center gap-2">
+            <Search className="h-4 w-4" />
             Otel Ara
           </TabsTrigger>
-          <TabsTrigger value="booking">
-            <Calendar className="mr-2 h-4 w-4" />
-            Rezervasyon Yap
-          </TabsTrigger>
-          <TabsTrigger value="view">
-            <Bookmark className="mr-2 h-4 w-4" />
-            Rezervasyonlarım
+          <TabsTrigger value="lookup" className="flex items-center gap-2">
+            <TicketCheck className="h-4 w-4" />
+            Rezervasyon Sorgula
           </TabsTrigger>
         </TabsList>
 
-        <div className="border rounded-lg p-4 min-h-[500px]">
-          {/* Hotel Search Tab */}
-          <TabsContent value="search" className="mt-0">
-            <Form {...hotelForm}>
-              <form onSubmit={hotelForm.handleSubmit(onSearchHotels)} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <FormField
-                    control={hotelForm.control}
-                    name="location"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Konum</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Konum seçin" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="girne">Girne, KKTC</SelectItem>
-                            <SelectItem value="gazimagusa">Gazimağusa, KKTC</SelectItem>
-                            <SelectItem value="lefkosa">Lefkoşa, KKTC</SelectItem>
-                            <SelectItem value="guzelyurt">Güzelyurt, KKTC</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={hotelForm.control}
-                    name="checkIn"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel>Giriş Tarihi</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant={"outline"}
-                                className={`w-full pl-3 text-left font-normal ${!field.value && "text-muted-foreground"}`}
-                              >
-                                {field.value ? (
-                                  format(field.value, "PPP", { locale: tr })
-                                ) : (
-                                  <span>Tarih seçin</span>
-                                )}
-                                <Calendar className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <CalendarComponent
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              disabled={(date) => date < new Date()}
-                              locale={tr}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={hotelForm.control}
-                    name="checkOut"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel>Çıkış Tarihi</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant={"outline"}
-                                className={`w-full pl-3 text-left font-normal ${!field.value && "text-muted-foreground"}`}
-                              >
-                                {field.value ? (
-                                  format(field.value, "PPP", { locale: tr })
-                                ) : (
-                                  <span>Tarih seçin</span>
-                                )}
-                                <Calendar className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <CalendarComponent
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              disabled={(date) => 
-                                date < (hotelForm.getValues("checkIn") || new Date())
-                              }
-                              locale={tr}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={hotelForm.control}
-                    name="guests"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Kişi Sayısı</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Kişi sayısı seçin" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="1">1 Kişi</SelectItem>
-                            <SelectItem value="2">2 Kişi</SelectItem>
-                            <SelectItem value="3">3 Kişi</SelectItem>
-                            <SelectItem value="4">4 Kişi</SelectItem>
-                            <SelectItem value="5">5 Kişi</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <Button type="submit" className="w-full" disabled={isSearching}>
-                  {isSearching ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Aranıyor...
-                    </>
-                  ) : (
-                    <>
-                      <Search className="mr-2 h-4 w-4" />
-                      Otel Ara
-                    </>
-                  )}
-                </Button>
-              </form>
-            </Form>
-
-            {searchResults && (
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-4">Arama Sonuçları</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {searchResults.map((hotel) => (
-                    <Card key={hotel.id} className="overflow-hidden">
-                      <img
-                        src={hotel.image}
-                        alt={hotel.name}
-                        className="w-full h-48 object-cover"
-                      />
-                      <CardHeader className="pb-2">
-                        <div className="flex justify-between items-start">
-                          <CardTitle className="text-lg">{hotel.name}</CardTitle>
-                          <Badge>{hotel.rating} ★</Badge>
-                        </div>
-                        <CardDescription className="flex items-center">
-                          <MapPin className="w-4 h-4 mr-1" />
-                          {hotel.location}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="pb-2">
-                        <div className="flex flex-wrap gap-1 mb-2">
-                          {hotel.amenities.map((amenity, index) => (
-                            <Badge key={index} variant="outline" className="text-xs">
-                              {amenity}
-                            </Badge>
-                          ))}
-                        </div>
-                        <p className="font-bold text-lg">{hotel.price} € / gece</p>
-                      </CardContent>
-                      <CardFooter>
-                        <Button 
-                          className="w-full" 
-                          onClick={() => handleSelectHotel(hotel)}
-                        >
-                          Rezervasyon Yap
-                        </Button>
-                      </CardFooter>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            )}
-          </TabsContent>
-
-          {/* Booking Process Tab */}
-          <TabsContent value="booking" className="mt-0">
-            {!selectedHotel ? (
-              <div className="text-center py-12">
-                <Hotel className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Henüz bir otel seçmediniz</h3>
-                <p className="text-muted-foreground mb-4">
-                  Rezervasyon yapmak için önce otel araması yapınız.
-                </p>
-                <Button onClick={() => setActiveTab("search")}>
-                  Otel Aramaya Git
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {/* Stepper */}
-                <div className="flex justify-between items-center mb-6">
-                  {[1, 2, 3, 4].map((step) => (
-                    <div 
-                      key={step} 
-                      className={`flex flex-col items-center ${bookingStep >= step ? 'text-primary' : 'text-muted-foreground'}`}
-                    >
-                      <div className={`
-                        w-8 h-8 rounded-full flex items-center justify-center mb-1
-                        ${bookingStep === step ? 'bg-primary text-white' : 
-                          bookingStep > step ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}
-                      `}>
-                        {step}
-                      </div>
-                      <span className="text-xs font-medium">
-                        {step === 1 ? 'Otel' : 
-                          step === 2 ? 'Uçuş' : 
-                          step === 3 ? 'Transfer' : 'Ödeme'}
-                      </span>
+        <TabsContent value="search" className="space-y-4">
+          {!selectedHotel ? (
+            <>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Otel Ara</CardTitle>
+                  <CardDescription>Tarih ve misafir sayısını seçerek arama yapın</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Giriş Tarihi</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className="w-full justify-start text-left">
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {checkInDate ? format(checkInDate, 'PPP', { locale: tr }) : 'Giriş tarihi seçin'}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={checkInDate}
+                            onSelect={setCheckInDate}
+                            initialFocus
+                            disabled={(date) => date < new Date()}
+                            className="p-3 pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
                     </div>
-                  ))}
-                </div>
-
-                {/* Selected Hotel Summary - Always visible during booking process */}
-                <div className="bg-muted p-4 rounded-lg flex gap-4 items-center">
-                  <img 
-                    src={selectedHotel.image} 
-                    alt={selectedHotel.name}
-                    className="w-24 h-24 object-cover rounded"
-                  />
-                  <div>
-                    <h3 className="font-semibold">{selectedHotel.name}</h3>
-                    <p className="text-sm text-muted-foreground">{selectedHotel.location}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge>{selectedHotel.rating} ★</Badge>
-                      <Badge variant="outline" className="text-xs">
-                        {hotelForm.getValues('checkIn') && hotelForm.getValues('checkOut') && 
-                          format(hotelForm.getValues('checkIn')!, "d MMM", { locale: tr }) + 
-                          " - " + 
-                          format(hotelForm.getValues('checkOut')!, "d MMM", { locale: tr })
-                        }
-                      </Badge>
-                      <Badge variant="outline" className="text-xs">
-                        {hotelForm.getValues('guests')} Misafir
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className="ml-auto text-right">
-                    <p className="font-bold text-lg">{selectedHotel.price} € / gece</p>
-                    {hotelForm.getValues('checkIn') && hotelForm.getValues('checkOut') && (
-                      <p className="text-sm text-muted-foreground">
-                        Toplam: {selectedHotel.price * 
-                          (Math.floor((hotelForm.getValues('checkOut')!.getTime() - 
-                          hotelForm.getValues('checkIn')!.getTime()) / (1000 * 60 * 60 * 24))) || 1} €
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Step 2: Flight Booking */}
-                {bookingStep === 2 && (
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Uçuş Bilgileri</h3>
-                    <Form {...flightForm}>
-                      <form onSubmit={flightForm.handleSubmit(onBookFlight)} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <FormField
-                            control={flightForm.control}
-                            name="departureAirport"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Kalkış Havalimanı</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                  <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Havalimanı seçin" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="Istanbul">İstanbul Havalimanı</SelectItem>
-                                    <SelectItem value="Ankara">Ankara Esenboğa</SelectItem>
-                                    <SelectItem value="Izmir">İzmir Adnan Menderes</SelectItem>
-                                    <SelectItem value="Antalya">Antalya Havalimanı</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={flightForm.control}
-                            name="arrivalAirport"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Varış Havalimanı</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                  <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Havalimanı seçin" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="Ercan">Ercan Havalimanı (KKTC)</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={flightForm.control}
-                            name="departureDate"
-                            render={({ field }) => (
-                              <FormItem className="flex flex-col">
-                                <FormLabel>Gidiş Tarihi</FormLabel>
-                                <Popover>
-                                  <PopoverTrigger asChild>
-                                    <FormControl>
-                                      <Button
-                                        variant={"outline"}
-                                        className={`w-full pl-3 text-left font-normal ${!field.value && "text-muted-foreground"}`}
-                                      >
-                                        {field.value ? (
-                                          format(field.value, "PPP", { locale: tr })
-                                        ) : (
-                                          <span>Tarih seçin</span>
-                                        )}
-                                        <Calendar className="ml-auto h-4 w-4 opacity-50" />
-                                      </Button>
-                                    </FormControl>
-                                  </PopoverTrigger>
-                                  <PopoverContent className="w-auto p-0" align="start">
-                                    <CalendarComponent
-                                      mode="single"
-                                      selected={field.value}
-                                      onSelect={field.onChange}
-                                      disabled={(date) => date < new Date()}
-                                      locale={tr}
-                                      initialFocus
-                                    />
-                                  </PopoverContent>
-                                </Popover>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={flightForm.control}
-                            name="returnDate"
-                            render={({ field }) => (
-                              <FormItem className="flex flex-col">
-                                <FormLabel>Dönüş Tarihi</FormLabel>
-                                <Popover>
-                                  <PopoverTrigger asChild>
-                                    <FormControl>
-                                      <Button
-                                        variant={"outline"}
-                                        className={`w-full pl-3 text-left font-normal ${!field.value && "text-muted-foreground"}`}
-                                      >
-                                        {field.value ? (
-                                          format(field.value, "PPP", { locale: tr })
-                                        ) : (
-                                          <span>Tarih seçin</span>
-                                        )}
-                                        <Calendar className="ml-auto h-4 w-4 opacity-50" />
-                                      </Button>
-                                    </FormControl>
-                                  </PopoverTrigger>
-                                  <PopoverContent className="w-auto p-0" align="start">
-                                    <CalendarComponent
-                                      mode="single"
-                                      selected={field.value}
-                                      onSelect={field.onChange}
-                                      disabled={(date) => 
-                                        date < (flightForm.getValues("departureDate") || new Date())
-                                      }
-                                      locale={tr}
-                                      initialFocus
-                                    />
-                                  </PopoverContent>
-                                </Popover>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-
-                        <FormField
-                          control={flightForm.control}
-                          name="passengers"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Yolcu Sayısı</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Yolcu sayısı seçin" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="1">1 Yolcu</SelectItem>
-                                  <SelectItem value="2">2 Yolcu</SelectItem>
-                                  <SelectItem value="3">3 Yolcu</SelectItem>
-                                  <SelectItem value="4">4 Yolcu</SelectItem>
-                                  <SelectItem value="5">5 Yolcu</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        {/* Mock flight options */}
-                        <div className="border rounded-md p-4 space-y-3">
-                          <h4 className="font-medium">Uygun Uçuşlar</h4>
-                          
-                          {/* Outbound */}
-                          <div className="p-3 border rounded-md bg-background">
-                            <div className="flex justify-between items-center mb-2">
-                              <span className="text-sm font-medium">Gidiş Uçuşu</span>
-                              <Badge>Seçildi</Badge>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <div>
-                                <p className="font-medium">09:30</p>
-                                <p className="text-xs text-muted-foreground">İstanbul</p>
-                              </div>
-                              <div className="flex flex-col items-center">
-                                <ArrowLeftRight className="w-4 h-4 text-muted-foreground mb-1" />
-                                <p className="text-xs text-muted-foreground">2 saat</p>
-                                <p className="text-xs font-medium">TK1214</p>
-                              </div>
-                              <div className="text-right">
-                                <p className="font-medium">11:30</p>
-                                <p className="text-xs text-muted-foreground">Ercan</p>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Return */}
-                          <div className="p-3 border rounded-md bg-background">
-                            <div className="flex justify-between items-center mb-2">
-                              <span className="text-sm font-medium">Dönüş Uçuşu</span>
-                              <Badge>Seçildi</Badge>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <div>
-                                <p className="font-medium">16:30</p>
-                                <p className="text-xs text-muted-foreground">Ercan</p>
-                              </div>
-                              <div className="flex flex-col items-center">
-                                <ArrowLeftRight className="w-4 h-4 text-muted-foreground mb-1" />
-                                <p className="text-xs text-muted-foreground">2 saat</p>
-                                <p className="text-xs font-medium">TK1215</p>
-                              </div>
-                              <div className="text-right">
-                                <p className="font-medium">18:30</p>
-                                <p className="text-xs text-muted-foreground">İstanbul</p>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="flex justify-between text-sm mt-2">
-                            <span>Toplam:</span>
-                            <span className="font-bold">280 €</span>
-                          </div>
-                        </div>
-
-                        <div className="flex justify-between gap-2">
-                          <Button 
-                            type="button" 
-                            variant="outline" 
-                            onClick={() => setBookingStep(1)}
-                          >
-                            Geri
-                          </Button>
-                          <Button type="submit">
-                            Uçuş Bilgilerini Onayla ve Devam Et
-                          </Button>
-                        </div>
-                      </form>
-                    </Form>
-                  </div>
-                )}
-
-                {/* Step 3: Transfer Booking */}
-                {bookingStep === 3 && (
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Transfer Seçenekleri</h3>
-                    <Form {...transferForm}>
-                      <form onSubmit={transferForm.handleSubmit(onBookTransfer)} className="space-y-4">
-                        <FormField
-                          control={transferForm.control}
-                          name="transferType"
-                          render={({ field }) => (
-                            <FormItem className="space-y-3">
-                              <FormLabel>Transfer Tipi</FormLabel>
-                              <FormControl>
-                                <RadioGroup
-                                  onValueChange={field.onChange}
-                                  defaultValue={field.value}
-                                  className="space-y-1"
-                                >
-                                  <div className="flex items-center space-x-2 p-4 border rounded-md">
-                                    <RadioGroupItem value="private" id="private" />
-                                    <div className="grid gap-1 flex-1">
-                                      <Label htmlFor="private" className="font-medium">Özel Transfer</Label>
-                                      <p className="text-sm text-muted-foreground">
-                                        Size özel araç ile konforlu transfer
-                                      </p>
-                                    </div>
-                                    <div className="font-medium">60 €</div>
-                                  </div>
-                                  <div className="flex items-center space-x-2 p-4 border rounded-md">
-                                    <RadioGroupItem value="shared" id="shared" />
-                                    <div className="grid gap-1 flex-1">
-                                      <Label htmlFor="shared" className="font-medium">Paylaşımlı Transfer</Label>
-                                      <p className="text-sm text-muted-foreground">
-                                        Diğer yolcular ile paylaşımlı araç
-                                      </p>
-                                    </div>
-                                    <div className="font-medium">25 €</div>
-                                  </div>
-                                  <div className="flex items-center space-x-2 p-4 border rounded-md">
-                                    <RadioGroupItem value="none" id="none" />
-                                    <div className="grid gap-1 flex-1">
-                                      <Label htmlFor="none" className="font-medium">Transfer İstemiyorum</Label>
-                                      <p className="text-sm text-muted-foreground">
-                                        Kendi ulaşımımı sağlayacağım
-                                      </p>
-                                    </div>
-                                    <div className="font-medium">0 €</div>
-                                  </div>
-                                </RadioGroup>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={transferForm.control}
-                          name="passengers"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Yolcu Sayısı</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Yolcu sayısı seçin" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="1">1 Yolcu</SelectItem>
-                                  <SelectItem value="2">2 Yolcu</SelectItem>
-                                  <SelectItem value="3">3 Yolcu</SelectItem>
-                                  <SelectItem value="4">4 Yolcu</SelectItem>
-                                  <SelectItem value="5">5 Yolcu</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <div className="p-4 border rounded-md bg-muted/50">
-                          <h4 className="font-medium mb-2">Transfer Bilgileri</h4>
-                          <div className="space-y-2 text-sm">
-                            <div className="flex justify-between">
-                              <span>Gidiş Transferi:</span>
-                              <span>Ercan Havalimanı → {selectedHotel.name}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span>Dönüş Transferi:</span>
-                              <span>{selectedHotel.name} → Ercan Havalimanı</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span>Mesafe:</span>
-                              <span>~45 km (yaklaşık 40 dakika)</span>
-                            </div>
-                            <Separator className="my-2" />
-                            <div className="flex justify-between font-medium">
-                              <span>Transfer ücreti:</span>
-                              <span>{transferForm.getValues("transferType") === "private" ? "60 €" : 
-                                     transferForm.getValues("transferType") === "shared" ? "25 €" : "0 €"}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex justify-between gap-2">
-                          <Button 
-                            type="button" 
-                            variant="outline" 
-                            onClick={() => setBookingStep(2)}
-                          >
-                            Geri
-                          </Button>
-                          <Button type="submit">
-                            Transfer Bilgilerini Onayla ve Devam Et
-                          </Button>
-                        </div>
-                      </form>
-                    </Form>
-                  </div>
-                )}
-
-                {/* Step 4: Payment & Confirmation */}
-                {bookingStep === 4 && (
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Ödeme ve Onay</h3>
                     
-                    <div className="border rounded-md p-4 space-y-4">
-                      <h4 className="font-medium">Rezervasyon Özeti</h4>
-                      
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2">
-                          <Hotel className="w-5 h-5 text-primary flex-shrink-0" />
-                          <div>
-                            <p className="font-medium">{selectedHotel.name}</p>
-                            <p className="text-sm text-muted-foreground">{selectedHotel.location}</p>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-2 text-sm">
-                          <div>
-                            <p className="text-muted-foreground">Giriş Tarihi</p>
-                            <p className="font-medium">
-                              {hotelForm.getValues('checkIn') && 
-                                format(hotelForm.getValues('checkIn')!, "PPP", { locale: tr })}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-muted-foreground">Çıkış Tarihi</p>
-                            <p className="font-medium">
-                              {hotelForm.getValues('checkOut') && 
-                                format(hotelForm.getValues('checkOut')!, "PPP", { locale: tr })}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-muted-foreground">Misafir Sayısı</p>
-                            <p className="font-medium">{hotelForm.getValues('guests')} Kişi</p>
-                          </div>
-                          <div>
-                            <p className="text-muted-foreground">Konaklama</p>
-                            <p className="font-medium">
-                              {hotelForm.getValues('checkIn') && hotelForm.getValues('checkOut') && 
-                                Math.floor((hotelForm.getValues('checkOut')!.getTime() - 
-                                hotelForm.getValues('checkIn')!.getTime()) / (1000 * 60 * 60 * 24)) || 1} Gece
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <Separator />
-                      
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2">
-                          <Plane className="w-5 h-5 text-primary flex-shrink-0" />
-                          <div>
-                            <p className="font-medium">Uçuş Bilgileri</p>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Gidiş:</span>
-                            <span>
-                              {flightForm.getValues('departureAirport')} → {flightForm.getValues('arrivalAirport')}
-                              {" "}({flightForm.getValues('departureDate') && 
-                                format(flightForm.getValues('departureDate')!, "d MMM", { locale: tr })})
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Dönüş:</span>
-                            <span>
-                              {flightForm.getValues('arrivalAirport')} → {flightForm.getValues('departureAirport')}
-                              {" "}({flightForm.getValues('returnDate') && 
-                                format(flightForm.getValues('returnDate')!, "d MMM", { locale: tr })})
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Yolcu:</span>
-                            <span>{flightForm.getValues('passengers')} Kişi</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <Separator />
-                      
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2">
-                          <Car className="w-5 h-5 text-primary flex-shrink-0" />
-                          <div>
-                            <p className="font-medium">Transfer Bilgileri</p>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Transfer Tipi:</span>
-                            <span>
-                              {transferForm.getValues('transferType') === 'private' 
-                                ? 'Özel Transfer' 
-                                : transferForm.getValues('transferType') === 'shared' 
-                                ? 'Paylaşımlı Transfer' 
-                                : 'Transfer Yok'}
-                            </span>
-                          </div>
-                          {transferForm.getValues('transferType') !== 'none' && (
-                            <>
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">Yolcu:</span>
-                                <span>{transferForm.getValues('passengers')} Kişi</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">Mesafe:</span>
-                                <span>~45 km</span>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      </div>
-
-                      <Separator />
-                      
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>Otel:</span>
-                          <span>
-                            {hotelForm.getValues('checkIn') && hotelForm.getValues('checkOut') && 
-                              (selectedHotel.price * 
-                                (Math.floor((hotelForm.getValues('checkOut')!.getTime() - 
-                                hotelForm.getValues('checkIn')!.getTime()) / (1000 * 60 * 60 * 24))) || 1)} €
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span>Uçuş:</span>
-                          <span>280 €</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span>Transfer:</span>
-                          <span>
-                            {transferForm.getValues('transferType') === 'private' 
-                              ? '60 €' 
-                              : transferForm.getValues('transferType') === 'shared' 
-                              ? '25 €' 
-                              : '0 €'}
-                          </span>
-                        </div>
-                        <Separator />
-                        <div className="flex justify-between font-bold">
-                          <span>Toplam:</span>
-                          <span>
-                            {hotelForm.getValues('checkIn') && hotelForm.getValues('checkOut') && 
-                              ((selectedHotel.price * 
-                                (Math.floor((hotelForm.getValues('checkOut')!.getTime() - 
-                                hotelForm.getValues('checkIn')!.getTime()) / (1000 * 60 * 60 * 24)) || 1)) + 
-                                280 + 
-                                (transferForm.getValues('transferType') === 'private' 
-                                  ? 60 
-                                  : transferForm.getValues('transferType') === 'shared' 
-                                  ? 25 
-                                  : 0))} €
-                          </span>
-                        </div>
-                      </div>
+                    <div className="space-y-2">
+                      <Label>Çıkış Tarihi</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className="w-full justify-start text-left">
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {checkOutDate ? format(checkOutDate, 'PPP', { locale: tr }) : 'Çıkış tarihi seçin'}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={checkOutDate}
+                            onSelect={setCheckOutDate}
+                            initialFocus
+                            disabled={(date) => checkInDate ? date <= checkInDate : date <= new Date()}
+                            className="p-3 pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
                     </div>
-
-                    <div className="border rounded-md p-4">
-                      <h4 className="font-medium mb-3">Ödeme Bilgileri</h4>
-                      <div className="space-y-3">
-                        <div className="space-y-2">
-                          <Label htmlFor="cardName">Kart Üzerindeki İsim</Label>
-                          <Input id="cardName" placeholder="Kart sahibinin adı" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="cardNumber">Kart Numarası</Label>
-                          <Input id="cardNumber" placeholder="1234 5678 9012 3456" />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="expiryDate">Son Kullanma Tarihi</Label>
-                            <Input id="expiryDate" placeholder="AA/YY" />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="cvv">CVV</Label>
-                            <Input id="cvv" placeholder="123" />
-                          </div>
-                        </div>
-                      </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Misafir Sayısı</Label>
+                      <Select value={guests} onValueChange={setGuests}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Misafir sayısı seçin" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1">1 Kişi</SelectItem>
+                          <SelectItem value="2">2 Kişi</SelectItem>
+                          <SelectItem value="3">3 Kişi</SelectItem>
+                          <SelectItem value="4">4 Kişi</SelectItem>
+                          <SelectItem value="5">5 Kişi</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-
-                    <div className="flex justify-between gap-2">
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        onClick={() => setBookingStep(3)}
-                      >
-                        Geri
-                      </Button>
-                      <Button onClick={handleCompleteBooking}>
-                        <CreditCard className="mr-2 h-4 w-4" />
-                        Ödemeyi Tamamla ve Rezervasyonu Onayla
+                    
+                    <div className="flex items-end">
+                      <Button className="w-full" onClick={handleSearch}>
+                        <Search className="mr-2 h-4 w-4" />
+                        Otel Ara
                       </Button>
                     </div>
                   </div>
-                )}
-              </div>
-            )}
-          </TabsContent>
-
-          {/* View Reservations Tab */}
-          <TabsContent value="view" className="mt-0">
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                <div className="col-span-2">
-                  <Label htmlFor="reservationCode" className="mb-2 block">Rezervasyon Kodu</Label>
-                  <Input 
-                    id="reservationCode" 
-                    placeholder="Örn: RES12345" 
-                    value={reservationCode}
-                    onChange={(e) => setReservationCode(e.target.value)}
-                  />
-                </div>
-                <Button 
-                  onClick={handleReservationLookup}
-                  disabled={searchingReservation}
-                >
-                  {searchingReservation ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Aranıyor...
-                    </>
-                  ) : (
-                    <>
-                      <Search className="mr-2 h-4 w-4" />
-                      Rezervasyon Ara
-                    </>
+                  
+                  {checkInDate && checkOutDate && (
+                    <div className="text-sm text-muted-foreground">
+                      Toplam konaklama: <span className="font-medium">{totalDays}</span> gece
+                    </div>
                   )}
-                </Button>
-              </div>
+                </CardContent>
+              </Card>
 
-              {viewReservation ? (
-                <Card>
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle>{viewReservation.hotelName}</CardTitle>
-                        <CardDescription>{viewReservation.location}</CardDescription>
-                      </div>
-                      <Badge variant={viewReservation.status === "confirmed" ? "default" : "secondary"}>
-                        {viewReservation.status === "confirmed" ? "Onaylandı" : "Beklemede"}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* Reservation details */}
-                      <div className="space-y-4">
-                        <h4 className="text-lg font-semibold flex items-center">
-                          <Hotel className="mr-2 h-5 w-5" />
-                          Rezervasyon Detayları
-                        </h4>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Rezervasyon No:</span>
-                            <span className="font-medium">{viewReservation.id}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Giriş Tarihi:</span>
-                            <span>
-                              {format(new Date(viewReservation.checkIn), "PPP", { locale: tr })}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Çıkış Tarihi:</span>
-                            <span>
-                              {format(new Date(viewReservation.checkOut), "PPP", { locale: tr })}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Misafir Sayısı:</span>
-                            <span>{viewReservation.guests} Kişi</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Oda Tipi:</span>
-                            <span>{viewReservation.roomType}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Toplam Tutar:</span>
-                            <span className="font-bold">{viewReservation.totalPrice} €</span>
-                          </div>
+              {searchResults.length > 0 && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Arama Sonuçları</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {searchResults.map((hotel) => (
+                      <Card key={hotel.id} className="overflow-hidden">
+                        <div className="relative h-48 w-full">
+                          <img 
+                            src={hotel.image} 
+                            alt={hotel.name}
+                            className="h-full w-full object-cover"
+                          />
+                          <Badge className="absolute top-2 right-2 bg-primary">
+                            {hotel.rating} ★
+                          </Badge>
                         </div>
-                      </div>
-
-                      {/* Flight details */}
-                      <div className="space-y-4">
-                        <h4 className="text-lg font-semibold flex items-center">
-                          <Plane className="mr-2 h-5 w-5" />
-                          Uçuş Bilgileri
-                        </h4>
-                        <div className="space-y-4 text-sm">
-                          <div className="border rounded-md p-3 bg-background">
-                            <div className="mb-2 text-muted-foreground">Gidiş Uçuşu</div>
-                            <div className="flex justify-between items-center">
-                              <div>
-                                <p className="font-medium">{viewReservation.flightInfo.outbound.departureTime}</p>
-                                <p className="text-xs text-muted-foreground">{viewReservation.flightInfo.outbound.departure}</p>
-                              </div>
-                              <div className="flex flex-col items-center">
-                                <ArrowLeftRight className="w-4 h-4 text-muted-foreground mb-1" />
-                                <p className="text-xs font-medium">{viewReservation.flightInfo.outbound.flightNo}</p>
-                              </div>
-                              <div className="text-right">
-                                <p className="font-medium">{viewReservation.flightInfo.outbound.arrivalTime}</p>
-                                <p className="text-xs text-muted-foreground">{viewReservation.flightInfo.outbound.arrival}</p>
-                              </div>
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {format(new Date(viewReservation.flightInfo.outbound.departureDate), "d MMMM yyyy", { locale: tr })}
-                            </p>
+                        <CardHeader className="pb-2">
+                          <div className="flex justify-between items-start">
+                            <CardTitle className="text-lg">{hotel.name}</CardTitle>
+                            <div className="text-lg font-bold">{hotel.price} ₺ <span className="text-sm font-normal">/ gece</span></div>
                           </div>
-
-                          <div className="border rounded-md p-3 bg-background">
-                            <div className="mb-2 text-muted-foreground">Dönüş Uçuşu</div>
-                            <div className="flex justify-between items-center">
-                              <div>
-                                <p className="font-medium">{viewReservation.flightInfo.inbound.departureTime}</p>
-                                <p className="text-xs text-muted-foreground">{viewReservation.flightInfo.inbound.departure}</p>
-                              </div>
-                              <div className="flex flex-col items-center">
-                                <ArrowLeftRight className="w-4 h-4 text-muted-foreground mb-1" />
-                                <p className="text-xs font-medium">{viewReservation.flightInfo.inbound.flightNo}</p>
-                              </div>
-                              <div className="text-right">
-                                <p className="font-medium">{viewReservation.flightInfo.inbound.arrivalTime}</p>
-                                <p className="text-xs text-muted-foreground">{viewReservation.flightInfo.inbound.arrival}</p>
-                              </div>
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {format(new Date(viewReservation.flightInfo.inbound.departureDate), "d MMMM yyyy", { locale: tr })}
-                            </p>
+                          <div className="flex items-center text-sm text-muted-foreground">
+                            <MapPin className="h-4 w-4 mr-1" /> 
+                            {hotel.location}
                           </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Transfer details */}
-                    {viewReservation.transferBooked && (
-                      <div className="space-y-3">
-                        <h4 className="text-lg font-semibold flex items-center">
-                          <Car className="mr-2 h-5 w-5" />
-                          Transfer Bilgileri
-                        </h4>
-                        <div className="border rounded-md p-4 bg-muted/30">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <div>
-                              <p className="text-muted-foreground">Transfer Tipi</p>
-                              <p className="font-medium">{viewReservation.transferType}</p>
-                            </div>
-                            <div>
-                              <p className="text-muted-foreground">Yolcu Sayısı</p>
-                              <p className="font-medium">{viewReservation.guests} Kişi</p>
-                            </div>
-                            <div>
-                              <p className="text-muted-foreground">Gidiş Transferi</p>
-                              <p>Ercan Havalimanı → {viewReservation.hotelName}</p>
-                            </div>
-                            <div>
-                              <p className="text-muted-foreground">Dönüş Transferi</p>
-                              <p>{viewReservation.hotelName} → Ercan Havalimanı</p>
-                            </div>
+                        </CardHeader>
+                        <CardContent className="pb-2">
+                          <p className="text-sm">{hotel.description}</p>
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {hotel.amenities.map((amenity, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">
+                                {amenity}
+                              </Badge>
+                            ))}
                           </div>
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                  <CardFooter className="flex justify-between">
-                    <Button variant="outline" onClick={() => setViewReservation(null)}>
-                      Kapat
-                    </Button>
-                    <Button>
-                      Rezervasyonu Yazdır
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ) : (
-                <div className="text-center py-12 border rounded-lg">
-                  <Bookmark className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Rezervasyon Bulunamadı</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Rezervasyon kodunuzu girerek rezervasyon detaylarınızı görüntüleyebilirsiniz.
-                  </p>
-                  <p className="text-muted-foreground text-sm">
-                    Örnek rezervasyon kodu: RES12345
-                  </p>
+                        </CardContent>
+                        <CardFooter>
+                          <Button 
+                            className="w-full" 
+                            onClick={() => handleSelectHotel(hotel)}
+                          >
+                            Rezervasyon Yap
+                          </Button>
+                        </CardFooter>
+                      </Card>
+                    ))}
+                  </div>
                 </div>
               )}
+            </>
+          ) : (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-medium">Rezervasyon</h3>
+                <Button variant="outline" size="sm" onClick={() => setSelectedHotel(null)}>
+                  Otellere Dön
+                </Button>
+              </div>
+
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="w-full md:w-1/3">
+                  <Card>
+                    <div className="relative h-48 w-full">
+                      <img 
+                        src={selectedHotel.image} 
+                        alt={selectedHotel.name}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg">{selectedHotel.name}</CardTitle>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <MapPin className="h-4 w-4 mr-1" /> 
+                        {selectedHotel.location}
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span>Giriş Tarihi:</span>
+                          <span className="font-medium">{checkInDate ? format(checkInDate, 'dd MMM yyyy', { locale: tr }) : '-'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Çıkış Tarihi:</span>
+                          <span className="font-medium">{checkOutDate ? format(checkOutDate, 'dd MMM yyyy', { locale: tr }) : '-'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Misafir Sayısı:</span>
+                          <span className="font-medium">{guests} kişi</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Toplam Konaklama:</span>
+                          <span className="font-medium">{totalDays} gece</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="w-full md:w-2/3 space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <div className="flex justify-between items-center">
+                        <CardTitle className="text-base">1. Oda Seçimi</CardTitle>
+                        {reservationStep > 1 && (
+                          <Badge variant={selectedRoom ? "default" : "outline"}>
+                            {selectedRoom || "Seçilmedi"}
+                          </Badge>
+                        )}
+                      </div>
+                    </CardHeader>
+                    {reservationStep === 1 && (
+                      <CardContent className="space-y-4">
+                        <div className="space-y-2">
+                          <Select value={selectedRoom} onValueChange={setSelectedRoom}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Oda tipi seçin" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Standart Oda">Standart Oda</SelectItem>
+                              <SelectItem value="Deluxe Oda">Deluxe Oda</SelectItem>
+                              <SelectItem value="Deluxe Deniz Manzaralı">Deluxe Deniz Manzaralı</SelectItem>
+                              <SelectItem value="Aile Odası">Aile Odası</SelectItem>
+                              <SelectItem value="Suite">Suite</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <Button 
+                          className="w-full" 
+                          onClick={handleContinueToFlights}
+                          disabled={!selectedRoom}
+                        >
+                          Uçuşlara Devam Et
+                        </Button>
+                      </CardContent>
+                    )}
+                  </Card>
+
+                  {showFlights && (
+                    <Card>
+                      <CardHeader>
+                        <div className="flex justify-between items-center">
+                          <CardTitle className="text-base">2. Uçuş Seçimi</CardTitle>
+                          {reservationStep > 2 && (
+                            <Badge variant={(selectedFlightTo && selectedFlightFrom) ? "default" : "outline"}>
+                              {(selectedFlightTo && selectedFlightFrom) ? "Seçildi" : "Seçilmedi"}
+                            </Badge>
+                          )}
+                        </div>
+                      </CardHeader>
+                      {reservationStep === 2 && (
+                        <CardContent className="space-y-4">
+                          <div className="space-y-2">
+                            <h4 className="text-sm font-medium">Gidiş Uçuşu ({checkInDate ? format(checkInDate, 'dd MMM yyyy', { locale: tr }) : '-'})</h4>
+                            <div className="space-y-2">
+                              {flights.map(flight => (
+                                <div 
+                                  key={flight.id}
+                                  className={`border rounded-lg p-3 flex justify-between items-center cursor-pointer hover:border-primary transition-colors ${selectedFlightTo === flight.id ? 'border-primary bg-primary/5' : ''}`}
+                                  onClick={() => setSelectedFlightTo(flight.id)}
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <img src={flight.logo} alt={flight.airline} className="h-6" />
+                                    <div>
+                                      <div className="font-medium">{flight.airline}</div>
+                                      <div className="text-sm text-muted-foreground">{flight.departure} - {flight.arrival}</div>
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <div className="font-medium">{flight.price} ₺</div>
+                                    <div className="text-sm">
+                                      {flight.departureTime} <ArrowRight className="inline h-3 w-3" /> {flight.arrivalTime}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <h4 className="text-sm font-medium">Dönüş Uçuşu ({checkOutDate ? format(checkOutDate, 'dd MMM yyyy', { locale: tr }) : '-'})</h4>
+                            <div className="space-y-2">
+                              {flights.map(flight => (
+                                <div 
+                                  key={`return-${flight.id}`}
+                                  className={`border rounded-lg p-3 flex justify-between items-center cursor-pointer hover:border-primary transition-colors ${selectedFlightFrom === flight.id ? 'border-primary bg-primary/5' : ''}`}
+                                  onClick={() => setSelectedFlightFrom(flight.id)}
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <img src={flight.logo} alt={flight.airline} className="h-6" />
+                                    <div>
+                                      <div className="font-medium">{flight.airline}</div>
+                                      <div className="text-sm text-muted-foreground">{flight.arrival} - {flight.departure}</div>
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <div className="font-medium">{flight.price} ₺</div>
+                                    <div className="text-sm">
+                                      {flight.departureTime} <ArrowRight className="inline h-3 w-3" /> {flight.arrivalTime}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          
+                          <Button 
+                            className="w-full" 
+                            onClick={handleContinueToTransfer}
+                            disabled={!selectedFlightTo || !selectedFlightFrom}
+                          >
+                            Transfer Seçimine Devam Et
+                          </Button>
+                        </CardContent>
+                      )}
+                    </Card>
+                  )}
+
+                  {showTransfer && (
+                    <Card>
+                      <CardHeader>
+                        <div className="flex justify-between items-center">
+                          <CardTitle className="text-base">3. Transfer Seçimi</CardTitle>
+                          {reservationStep > 3 && (
+                            <Badge variant={selectedTransfer ? "default" : "outline"}>
+                              {selectedTransfer ? "Seçildi" : "Seçilmedi"}
+                            </Badge>
+                          )}
+                        </div>
+                      </CardHeader>
+                      {reservationStep === 3 && (
+                        <CardContent className="space-y-4">
+                          <div className="space-y-2">
+                            <h4 className="text-sm font-medium">Transfer Seçenekleri</h4>
+                            <div className="space-y-2">
+                              {transfers.map(transfer => (
+                                <div 
+                                  key={transfer.id}
+                                  className={`border rounded-lg p-3 flex justify-between items-center cursor-pointer hover:border-primary transition-colors ${selectedTransfer === transfer.id ? 'border-primary bg-primary/5' : ''}`}
+                                  onClick={() => setSelectedTransfer(transfer.id)}
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <div className="bg-primary/10 p-2 rounded-full">
+                                      {transfer.icon}
+                                    </div>
+                                    <div>
+                                      <div className="font-medium">{transfer.type}</div>
+                                      <div className="text-sm text-muted-foreground">
+                                        {transfer.capacity} - {transfer.distance}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <div className="font-medium">{transfer.price} ₺{transfer.shared ? "/kişi" : ""}</div>
+                                    <div className="flex items-center text-sm text-muted-foreground">
+                                      <Timer className="mr-1 h-3 w-3" /> {transfer.duration}
+                                      {transfer.shared && <Badge className="ml-2 text-xs" variant="outline">Paylaşımlı</Badge>}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          
+                          <Separator />
+                          
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-center font-medium">
+                              <span>Toplam Tutar:</span>
+                              <span className="text-lg">{calculateTotalPrice().toLocaleString()} ₺</span>
+                            </div>
+                            
+                            <Button 
+                              className="w-full" 
+                              onClick={handleCompleteReservation}
+                              disabled={!selectedTransfer}
+                            >
+                              <CreditCard className="mr-2 h-4 w-4" />
+                              Rezervasyonu Tamamla
+                            </Button>
+                          </div>
+                        </CardContent>
+                      )}
+                    </Card>
+                  )}
+                </div>
+              </div>
             </div>
-          </TabsContent>
-        </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="lookup" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Rezervasyon Sorgula</CardTitle>
+              <CardDescription>Rezervasyon kodunuzu girerek detayları görüntüleyin</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-2">
+                <Input 
+                  placeholder="Rezervasyon kodu (örn: RES123456)" 
+                  value={reservationCode}
+                  onChange={e => setReservationCode(e.target.value)}
+                />
+                <Button onClick={handleLookupReservation}>
+                  <Search className="mr-2 h-4 w-4" />
+                  Sorgula
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {foundReservation && (
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <CardTitle>Rezervasyon Detayları</CardTitle>
+                  <Badge variant={foundReservation.status === "confirmed" ? "success" : "outline"}>
+                    {foundReservation.status === "confirmed" ? "Onaylandı" : foundReservation.status}
+                  </Badge>
+                </div>
+                <CardDescription>
+                  Rezervasyon Kodu: <span className="font-medium">{foundReservation.code}</span>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">Otel Bilgileri</h3>
+                    <Card>
+                      <CardContent className="pt-6">
+                        <div className="space-y-2">
+                          <div>
+                            <span className="font-medium">Otel: </span>
+                            {hotels.find(h => h.id === foundReservation.hotelId)?.name}
+                          </div>
+                          <div>
+                            <span className="font-medium">Konaklama: </span>
+                            {format(foundReservation.checkIn, 'dd MMM yyyy', { locale: tr })} - {format(foundReservation.checkOut, 'dd MMM yyyy', { locale: tr })}
+                          </div>
+                          <div>
+                            <span className="font-medium">Oda Tipi: </span>
+                            {foundReservation.room}
+                          </div>
+                          <div>
+                            <span className="font-medium">Misafir Sayısı: </span>
+                            {foundReservation.guests} kişi
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">Uçuş Bilgileri</h3>
+                    <Card>
+                      <CardContent className="pt-6">
+                        <div className="space-y-3">
+                          <div>
+                            <div className="font-medium">Gidiş Uçuşu:</div>
+                            <div className="flex justify-between items-center mt-1">
+                              <div className="flex items-center">
+                                <Plane className="h-4 w-4 mr-2" />
+                                <div>
+                                  {flights.find(f => f.id === foundReservation.flightTo)?.airline} - {format(foundReservation.checkIn, 'dd MMM yyyy', { locale: tr })}
+                                </div>
+                              </div>
+                              <div className="text-sm">
+                                {flights.find(f => f.id === foundReservation.flightTo)?.departureTime} - {flights.find(f => f.id === foundReservation.flightTo)?.arrivalTime}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <div className="font-medium">Dönüş Uçuşu:</div>
+                            <div className="flex justify-between items-center mt-1">
+                              <div className="flex items-center">
+                                <Plane className="h-4 w-4 mr-2" />
+                                <div>
+                                  {flights.find(f => f.id === foundReservation.flightFrom)?.airline} - {format(foundReservation.checkOut, 'dd MMM yyyy', { locale: tr })}
+                                </div>
+                              </div>
+                              <div className="text-sm">
+                                {flights.find(f => f.id === foundReservation.flightFrom)?.departureTime} - {flights.find(f => f.id === foundReservation.flightFrom)?.arrivalTime}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="text-sm font-medium mb-2">Transfer Bilgileri</h3>
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center">
+                          {transfers.find(t => t.id === foundReservation.transfer)?.icon}
+                          <div className="ml-2">
+                            <div className="font-medium">{transfers.find(t => t.id === foundReservation.transfer)?.type}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {transfers.find(t => t.id === foundReservation.transfer)?.capacity} - {transfers.find(t => t.id === foundReservation.transfer)?.distance}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div>{transfers.find(t => t.id === foundReservation.transfer)?.price} ₺</div>
+                          <div className="flex items-center text-sm text-muted-foreground">
+                            <Timer className="mr-1 h-3 w-3" /> {transfers.find(t => t.id === foundReservation.transfer)?.duration}
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+                
+                <div className="border-t pt-4">
+                  <div className="flex justify-between items-center font-medium">
+                    <span>Toplam Tutar:</span>
+                    <span className="text-lg">{foundReservation.totalPrice.toLocaleString()} ₺</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
       </Tabs>
     </div>
   );
