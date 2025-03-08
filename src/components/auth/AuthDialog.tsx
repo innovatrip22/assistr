@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -80,23 +79,39 @@ const AuthDialog = ({ onClose, type: initialType, onSuccess }: AuthDialogProps) 
     setIsLoading(true);
 
     try {
-      // Check if the institution code matches any valid institution code
       console.log("Institution login with code:", formData.institutionCode);
       
-      // Check the institution code against valid codes from feedbackService
-      const institutionKey = Object.keys(INSTITUTIONS).find(
-        key => formData.institutionCode === INSTITUTIONS[key as keyof typeof INSTITUTIONS].password
-      );
+      const institutionCodes = {
+        "elektrik123": "ELEKTRIK",
+        "su123": "SU", 
+        "dogalgaz123": "DOGALGAZ",
+        "belediye123": "BELEDIYE",
+        "turizm123": "TURIZM",
+        "bakanlik123": "BAKANLIK"
+      };
       
-      if (institutionKey) {
-        toast.success("Kurum girişi başarılı");
-        // Save the institution type in localStorage for test login
-        localStorage.setItem("testUserType", "institution");
-        // Redirect to the institution dashboard
+      if (Object.keys(institutionCodes).includes(formData.institutionCode)) {
+        const institutionType = institutionCodes[formData.institutionCode as keyof typeof institutionCodes];
+        
+        toast.success(`${institutionType} girişi başarılı`);
+        
+        localStorage.setItem("testUserType", institutionType);
+        
         navigate("/institution");
         if (onSuccess) onSuccess();
       } else {
-        toast.error("Geçersiz kurum kodu");
+        const institutionKey = Object.keys(INSTITUTIONS).find(
+          key => formData.institutionCode === INSTITUTIONS[key as keyof typeof INSTITUTIONS].password
+        );
+        
+        if (institutionKey) {
+          toast.success("Kurum girişi başarılı");
+          localStorage.setItem("testUserType", institutionKey);
+          navigate("/institution");
+          if (onSuccess) onSuccess();
+        } else {
+          toast.error("Geçersiz kurum kodu");
+        }
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -110,7 +125,6 @@ const AuthDialog = ({ onClose, type: initialType, onSuccess }: AuthDialogProps) 
     e.preventDefault();
     setIsLoading(true);
 
-    // Fix the type comparison by checking the string value
     if (type === "institution") {
       handleInstitutionLogin(e);
       return;
@@ -118,16 +132,13 @@ const AuthDialog = ({ onClose, type: initialType, onSuccess }: AuthDialogProps) 
 
     try {
       if (method === "email") {
-        // Email login (simulated for demo)
         console.log("Email login with:", formData.email, formData.password);
         
         if (formData.email === "123456" && formData.password === "123456") {
           toast.success("Giriş başarılı");
           
-          // Save the user type in localStorage for test login
           localStorage.setItem("testUserType", type);
           
-          // Redirect based on user type
           if (type === "business") {
             navigate("/business");
           } else {
@@ -138,16 +149,13 @@ const AuthDialog = ({ onClose, type: initialType, onSuccess }: AuthDialogProps) 
           toast.error("Geçersiz kimlik bilgileri");
         }
       } else {
-        // Code login (simulate for now)
         console.log("Code login with phone:", formData.phone, "and code:", formData.code);
         
         if (formData.code === "1234") {
           toast.success("Giriş başarılı");
           
-          // Save the user type in localStorage for test login
           localStorage.setItem("testUserType", type);
           
-          // Redirect based on user type
           if (type === "business") {
             navigate("/business");
           } else {

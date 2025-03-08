@@ -1,9 +1,11 @@
+
 import { createContext, useContext, useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
-type UserType = "institution" | "business" | "tourist" | null;
+// Define all valid user types
+type UserType = "institution" | "business" | "tourist" | "ELEKTRIK" | "SU" | "DOGALGAZ" | "BELEDIYE" | "TURIZM" | "BAKANLIK" | null;
 
 interface AuthContextType {
   user: any;

@@ -4,6 +4,8 @@ import { Navigate } from "react-router-dom";
 
 // Kullanıcı tipini bir birleşim olarak tanımla
 type UserType = "institution" | "business" | "tourist";
+// Kurum tiplerini de tanımla
+const INSTITUTION_CODES = ["ELEKTRIK", "SU", "DOGALGAZ", "BELEDIYE", "TURIZM", "BAKANLIK"];
 
 interface AuthRequiredProps {
   children: React.ReactNode;
@@ -27,20 +29,21 @@ const AuthRequired = ({ children, userType }: AuthRequiredProps) => {
 
   // Kaydedilmiş bir kullanıcı tipi yoksa anasayfaya yönlendir
   if (!currentUserType) {
+    console.log("Kullanıcı tipi bulunamadı, anasayfaya yönlendiriliyor");
     return <Navigate to="/" />;
   }
 
-  // Tam eşleşme için kontrol et
-  // IMPORTANT: Burada institution kontrolü için kurum kodlarının tamamını kabul et
+  // Kurum tipi kontrolü
   if (userType === "institution") {
-    // Eğer giriş yapan kullanıcı herhangi bir kurum tipiyse erişime izin ver
-    const institutionCodes = ["ELEKTRIK", "SU", "DOGALGAZ", "BELEDIYE", "TURIZM", "BAKANLIK"];
-    if (!institutionCodes.includes(currentUserType)) {
-      console.log(`Erişim reddedildi: ${userType} gerekli, fakat ${currentUserType} bulundu`);
+    // INSTITUTION_CODES listesindeki değerlerin herhangi birisi veya "institution" kelimesi
+    // kabul edilebilir bir kurum tipi olarak değerlendirilir
+    if (currentUserType !== "institution" && !INSTITUTION_CODES.includes(currentUserType)) {
+      console.log(`Erişim reddedildi: Kurum girişi gerekli, fakat ${currentUserType} bulundu`);
       return <Navigate to="/" />;
     }
-  } else if (currentUserType !== userType) {
-    // Diğer kullanıcı tipleri için tam eşleşme kontrol et
+  } 
+  // İşletme veya turist kontrolü 
+  else if (currentUserType !== userType) {
     console.log(`Erişim reddedildi: ${userType} gerekli, fakat ${currentUserType} bulundu`);
     return <Navigate to="/" />;
   }
