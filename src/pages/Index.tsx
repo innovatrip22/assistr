@@ -119,9 +119,9 @@ const Index = () => {
         KKTC Turizm Portalı &copy; {new Date().getFullYear()} | Tüm Hakları Saklıdır
       </motion.p>
 
-      {showAuthDialog && selectedUserType && (
+      {showAuthDialog && (
         <AuthDialog 
-          type={selectedUserType} 
+          type={selectedUserType || "tourist"} 
           onClose={handleCloseAuthDialog} 
           onSuccess={handleAuthSuccess} 
         />

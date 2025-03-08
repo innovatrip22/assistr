@@ -24,13 +24,15 @@ import { INSTITUTIONS } from "@/services/feedbackService";
 
 type AuthDialogProps = {
   onClose?: () => void;
+  type?: "institution" | "business" | "tourist";
+  onSuccess?: () => void;
 };
 
 type UserType = "institution" | "business" | "tourist";
 
-const AuthDialog = ({ onClose }: AuthDialogProps) => {
+const AuthDialog = ({ onClose, type: initialType, onSuccess }: AuthDialogProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [type, setType] = useState<UserType>("tourist");
+  const [type, setType] = useState<UserType>(initialType || "tourist");
   const [step, setStep] = useState(1);
   const [method, setMethod] = useState<"email" | "code">("email");
   const [formData, setFormData] = useState({
@@ -42,7 +44,7 @@ const AuthDialog = ({ onClose }: AuthDialogProps) => {
   });
 
   const navigate = useNavigate();
-  const { signInWithEmail, signOut } = useAuth();
+  const { signOut } = useAuth();
 
   const handleTypeChange = (newType: UserType) => {
     setType(newType);
@@ -92,6 +94,7 @@ const AuthDialog = ({ onClose }: AuthDialogProps) => {
         localStorage.setItem("testUserType", "institution");
         // Redirect to the institution dashboard
         navigate("/institution");
+        if (onSuccess) onSuccess();
       } else {
         toast.error("Geçersiz kurum kodu");
       }
@@ -115,15 +118,24 @@ const AuthDialog = ({ onClose }: AuthDialogProps) => {
 
     try {
       if (method === "email") {
-        // Email login
-        await signInWithEmail(formData.email, formData.password);
-        toast.success("Giriş başarılı");
+        // Email login (simulated for demo)
+        console.log("Email login with:", formData.email, formData.password);
         
-        // Redirect based on user type
-        if (type === "business") {
-          navigate("/business");
+        if (formData.email === "123456" && formData.password === "123456") {
+          toast.success("Giriş başarılı");
+          
+          // Save the user type in localStorage for test login
+          localStorage.setItem("testUserType", type);
+          
+          // Redirect based on user type
+          if (type === "business") {
+            navigate("/business");
+          } else {
+            navigate("/tourist");
+          }
+          if (onSuccess) onSuccess();
         } else {
-          navigate("/tourist");
+          toast.error("Geçersiz kimlik bilgileri");
         }
       } else {
         // Code login (simulate for now)
@@ -141,6 +153,7 @@ const AuthDialog = ({ onClose }: AuthDialogProps) => {
           } else {
             navigate("/tourist");
           }
+          if (onSuccess) onSuccess();
         } else {
           toast.error("Geçersiz kod");
         }
@@ -156,7 +169,20 @@ const AuthDialog = ({ onClose }: AuthDialogProps) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <Card className="w-full max-w-md mx-4">
-        <AuthDialogHeader onClose={onClose} />
+        <CardHeader>
+          <AuthDialogHeader title={`${type.charAt(0).toUpperCase() + type.slice(1)} Girişi`} />
+          {onClose && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-2 top-2"
+              onClick={onClose}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              <span className="sr-only">Kapat</span>
+            </Button>
+          )}
+        </CardHeader>
         
         <Tabs value={type} onValueChange={(value) => handleTypeChange(value as UserType)}>
           <TabsList className="grid w-full grid-cols-3">
@@ -184,21 +210,92 @@ const AuthDialog = ({ onClose }: AuthDialogProps) => {
             ) : (
               <>
                 {method === "email" ? (
-                  <EmailLoginForm
-                    formData={formData}
-                    onChange={handleChange}
-                    onSubmit={handleSubmit}
-                    isLoading={isLoading}
-                    onBack={handleBack}
-                  />
+                  <CardContent className="space-y-4 pt-6">
+                    <form onSubmit={handleSubmit}>
+                      <div className="space-y-2 mb-4">
+                        <Label htmlFor="email">E-posta</Label>
+                        <Input
+                          id="email"
+                          name="email"
+                          placeholder="E-posta adresiniz"
+                          required
+                          value={formData.email}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="space-y-2 mb-4">
+                        <Label htmlFor="password">Şifre</Label>
+                        <Input
+                          id="password"
+                          name="password"
+                          type="password"
+                          placeholder="Şifreniz"
+                          required
+                          value={formData.password}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mb-4">
+                        Test giriş için: Email: 123456, Şifre: 123456
+                      </p>
+                      <div className="flex gap-4">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleBack}
+                          className="w-full"
+                        >
+                          Geri
+                        </Button>
+                        <Button className="w-full" type="submit" disabled={isLoading}>
+                          {isLoading ? "Giriş yapılıyor..." : "Giriş Yap"}
+                        </Button>
+                      </div>
+                    </form>
+                  </CardContent>
                 ) : (
-                  <CodeLoginForm
-                    formData={formData}
-                    onChange={handleChange}
-                    onSubmit={handleSubmit}
-                    isLoading={isLoading}
-                    onBack={handleBack}
-                  />
+                  <CardContent className="space-y-4 pt-6">
+                    <form onSubmit={handleSubmit}>
+                      <div className="space-y-2 mb-4">
+                        <Label htmlFor="phone">Telefon</Label>
+                        <Input
+                          id="phone"
+                          name="phone"
+                          placeholder="Telefon numaranız"
+                          required
+                          value={formData.phone}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="space-y-2 mb-4">
+                        <Label htmlFor="code">Doğrulama Kodu</Label>
+                        <Input
+                          id="code"
+                          name="code"
+                          placeholder="Doğrulama kodu"
+                          required
+                          value={formData.code}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mb-4">
+                        Test giriş için kod: 1234
+                      </p>
+                      <div className="flex gap-4">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleBack}
+                          className="w-full"
+                        >
+                          Geri
+                        </Button>
+                        <Button className="w-full" type="submit" disabled={isLoading}>
+                          {isLoading ? "Giriş yapılıyor..." : "Giriş Yap"}
+                        </Button>
+                      </div>
+                    </form>
+                  </CardContent>
                 )}
               </>
             )}
@@ -214,21 +311,92 @@ const AuthDialog = ({ onClose }: AuthDialogProps) => {
             ) : (
               <>
                 {method === "email" ? (
-                  <EmailLoginForm
-                    formData={formData}
-                    onChange={handleChange}
-                    onSubmit={handleSubmit}
-                    isLoading={isLoading}
-                    onBack={handleBack}
-                  />
+                  <CardContent className="space-y-4 pt-6">
+                    <form onSubmit={handleSubmit}>
+                      <div className="space-y-2 mb-4">
+                        <Label htmlFor="email">E-posta</Label>
+                        <Input
+                          id="email"
+                          name="email"
+                          placeholder="E-posta adresiniz"
+                          required
+                          value={formData.email}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="space-y-2 mb-4">
+                        <Label htmlFor="password">Şifre</Label>
+                        <Input
+                          id="password"
+                          name="password"
+                          type="password"
+                          placeholder="Şifreniz"
+                          required
+                          value={formData.password}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mb-4">
+                        Test giriş için: Email: 123456, Şifre: 123456
+                      </p>
+                      <div className="flex gap-4">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleBack}
+                          className="w-full"
+                        >
+                          Geri
+                        </Button>
+                        <Button className="w-full" type="submit" disabled={isLoading}>
+                          {isLoading ? "Giriş yapılıyor..." : "Giriş Yap"}
+                        </Button>
+                      </div>
+                    </form>
+                  </CardContent>
                 ) : (
-                  <CodeLoginForm
-                    formData={formData}
-                    onChange={handleChange}
-                    onSubmit={handleSubmit}
-                    isLoading={isLoading}
-                    onBack={handleBack}
-                  />
+                  <CardContent className="space-y-4 pt-6">
+                    <form onSubmit={handleSubmit}>
+                      <div className="space-y-2 mb-4">
+                        <Label htmlFor="phone">Telefon</Label>
+                        <Input
+                          id="phone"
+                          name="phone"
+                          placeholder="Telefon numaranız"
+                          required
+                          value={formData.phone}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="space-y-2 mb-4">
+                        <Label htmlFor="code">Doğrulama Kodu</Label>
+                        <Input
+                          id="code"
+                          name="code"
+                          placeholder="Doğrulama kodu"
+                          required
+                          value={formData.code}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mb-4">
+                        Test giriş için kod: 1234
+                      </p>
+                      <div className="flex gap-4">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleBack}
+                          className="w-full"
+                        >
+                          Geri
+                        </Button>
+                        <Button className="w-full" type="submit" disabled={isLoading}>
+                          {isLoading ? "Giriş yapılıyor..." : "Giriş Yap"}
+                        </Button>
+                      </div>
+                    </form>
+                  </CardContent>
                 )}
               </>
             )}

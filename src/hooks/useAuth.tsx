@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -9,6 +10,7 @@ interface AuthContextType {
   user: any;
   userType: UserType;
   signOut: () => Promise<void>;
+  signInWithEmail: (email: string, password: string) => Promise<void>;
   loading: boolean;
 }
 
@@ -16,6 +18,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   userType: null,
   signOut: async () => {},
+  signInWithEmail: async () => {},
   loading: true,
 });
 
@@ -177,6 +180,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
+  const signInWithEmail = async (email: string, password: string) => {
+    try {
+      const { error, data } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) throw error;
+      
+      console.log("Login successful, session data:", data.session?.user.id);
+      return data;
+    } catch (error: any) {
+      console.error("Email sign in error:", error);
+      throw error;
+    }
+  };
+
   const signOut = async () => {
     try {
       // Clear test login if exists
@@ -202,7 +222,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, userType, signOut, loading }}>
+    <AuthContext.Provider value={{ user, userType, signOut, signInWithEmail, loading }}>
       {children}
     </AuthContext.Provider>
   );
