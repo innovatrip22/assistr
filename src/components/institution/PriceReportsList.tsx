@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ShoppingCart, Calendar, Clock, CheckCircle, ReplyAll, Share2 } from "lucide-react";
 import { format } from "date-fns";
@@ -19,9 +18,10 @@ interface PriceReportsListProps {
   onOpenResponseDialog: (id: string, type: 'report') => void;
   onAssignReport: (id: string) => void;
   loadData: () => void;
+  limit?: number;
 }
 
-const PriceReportsList = ({ onOpenResponseDialog, onAssignReport, loadData }: PriceReportsListProps) => {
+const PriceReportsList = ({ onOpenResponseDialog, onAssignReport, loadData, limit }: PriceReportsListProps) => {
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,7 +32,9 @@ const PriceReportsList = ({ onOpenResponseDialog, onAssignReport, loadData }: Pr
   const loadReports = async () => {
     try {
       const data = await getReports();
-      setReports(data.filter(report => report.type === 'price'));
+      const filteredReports = data.filter(report => report.type === 'price');
+      const limitedReports = limit ? filteredReports.slice(0, limit) : filteredReports;
+      setReports(limitedReports);
     } catch (error) {
       console.error("Error loading reports:", error);
     } finally {

@@ -29,9 +29,10 @@ import { useToast } from "@/hooks/use-toast";
 interface FeedbackListProps {
   onOpenResponseDialog: (id: string, type: 'feedback') => void;
   loadData: () => void;
+  limit?: number;
 }
 
-const FeedbackList = ({ onOpenResponseDialog, loadData }: FeedbackListProps) => {
+const FeedbackList = ({ onOpenResponseDialog, loadData, limit }: FeedbackListProps) => {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -44,7 +45,8 @@ const FeedbackList = ({ onOpenResponseDialog, loadData }: FeedbackListProps) => 
     try {
       setLoading(true);
       const data = await getFeedbacks();
-      setFeedbacks(data);
+      const limitedData = limit ? data.slice(0, limit) : data;
+      setFeedbacks(limitedData);
     } catch (error) {
       console.error("Error loading feedbacks:", error);
       toast({

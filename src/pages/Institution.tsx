@@ -40,6 +40,10 @@ const Institution = () => {
   const [currentInstitution, setCurrentInstitution] = useState<string | null>(null);
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const [showResponseDialog, setShowResponseDialog] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [selectedItemType, setSelectedItemType] = useState<'feedback' | 'report' | null>(null);
+  const [showAssignDialog, setShowAssignDialog] = useState(false);
 
   useEffect(() => {
     // Get the institution code from localStorage (in a real app this would come from the auth system)
@@ -56,6 +60,22 @@ const Institution = () => {
   const handleSignOut = async () => {
     await signOut();
     navigate("/");
+  };
+
+  const handleOpenResponseDialog = (id: string, type: 'feedback' | 'report') => {
+    setSelectedItemId(id);
+    setSelectedItemType(type);
+    setShowResponseDialog(true);
+  };
+
+  const handleAssignReport = (id: string) => {
+    setSelectedItemId(id);
+    setShowAssignDialog(true);
+  };
+
+  const loadData = () => {
+    // This would reload feedback and reports data
+    toast.success("Data reloaded");
   };
 
   // Define the common menu items for all institutions
@@ -217,7 +237,11 @@ const Institution = () => {
                     <CardTitle>Son Geri Bildirimler</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <FeedbackList limit={5} />
+                    <FeedbackList 
+                      onOpenResponseDialog={handleOpenResponseDialog} 
+                      loadData={loadData} 
+                      limit={5} 
+                    />
                   </CardContent>
                 </Card>
                 <Card>
@@ -225,7 +249,12 @@ const Institution = () => {
                     <CardTitle>Son Acil Raporlar</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <EmergencyReportsList limit={5} />
+                    <EmergencyReportsList 
+                      onOpenResponseDialog={handleOpenResponseDialog} 
+                      onAssignReport={handleAssignReport} 
+                      loadData={loadData} 
+                      limit={5} 
+                    />
                   </CardContent>
                 </Card>
               </div>
@@ -243,16 +272,16 @@ const Institution = () => {
                   <TabsTrigger value="emergency">Acil Durumlar</TabsTrigger>
                 </TabsList>
                 <TabsContent value="all">
-                  <FeedbackList />
+                  <FeedbackList onOpenResponseDialog={handleOpenResponseDialog} loadData={loadData} />
                 </TabsContent>
                 <TabsContent value="price">
-                  <PriceReportsList />
+                  <PriceReportsList onOpenResponseDialog={handleOpenResponseDialog} onAssignReport={handleAssignReport} loadData={loadData} />
                 </TabsContent>
                 <TabsContent value="fraud">
-                  <FraudReportsList />
+                  <FraudReportsList onOpenResponseDialog={handleOpenResponseDialog} onAssignReport={handleAssignReport} loadData={loadData} />
                 </TabsContent>
                 <TabsContent value="emergency">
-                  <EmergencyReportsList />
+                  <EmergencyReportsList onOpenResponseDialog={handleOpenResponseDialog} onAssignReport={handleAssignReport} loadData={loadData} />
                 </TabsContent>
               </Tabs>
             </div>

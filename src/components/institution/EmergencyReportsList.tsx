@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Siren, Calendar, Clock, CheckCircle, ReplyAll, Share2 } from "lucide-react";
 import { format } from "date-fns";
@@ -19,9 +18,10 @@ interface EmergencyReportsListProps {
   onOpenResponseDialog: (id: string, type: 'report') => void;
   onAssignReport: (id: string) => void;
   loadData: () => void;
+  limit?: number;
 }
 
-const EmergencyReportsList = ({ onOpenResponseDialog, onAssignReport, loadData }: EmergencyReportsListProps) => {
+const EmergencyReportsList = ({ onOpenResponseDialog, onAssignReport, loadData, limit }: EmergencyReportsListProps) => {
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,7 +32,9 @@ const EmergencyReportsList = ({ onOpenResponseDialog, onAssignReport, loadData }
   const loadReports = async () => {
     try {
       const data = await getReports();
-      setReports(data.filter(report => report.type === 'emergency'));
+      const filteredReports = data.filter(report => report.type === 'emergency');
+      const limitedReports = limit ? filteredReports.slice(0, limit) : filteredReports;
+      setReports(limitedReports);
     } catch (error) {
       console.error("Error loading reports:", error);
     } finally {
