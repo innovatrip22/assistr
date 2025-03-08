@@ -4,11 +4,13 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import AuthDialog from "@/components/auth/AuthDialog";
 import { Button } from "@/components/ui/button";
-import { Building, User, Briefcase } from "lucide-react";
+import { Building, User, Briefcase, Info } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 const Index = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [selectedUserType, setSelectedUserType] = useState<"tourist" | "institution" | "business" | null>(null);
+  const [showDemoInfo, setShowDemoInfo] = useState(false);
   const navigate = useNavigate();
 
   const handleOpenAuthDialog = (type: "tourist" | "institution" | "business") => {
@@ -34,13 +36,54 @@ const Index = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-center mb-10"
+        className="text-center mb-6"
       >
         <h1 className="text-4xl font-bold text-primary mb-2">KKTC Turizm Portalı</h1>
         <p className="text-gray-600 max-w-md mx-auto">
           KKTC'yi ziyaret eden turistler, işletmeler ve kurumlar için tek durak hizmet noktası
         </p>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="mt-4"
+          onClick={() => setShowDemoInfo(!showDemoInfo)}
+        >
+          <Info className="w-4 h-4 mr-2" />
+          Demo Bilgileri
+        </Button>
       </motion.div>
+
+      {showDemoInfo && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 max-w-lg"
+        >
+          <Card>
+            <CardContent className="pt-6">
+              <h3 className="font-bold text-lg mb-2">Demo Giriş Bilgileri</h3>
+              <div className="space-y-2 text-sm">
+                <p className="font-semibold">Turist & İşletme Girişi:</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Email: 123456</li>
+                  <li>Şifre: 123456</li>
+                  <li>Telefon kodu: 1234</li>
+                </ul>
+                
+                <p className="font-semibold mt-3">Kurum Girişi Kodları:</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Elektrik Kurumu: elektrik123</li>
+                  <li>Su Kurumu: su123</li>
+                  <li>Doğalgaz Kurumu: dogalgaz123</li>
+                  <li>Belediye: belediye123</li>
+                  <li>Turizm Bakanlığı: turizm123</li>
+                  <li>Bakanlık: bakanlik123</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl w-full">
         {/* Tourist Card */}

@@ -19,6 +19,7 @@ const AuthRequired = ({ children, userType }: AuthRequiredProps) => {
   useEffect(() => {
     // localStorage'dan kaydedilen kullanıcı tipini al
     const savedUserType = localStorage.getItem("testUserType");
+    console.log("AuthRequired: Saved user type:", savedUserType);
     setCurrentUserType(savedUserType);
     setLoading(false);
   }, []);
@@ -48,6 +49,7 @@ const AuthRequired = ({ children, userType }: AuthRequiredProps) => {
     return <Navigate to="/" />;
   }
 
+  console.log(`Erişim onaylandı: ${userType} için ${currentUserType}`);
   return <>{children}</>;
 };
 

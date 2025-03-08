@@ -96,22 +96,25 @@ const AuthDialog = ({ onClose, type: initialType, onSuccess }: AuthDialogProps) 
         toast.success(`${institutionType} girişi başarılı`);
         
         localStorage.setItem("testUserType", institutionType);
+        console.log("Setting institution type in localStorage:", institutionType);
         
         navigate("/institution");
         if (onSuccess) onSuccess();
+        return;
+      }
+      
+      const institutionKey = Object.keys(INSTITUTIONS).find(
+        key => formData.institutionCode === INSTITUTIONS[key as keyof typeof INSTITUTIONS].password
+      );
+      
+      if (institutionKey) {
+        toast.success("Kurum girişi başarılı");
+        localStorage.setItem("testUserType", institutionKey);
+        console.log("Setting institution type in localStorage:", institutionKey);
+        navigate("/institution");
+        if (onSuccess) onSuccess();
       } else {
-        const institutionKey = Object.keys(INSTITUTIONS).find(
-          key => formData.institutionCode === INSTITUTIONS[key as keyof typeof INSTITUTIONS].password
-        );
-        
-        if (institutionKey) {
-          toast.success("Kurum girişi başarılı");
-          localStorage.setItem("testUserType", institutionKey);
-          navigate("/institution");
-          if (onSuccess) onSuccess();
-        } else {
-          toast.error("Geçersiz kurum kodu");
-        }
+        toast.error("Geçersiz kurum kodu");
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -135,9 +138,10 @@ const AuthDialog = ({ onClose, type: initialType, onSuccess }: AuthDialogProps) 
         console.log("Email login with:", formData.email, formData.password);
         
         if (formData.email === "123456" && formData.password === "123456") {
-          toast.success("Giriş başarılı");
+          toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} girişi başarılı`);
           
           localStorage.setItem("testUserType", type);
+          console.log("Setting user type in localStorage:", type);
           
           if (type === "business") {
             navigate("/business");
@@ -146,15 +150,16 @@ const AuthDialog = ({ onClose, type: initialType, onSuccess }: AuthDialogProps) 
           }
           if (onSuccess) onSuccess();
         } else {
-          toast.error("Geçersiz kimlik bilgileri");
+          toast.error("Geçersiz kimlik bilgileri. Demo için: 123456 / 123456");
         }
       } else {
         console.log("Code login with phone:", formData.phone, "and code:", formData.code);
         
         if (formData.code === "1234") {
-          toast.success("Giriş başarılı");
+          toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} girişi başarılı`);
           
           localStorage.setItem("testUserType", type);
+          console.log("Setting user type in localStorage:", type);
           
           if (type === "business") {
             navigate("/business");
@@ -163,7 +168,7 @@ const AuthDialog = ({ onClose, type: initialType, onSuccess }: AuthDialogProps) 
           }
           if (onSuccess) onSuccess();
         } else {
-          toast.error("Geçersiz kod");
+          toast.error("Geçersiz kod. Demo için kod: 1234");
         }
       }
     } catch (error) {
@@ -427,6 +432,9 @@ const AuthDialog = ({ onClose, type: initialType, onSuccess }: AuthDialogProps) 
                     onChange={handleChange}
                   />
                 </div>
+                <p className="text-xs text-gray-500 mt-2 mb-4">
+                  Demo kurum kodları: elektrik123, su123, dogalgaz123, belediye123, turizm123, bakanlik123
+                </p>
                 <Button className="w-full mt-4" type="submit" disabled={isLoading}>
                   {isLoading ? "Giriş yapılıyor..." : "Giriş Yap"}
                 </Button>

@@ -2,35 +2,44 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, AlertTriangle, Clock, RefreshCcw, MessageSquare, FileWarning, DollarSign } from "lucide-react";
+import { CheckCircle2, AlertTriangle, Clock, RefreshCcw, MessageSquare, FileWarning, DollarSign, Share2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const mockNotifications = [
   {
     id: 1,
-    title: "Fiyat Raporu Bildirim",
-    description: "İşletmeniz hakkında bir fiyat raporu oluşturuldu. İncelemek için tıklayın.",
-    time: "30 dakika önce",
-    type: "warning",
+    title: "Yeni Turist Bildirildi",
+    description: "KKTC'ye yaklaşık 200 yeni turist geldi. İşletmenize yönlendirmek için promosyon oluşturun.",
+    time: "10 dakika önce",
+    type: "info",
     isRead: false
   },
   {
     id: 2,
     title: "Yeni Değerlendirme",
-    description: "İşletmenize yeni bir müşteri değerlendirmesi yapıldı. 4 yıldız verildi.",
-    time: "2 saat önce",
-    type: "info",
+    description: "İşletmenize yeni bir müşteri değerlendirmesi yapıldı. 5 yıldız ve olumlu yorumlar aldınız.",
+    time: "30 dakika önce",
+    type: "success",
     isRead: false
   },
   {
     id: 3,
+    title: "Turizm Bakanlığı Denetimi",
+    description: "Yarın işletmenizde Turizm Bakanlığı tarafından rutin denetim yapılacaktır.",
+    time: "1 saat önce",
+    type: "warning",
+    isRead: false
+  },
+  {
+    id: 4,
     title: "Rezervasyon Onayı",
-    description: "Yeni bir rezervasyon talebi onaylandı. 2 kişilik, yarın 19:00.",
+    description: "Yeni bir rezervasyon talebi onaylandı. 4 kişilik, yarın 20:00.",
     time: "3 saat önce",
     type: "success",
     isRead: true
   },
   {
-    id: 4,
+    id: 5,
     title: "Turist Yoğunluğu Tahmini",
     description: "Önümüzdeki hafta sonu için yüksek turist yoğunluğu bekleniyor. Hazırlıklı olun.",
     time: "1 gün önce",
@@ -38,18 +47,10 @@ const mockNotifications = [
     isRead: true
   },
   {
-    id: 5,
-    title: "Önemli Duyuru",
-    description: "Turizm Bakanlığı'ndan önemli bir duyuru yayınlandı. İncelemek için tıklayın.",
-    time: "2 gün önce",
-    type: "info",
-    isRead: true
-  },
-  {
     id: 6,
     title: "Ödeme Alındı",
-    description: "Yapılan rezervasyon için ön ödeme alındı. Tutar: 750₺",
-    time: "3 gün önce",
+    description: "Yapılan rezervasyon için ön ödeme alındı. Tutar: 1200₺",
+    time: "2 gün önce",
     type: "success",
     isRead: true
   },
@@ -64,6 +65,13 @@ const BusinessNotifications = () => {
       ...notification,
       isRead: true
     })));
+  };
+  
+  const shareNotification = (id: number) => {
+    const notification = notifications.find(n => n.id === id);
+    if (notification) {
+      alert(`"${notification.title}" bildirimi personele iletildi.`);
+    }
   };
 
   const getIconForType = (type: string) => {
@@ -155,6 +163,16 @@ const BusinessNotifications = () => {
                     <p className="text-sm text-muted-foreground mt-1">
                       {notification.description}
                     </p>
+                    <div className="flex justify-end mt-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => shareNotification(notification.id)}
+                      >
+                        <Share2 className="h-3 w-3 mr-1" />
+                        Personele İlet
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
