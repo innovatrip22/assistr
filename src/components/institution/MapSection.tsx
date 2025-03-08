@@ -30,10 +30,11 @@ const MapSection = () => {
   const [institutionType, setInstitutionType] = useState<string | null>(null);
 
   useEffect(() => {
-    // Get the institution type from localStorage
+    // localStorage'dan kurum tipini al
     const savedInstitutionType = localStorage.getItem("testUserType");
     if (savedInstitutionType) {
       setInstitutionType(savedInstitutionType);
+      console.log("MapSection - Kurum tipi yüklendi:", savedInstitutionType);
     }
   }, []);
 
@@ -41,53 +42,81 @@ const MapSection = () => {
     setActiveTab(value);
   };
 
+  // Kurum tipine özgü başlık ve açıklamaları belirle
+  const getTitle = () => {
+    switch(institutionType) {
+      case 'BELEDIYE': return "Belediye Bölgesi Haritası";
+      case 'ELEKTRIK': return "Elektrik Şebekesi Haritası";
+      case 'SU': return "Su Şebekesi Haritası";
+      case 'DOGALGAZ': return "Doğalgaz Şebekesi Haritası";
+      case 'TURIZM': return "Turizm Bölgeleri Haritası";
+      case 'BAKANLIK': return "KKTC Genel Haritası";
+      default: return "KKTC Haritası";
+    }
+  };
+
+  const getDescription = () => {
+    switch(institutionType) {
+      case 'BELEDIYE': return "Belediye sınırları içindeki raporlar ve yoğunluk";
+      case 'ELEKTRIK': return "Elektrik şebekesi ve arızalar";
+      case 'SU': return "Su şebekesi ve kesinti noktaları";
+      case 'DOGALGAZ': return "Doğalgaz hatları ve basınç noktaları";
+      case 'TURIZM': return "Turistik bölgeler ve ziyaretçi yoğunluğu";
+      case 'BAKANLIK': return "Tüm ada genelindeki turizm verileri";
+      default: return "Bölge genelindeki raporlar, yoğunluk ve tahminler";
+    }
+  };
+
+  // Tab etiketlerini kurum tipine göre belirle
+  const getHeatmapLabel = () => {
+    switch(institutionType) {
+      case 'ELEKTRIK': return "Elektrik Yoğunluğu";
+      case 'SU': return "Su Kullanım Yoğunluğu";
+      case 'DOGALGAZ': return "Gaz Tüketim Haritası";
+      default: return "Yoğunluk Haritası";
+    }
+  };
+
+  const getPredictionLabel = () => {
+    switch(institutionType) {
+      case 'ELEKTRIK': return "Elektrik Tahminleri";
+      case 'SU': return "Su Tüketim Tahmini";
+      case 'DOGALGAZ': return "Gaz Tahminleri";
+      default: return "Yapay Zeka Öngörüleri";
+    }
+  };
+
+  const getTrafficLabel = () => {
+    switch(institutionType) {
+      case 'BELEDIYE': return "Trafik Durumu";
+      case 'ELEKTRIK': return "Şebeke Durumu";
+      case 'SU': return "Su Basıncı";
+      case 'DOGALGAZ': return "Hat Durumu";
+      default: return "Trafik Durumu";
+    }
+  };
+
   return (
     <Card className="col-span-1 lg:col-span-2">
       <CardHeader>
         <div className="flex items-center gap-3">
           <MapIcon className="w-6 h-6 text-primary" />
-          <CardTitle>
-            {institutionType === 'BELEDIYE' ? "Belediye Bölgesi Haritası" : 
-             institutionType === 'ELEKTRIK' ? "Elektrik Şebekesi Haritası" :
-             institutionType === 'SU' ? "Su Şebekesi Haritası" :
-             institutionType === 'DOGALGAZ' ? "Doğalgaz Şebekesi Haritası" : 
-             institutionType === 'TURIZM' ? "Turizm Bölgeleri Haritası" :
-             institutionType === 'BAKANLIK' ? "KKTC Genel Haritası" :
-             "KKTC Haritası"}
-          </CardTitle>
+          <CardTitle>{getTitle()}</CardTitle>
         </div>
-        <CardDescription>
-          {institutionType === 'BELEDIYE' ? "Belediye sınırları içindeki raporlar ve yoğunluk" : 
-           institutionType === 'ELEKTRIK' ? "Elektrik şebekesi ve arızalar" :
-           institutionType === 'SU' ? "Su şebekesi ve kesinti noktaları" :
-           institutionType === 'DOGALGAZ' ? "Doğalgaz hatları ve basınç noktaları" : 
-           institutionType === 'TURIZM' ? "Turistik bölgeler ve ziyaretçi yoğunluğu" :
-           institutionType === 'BAKANLIK' ? "Tüm ada genelindeki turizm verileri" :
-           "Bölge genelindeki raporlar, yoğunluk ve tahminler"}
-        </CardDescription>
+        <CardDescription>{getDescription()}</CardDescription>
       </CardHeader>
       
       <CardContent>
         <Tabs defaultValue="heatmap" onValueChange={handleTabChange} className="mb-4">
           <TabsList>
             <TabsTrigger value="heatmap">
-              {institutionType === 'ELEKTRIK' ? "Elektrik Yoğunluğu" :
-               institutionType === 'SU' ? "Su Kullanım Yoğunluğu" :
-               institutionType === 'DOGALGAZ' ? "Gaz Tüketim Haritası" :
-               "Yoğunluk Haritası"}
+              {getHeatmapLabel()}
             </TabsTrigger>
             <TabsTrigger value="prediction">
-              {institutionType === 'ELEKTRIK' ? "Elektrik Tahminleri" :
-               institutionType === 'SU' ? "Su Tüketim Tahmini" :
-               institutionType === 'DOGALGAZ' ? "Gaz Tahminleri" :
-               "Yapay Zeka Öngörüleri"}
+              {getPredictionLabel()}
             </TabsTrigger>
             <TabsTrigger value="traffic">
-              {institutionType === 'BELEDIYE' ? "Trafik Durumu" :
-               institutionType === 'ELEKTRIK' ? "Şebeke Durumu" :
-               institutionType === 'SU' ? "Su Basıncı" :
-               institutionType === 'DOGALGAZ' ? "Hat Durumu" :
-               "Trafik Durumu"}
+              {getTrafficLabel()}
             </TabsTrigger>
           </TabsList>
           

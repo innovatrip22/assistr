@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
-// Define user type as a union to match what's used in AuthDialog
+// Kullanıcı tipini bir birleşim olarak tanımla
 type UserType = "institution" | "business" | "tourist";
 
 interface AuthRequiredProps {
@@ -15,7 +15,7 @@ const AuthRequired = ({ children, userType }: AuthRequiredProps) => {
   const [currentUserType, setCurrentUserType] = useState<string | null>(null);
 
   useEffect(() => {
-    // Get the saved user type from localStorage
+    // localStorage'dan kaydedilen kullanıcı tipini al
     const savedUserType = localStorage.getItem("testUserType");
     setCurrentUserType(savedUserType);
     setLoading(false);
@@ -25,14 +25,23 @@ const AuthRequired = ({ children, userType }: AuthRequiredProps) => {
     return <div className="flex items-center justify-center h-screen">Yükleniyor...</div>;
   }
 
-  // If there's no saved user type, redirect to home
+  // Kaydedilmiş bir kullanıcı tipi yoksa anasayfaya yönlendir
   if (!currentUserType) {
     return <Navigate to="/" />;
   }
 
-  // Make sure we're checking for exact match
-  if (currentUserType !== userType) {
-    console.log(`Access denied: Required ${userType}, but found ${currentUserType}`);
+  // Tam eşleşme için kontrol et
+  // IMPORTANT: Burada institution kontrolü için kurum kodlarının tamamını kabul et
+  if (userType === "institution") {
+    // Eğer giriş yapan kullanıcı herhangi bir kurum tipiyse erişime izin ver
+    const institutionCodes = ["ELEKTRIK", "SU", "DOGALGAZ", "BELEDIYE", "TURIZM", "BAKANLIK"];
+    if (!institutionCodes.includes(currentUserType)) {
+      console.log(`Erişim reddedildi: ${userType} gerekli, fakat ${currentUserType} bulundu`);
+      return <Navigate to="/" />;
+    }
+  } else if (currentUserType !== userType) {
+    // Diğer kullanıcı tipleri için tam eşleşme kontrol et
+    console.log(`Erişim reddedildi: ${userType} gerekli, fakat ${currentUserType} bulundu`);
     return <Navigate to="/" />;
   }
 
