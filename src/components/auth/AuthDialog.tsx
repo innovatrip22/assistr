@@ -20,6 +20,7 @@ import AuthDialogHeader from "./AuthDialogHeader";
 import AuthMethodSelector from "./AuthMethodSelector";
 import EmailLoginForm from "./EmailLoginForm";
 import CodeLoginForm from "./CodeLoginForm";
+import { INSTITUTIONS } from "@/services/feedbackService";
 
 type AuthDialogProps = {
   onClose?: () => void;
@@ -77,11 +78,18 @@ const AuthDialog = ({ onClose }: AuthDialogProps) => {
     setIsLoading(true);
 
     try {
-      // Simulated institution authentication
+      // Check if the institution code matches any valid institution code
       console.log("Institution login with code:", formData.institutionCode);
       
-      if (formData.institutionCode === "12345") {
+      // Check the institution code against valid codes from feedbackService
+      const institutionKey = Object.keys(INSTITUTIONS).find(
+        key => formData.institutionCode === INSTITUTIONS[key as keyof typeof INSTITUTIONS].password
+      );
+      
+      if (institutionKey) {
         toast.success("Kurum girişi başarılı");
+        // Save the institution type in localStorage for test login
+        localStorage.setItem("testUserType", "institution");
         // Redirect to the institution dashboard
         navigate("/institution");
       } else {
@@ -99,8 +107,8 @@ const AuthDialog = ({ onClose }: AuthDialogProps) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Fix the type comparison by ensuring type safety
-    if (type === "institution" as UserType) {
+    // Fix the type comparison by checking the string value
+    if (type === "institution") {
       handleInstitutionLogin(e);
       return;
     }
@@ -123,6 +131,9 @@ const AuthDialog = ({ onClose }: AuthDialogProps) => {
         
         if (formData.code === "1234") {
           toast.success("Giriş başarılı");
+          
+          // Save the user type in localStorage for test login
+          localStorage.setItem("testUserType", type);
           
           // Redirect based on user type
           if (type === "business") {
