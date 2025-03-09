@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -5,25 +6,30 @@ import AuthDialog from "@/components/auth/AuthDialog";
 import { Button } from "@/components/ui/button";
 import { Building, User, Briefcase, Info } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+
 const Index = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [selectedUserType, setSelectedUserType] = useState<"tourist" | "institution" | "business" | null>(null);
   const [showDemoInfo, setShowDemoInfo] = useState(false);
   const navigate = useNavigate();
+
   const handleOpenAuthDialog = (type: "tourist" | "institution" | "business") => {
     setSelectedUserType(type);
     setShowAuthDialog(true);
   };
+
   const handleCloseAuthDialog = () => {
     setShowAuthDialog(false);
     setSelectedUserType(null);
   };
+
   const handleAuthSuccess = () => {
     setShowAuthDialog(false);
     if (selectedUserType) {
       navigate(`/${selectedUserType}`);
     }
   };
+
   return <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col justify-center items-center p-4">
       <motion.div initial={{
       opacity: 0,
@@ -34,7 +40,14 @@ const Index = () => {
     }} transition={{
       duration: 0.5
     }} className="text-center mb-6">
-        <h1 className="text-4xl font-bold text-primary mb-2">AssisTR</h1>
+        <div className="flex flex-col items-center justify-center mb-4">
+          <img 
+            src="/lovable-uploads/5ecb91b8-3b2a-4493-95fe-ccb5e08148fa.png" 
+            alt="AssisTR Logo" 
+            className="w-32 h-32 mb-2 rounded-lg shadow-md"
+          />
+          <h1 className="text-4xl font-bold text-[#ff3b30] mb-2">AssisTR</h1>
+        </div>
         <p className="text-gray-600 max-w-md mx-auto">
           KKTC'yi ziyaret eden turistler, işletmeler ve kurumlar için tek durak hizmet noktası
         </p>
@@ -161,4 +174,5 @@ const Index = () => {
       {showAuthDialog && <AuthDialog type={selectedUserType || "tourist"} onClose={handleCloseAuthDialog} onSuccess={handleAuthSuccess} />}
     </div>;
 };
+
 export default Index;

@@ -26,7 +26,7 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#dc2626",
+          DEFAULT: "#ff3b30", // Logonun rengi ile güncellendi
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
