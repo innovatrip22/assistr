@@ -6,7 +6,8 @@ import { tr } from "date-fns/locale";
 import { 
   Map, MessageSquare, Calendar, Bell, Navigation, 
   FileText, Hotel, Plane, Bus, User, Landmark, 
-  Settings, LogOut, Menu, ChevronRight
+  Settings, LogOut, Menu, ChevronRight, Utensils, 
+  Building, Store, MapPin
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -28,12 +29,17 @@ import ReportAssistant from "@/components/tourist/ReportAssistant";
 import TravelPlanner from "@/components/tourist/TravelPlanner";
 import TravelChat from "@/components/tourist/TravelChat";
 import HotelReservation from "@/components/tourist/HotelReservation";
+import RestaurantReservation from "@/components/tourist/RestaurantReservation";
+import PublicBuildingsMap from "@/components/tourist/PublicBuildingsMap";
+import BusinessDemoPanel from "@/components/tourist/BusinessDemoPanel";
+import ChatbotButton from "@/components/tourist/ChatbotButton";
 
 const Tourist = () => {
   const [activeTab, setActiveTab] = useState("nearby");
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showChatbot, setShowChatbot] = useState(false);
   const navigate = useNavigate();
   const { signOut, user } = useAuth();
 
@@ -95,13 +101,15 @@ const Tourist = () => {
 
   const menuItems = [
     { value: "nearby", label: "Yakındakiler", icon: <Navigation className="w-4 h-4" /> },
-    { value: "hotel", label: "Otel", icon: <Hotel className="w-4 h-4" /> },
-    { value: "flights", label: "Uçuşlar", icon: <Plane className="w-4 h-4" /> },
-    { value: "plan", label: "Gezi Planı", icon: <Calendar className="w-4 h-4" /> },
+    { value: "plan", label: "Gezi Planla", icon: <Calendar className="w-4 h-4" /> },
+    { value: "hotel", label: "Otel Rezervasyonu", icon: <Hotel className="w-4 h-4" /> },
+    { value: "restaurant", label: "Restoran Rezervasyonu", icon: <Utensils className="w-4 h-4" /> },
+    { value: "flights", label: "Uçuş Bilgileri", icon: <Plane className="w-4 h-4" /> },
+    { value: "publicBuildings", label: "Yakın Kamu Binaları", icon: <Building className="w-4 h-4" /> },
+    { value: "businessDemo", label: "İşletme Paneli (Demo)", icon: <Store className="w-4 h-4" /> },
     { value: "assistant", label: "Asistan", icon: <Map className="w-4 h-4" /> },
     { value: "feedback", label: "Geri Bildirim", icon: <MessageSquare className="w-4 h-4" /> },
     { value: "report", label: "Raporlar", icon: <FileText className="w-4 h-4" /> },
-    { value: "chat", label: "Sohbet", icon: <MessageSquare className="w-4 h-4" /> },
   ];
 
   if (loading) {
@@ -207,7 +215,7 @@ const Tourist = () => {
         {/* Desktop Menu */}
         <div className="hidden md:block mb-6">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="mb-4 w-full grid grid-cols-8">
+            <TabsList className="mb-4 w-full grid grid-cols-10">
               {menuItems.map((item) => (
                 <TabsTrigger key={item.value} value={item.value}>
                   {item.icon}
@@ -221,25 +229,68 @@ const Tourist = () => {
               <TabsContent value="nearby" className="mt-0">
                 <NearbyPlaces />
               </TabsContent>
+              <TabsContent value="plan" className="mt-0">
+                <TravelPlanner />
+              </TabsContent>
               <TabsContent value="hotel" className="mt-0">
                 <HotelReservation />
+              </TabsContent>
+              <TabsContent value="restaurant" className="mt-0">
+                <RestaurantReservation />
               </TabsContent>
               <TabsContent value="flights" className="mt-0">
                 <div className="flex flex-col items-center justify-center py-10">
                   <Plane className="w-16 h-16 text-muted-foreground mb-4" />
                   <h3 className="text-xl font-medium">Uçuş Bilgileri</h3>
                   <p className="text-muted-foreground mb-4 text-center max-w-md">
-                    Uçuş bilgilerinize Otel rezervasyon bölümünden erişebilirsiniz. 
-                    Otel rezervasyonunuzla uyumlu uçuş seçenekleri sunulmaktadır.
+                    Uçuş bilgilerinize bu bölümden erişebilirsiniz. 
+                    PNR kodunuzu girerek uçuş detaylarınızı görüntüleyebilir veya yeni uçuş arayabilirsiniz.
                   </p>
-                  <Button onClick={() => setActiveTab("hotel")}>
-                    <Hotel className="mr-2 h-4 w-4" />
-                    Otel Rezervasyonuna Git
-                  </Button>
+                  <div className="grid md:grid-cols-2 gap-6 w-full max-w-3xl mt-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Plane className="h-5 w-5 text-primary" />
+                          PNR Sorgulama
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">PNR Kodu</label>
+                            <div className="flex gap-2">
+                              <input 
+                                type="text" 
+                                placeholder="6 haneli PNR kodunuz" 
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                              />
+                              <Button size="sm">Sorgula</Button>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <MapPin className="h-5 w-5 text-primary" />
+                          Uçuş Ara
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <Button className="w-full">Yeni Uçuş Araması Yap</Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
               </TabsContent>
-              <TabsContent value="plan" className="mt-0">
-                <TravelPlanner />
+              <TabsContent value="publicBuildings" className="mt-0">
+                <PublicBuildingsMap />
+              </TabsContent>
+              <TabsContent value="businessDemo" className="mt-0">
+                <BusinessDemoPanel />
               </TabsContent>
               <TabsContent value="assistant" className="mt-0">
                 <TravelAssistant />
@@ -249,9 +300,6 @@ const Tourist = () => {
               </TabsContent>
               <TabsContent value="report" className="mt-0">
                 <ReportAssistant />
-              </TabsContent>
-              <TabsContent value="chat" className="mt-0">
-                <TravelChat />
               </TabsContent>
             </div>
           </Tabs>
@@ -268,31 +316,38 @@ const Tourist = () => {
 
           <div className="border rounded-lg p-4 bg-white shadow-sm">
             {activeTab === "nearby" && <NearbyPlaces />}
+            {activeTab === "plan" && <TravelPlanner />}
             {activeTab === "hotel" && <HotelReservation />}
+            {activeTab === "restaurant" && <RestaurantReservation />}
+            {activeTab === "publicBuildings" && <PublicBuildingsMap />}
+            {activeTab === "businessDemo" && <BusinessDemoPanel />}
             {activeTab === "flights" && (
               <div className="flex flex-col items-center justify-center py-8">
                 <Plane className="w-12 h-12 text-muted-foreground mb-4" />
                 <h3 className="text-lg font-medium">Uçuş Bilgileri</h3>
                 <p className="text-muted-foreground mb-4 text-center text-sm">
-                  Uçuş bilgilerinize Otel rezervasyon bölümünden erişebilirsiniz.
+                  PNR kodunuzu girerek uçuş detaylarınızı görüntüleyebilir veya yeni uçuş arayabilirsiniz.
                 </p>
-                <Button size="sm" onClick={() => setActiveTab("hotel")}>
-                  <Hotel className="mr-2 h-4 w-4" />
-                  Otel Rezervasyonu
-                </Button>
+                <div className="space-y-4 w-full">
+                  <input 
+                    type="text" 
+                    placeholder="PNR kodunuzu girin" 
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  />
+                  <Button className="w-full">PNR Sorgula</Button>
+                  <Button variant="outline" className="w-full">Yeni Uçuş Ara</Button>
+                </div>
               </div>
             )}
-            {activeTab === "plan" && <TravelPlanner />}
             {activeTab === "assistant" && <TravelAssistant />}
             {activeTab === "feedback" && <FeedbackAssistant />}
             {activeTab === "report" && <ReportAssistant />}
-            {activeTab === "chat" && <TravelChat />}
           </div>
         </div>
 
         {/* Quick Actions - Mobile Only */}
         <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t p-2 z-10">
-          <div className="grid grid-cols-4 gap-1">
+          <div className="grid grid-cols-5 gap-1">
             <Button 
               variant={activeTab === "nearby" ? "default" : "ghost"} 
               size="sm"
@@ -301,6 +356,15 @@ const Tourist = () => {
             >
               <Navigation className="h-5 w-5 mb-1" />
               Keşfet
+            </Button>
+            <Button 
+              variant={activeTab === "plan" ? "default" : "ghost"} 
+              size="sm"
+              className="flex flex-col items-center h-16 text-xs p-1"
+              onClick={() => handleTabChange("plan")}
+            >
+              <Calendar className="h-5 w-5 mb-1" />
+              Gezi Planla
             </Button>
             <Button 
               variant={activeTab === "hotel" ? "default" : "ghost"} 
@@ -312,22 +376,22 @@ const Tourist = () => {
               Konaklama
             </Button>
             <Button 
-              variant={activeTab === "plan" ? "default" : "ghost"} 
+              variant={activeTab === "restaurant" ? "default" : "ghost"} 
               size="sm"
               className="flex flex-col items-center h-16 text-xs p-1"
-              onClick={() => handleTabChange("plan")}
+              onClick={() => handleTabChange("restaurant")}
             >
-              <Calendar className="h-5 w-5 mb-1" />
-              Plan
+              <Utensils className="h-5 w-5 mb-1" />
+              Restoran
             </Button>
             <Button 
-              variant={activeTab === "assistant" ? "default" : "ghost"} 
+              variant={activeTab === "flights" ? "default" : "ghost"} 
               size="sm"
               className="flex flex-col items-center h-16 text-xs p-1"
-              onClick={() => handleTabChange("assistant")}
+              onClick={() => handleTabChange("flights")}
             >
-              <Map className="h-5 w-5 mb-1" />
-              Asistan
+              <Plane className="h-5 w-5 mb-1" />
+              Uçuşlar
             </Button>
           </div>
         </div>
@@ -370,6 +434,9 @@ const Tourist = () => {
           </div>
         )}
       </div>
+
+      {/* Sabit Chatbot Butonu */}
+      <ChatbotButton />
     </div>
   );
 };

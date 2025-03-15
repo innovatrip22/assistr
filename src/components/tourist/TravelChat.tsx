@@ -64,46 +64,73 @@ const TravelChat = () => {
 
   return (
     <div className="space-y-4">
-      <ScrollArea className="h-[300px] pr-4">
-        <div className="space-y-4">
-          {chatHistory.map((message, index) => (
-            <div 
-              key={index} 
-              className={`flex gap-3 ${message.role === 'assistant' ? 'bg-accent' : 'bg-gray-50'} p-4 rounded-lg`}
-            >
-              <div className={`flex-shrink-0 w-8 h-8 ${message.role === 'assistant' ? 'bg-primary' : 'bg-gray-300'} rounded-full flex items-center justify-center`}>
-                <MessageSquare className="w-4 h-4 text-white" />
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-bold flex items-center">
+          <MessageSquare className="mr-2 h-6 w-6" />
+          KKTC Turizm Asistanı
+        </h2>
+      </div>
+      
+      <div className="border rounded-lg overflow-hidden">
+        <ScrollArea className="h-[400px] p-4">
+          <div className="space-y-4">
+            {chatHistory.map((message, index) => (
+              <div 
+                key={index} 
+                className={`flex gap-3 ${message.role === 'assistant' ? 'bg-accent' : 'bg-gray-50'} p-4 rounded-lg`}
+              >
+                <div className={`flex-shrink-0 w-8 h-8 ${message.role === 'assistant' ? 'bg-primary' : 'bg-gray-300'} rounded-full flex items-center justify-center`}>
+                  <MessageSquare className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">
+                    {message.content}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-600">
-                  {message.content}
-                </p>
+            ))}
+            {isTyping && (
+              <div className="flex gap-3 bg-accent p-4 rounded-lg">
+                <div className="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                  <Loader2 className="w-4 h-4 text-white animate-spin" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Yanıt yazılıyor...</p>
+                </div>
               </div>
-            </div>
-          ))}
-          {isTyping && (
-            <div className="flex gap-3 bg-accent p-4 rounded-lg">
-              <div className="flex-shrink-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                <Loader2 className="w-4 h-4 text-white animate-spin" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Yanıt yazılıyor...</p>
-              </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+        </ScrollArea>
+        <div className="border-t p-4">
+          <div className="flex gap-2">
+            <Input 
+              placeholder="KKTC hakkında bir soru sorun..." 
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              className="flex-1"
+            />
+            <Button onClick={handleSendMessage} disabled={isTyping}>
+              {isTyping ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            </Button>
+          </div>
         </div>
-      </ScrollArea>
-      <div className="flex gap-2">
-        <Input 
-          placeholder="KKTC hakkında bir soru sorun..." 
-          value={inputMessage}
-          onChange={(e) => setInputMessage(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-        />
-        <Button onClick={handleSendMessage} disabled={isTyping}>
-          {isTyping ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-        </Button>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="p-4 border rounded-lg bg-accent/30">
+          <h3 className="font-medium mb-2">Gezilecek Yerler</h3>
+          <p className="text-sm text-muted-foreground">Asistana KKTC'deki popüler turistik yerler hakkında sorular sorabilirsiniz.</p>
+        </div>
+        <div className="p-4 border rounded-lg bg-accent/30">
+          <h3 className="font-medium mb-2">Ulaşım</h3>
+          <p className="text-sm text-muted-foreground">KKTC içindeki ulaşım seçenekleri ve tavsiyeler için asistana danışabilirsiniz.</p>
+        </div>
+        <div className="p-4 border rounded-lg bg-accent/30">
+          <h3 className="font-medium mb-2">Yerel Yemekler</h3>
+          <p className="text-sm text-muted-foreground">KKTC'nin meşhur yemekleri ve en iyi restoranları hakkında bilgi alabilirsiniz.</p>
+        </div>
       </div>
     </div>
   );
