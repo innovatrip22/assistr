@@ -1,20 +1,37 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, CalendarIcon, Clock, Landmark, Coffee, Utensils, Bus, Camera } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Loader2, CalendarIcon, Clock, Landmark, Coffee, Utensils, Bus, Car, 
+  Camera, MapPin, Euro, PlaneTakeoff, Ship, Train, Info } from "lucide-react";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 
 type InterestType = 'tarih' | 'yemek' | 'kafe' | 'tur' | 'fotograf';
+
+type Transportation = {
+  type: string;
+  icon: JSX.Element;
+  description: string;
+  duration: string;
+  price: string;
+  frequency?: string;
+};
 
 type Activity = {
   time: string;
   activity: string;
   description: string;
+  location?: string;
+  cost?: string;
+  image?: string;
+  transportation?: Transportation[];
 };
 
 type DayPlan = {
@@ -29,6 +46,81 @@ type TravelPlan = {
   days: DayPlan[];
 };
 
+// Sample images for activities
+const activityImages = {
+  "Girne Limanı": "/lovable-uploads/5ecb91b8-3b2a-4493-95fe-ccb5e08148fa.png",
+  "St. Hilarion Kalesi": "https://images.unsplash.com/photo-1635199893453-ddd501acda84?q=80&w=600&auto=format&fit=crop",
+  "Girne Kalesi": "https://images.unsplash.com/photo-1566247514599-3f4e32d3d42a?q=80&w=600&auto=format&fit=crop",
+  "Bellapais Manastırı": "https://images.unsplash.com/photo-1559682468-a6a29e7d9517?q=80&w=600&auto=format&fit=crop",
+  "Karpaz Milli Parkı": "https://images.unsplash.com/photo-1532274402911-5a369e4c4bb5?q=80&w=600&auto=format&fit=crop",
+  "Apostolos Andreas Manastırı": "https://images.unsplash.com/photo-1580041065738-e72023775cdc?q=80&w=600&auto=format&fit=crop",
+  "Salamis Harabeleri": "https://images.unsplash.com/photo-1560152217-4f33aa88d766?q=80&w=600&auto=format&fit=crop",
+  "Gazimağusa Surları": "https://images.unsplash.com/photo-1548940740-204726a19ec3?q=80&w=600&auto=format&fit=crop",
+  "Namık Kemal Zindanı": "https://images.unsplash.com/photo-1566041510639-8d95a2490bfb?q=80&w=600&auto=format&fit=crop",
+};
+
+// Transportation options for different destinations
+const transportationOptions = {
+  "Girne": [
+    {
+      type: "Otobüs",
+      icon: <Bus className="h-4 w-4" />,
+      description: "Lefkoşa-Girne arası düzenli seferler",
+      duration: "45 dakika",
+      price: "40 TL (yaklaşık 2 €)",
+      frequency: "Her saat başı"
+    },
+    {
+      type: "Taksi",
+      icon: <Car className="h-4 w-4" />,
+      description: "Özel taksi hizmeti",
+      duration: "30 dakika",
+      price: "400-500 TL (yaklaşık 20-25 €)"
+    },
+    {
+      type: "Araç Kiralama",
+      icon: <Car className="h-4 w-4" />,
+      description: "Günlük kiralık araç",
+      duration: "30 dakika",
+      price: "500-800 TL/gün (yaklaşık 25-40 €/gün)"
+    }
+  ],
+  "Gazimağusa": [
+    {
+      type: "Otobüs",
+      icon: <Bus className="h-4 w-4" />,
+      description: "Lefkoşa-Gazimağusa arası düzenli seferler",
+      duration: "1 saat 15 dakika",
+      price: "50 TL (yaklaşık 2.5 €)",
+      frequency: "Saatte bir"
+    },
+    {
+      type: "Taksi",
+      icon: <Car className="h-4 w-4" />,
+      description: "Özel taksi hizmeti",
+      duration: "1 saat",
+      price: "500-600 TL (yaklaşık 25-30 €)"
+    }
+  ],
+  "Karpaz": [
+    {
+      type: "Otobüs",
+      icon: <Bus className="h-4 w-4" />,
+      description: "Lefkoşa-Karpaz arası seferler (aktarmalı)",
+      duration: "2 saat 30 dakika",
+      price: "70 TL (yaklaşık 3.5 €)",
+      frequency: "Günde 3 sefer"
+    },
+    {
+      type: "Araç Kiralama",
+      icon: <Car className="h-4 w-4" />,
+      description: "Günlük kiralık araç önerilir",
+      duration: "2 saat",
+      price: "500-800 TL/gün (yaklaşık 25-40 €/gün)"
+    }
+  ]
+};
+
 const TravelPlanner = () => {
   const [planDate, setPlanDate] = useState<Date | undefined>(new Date());
   const [duration, setDuration] = useState("1");
@@ -36,6 +128,7 @@ const TravelPlanner = () => {
   const [planGenerated, setPlanGenerated] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState<TravelPlan | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedTransportTab, setSelectedTransportTab] = useState<string>("bus");
 
   const toggleInterest = (interest: string) => {
     setInterests(prev => 
@@ -43,6 +136,13 @@ const TravelPlanner = () => {
       ? prev.filter(i => i !== interest) 
       : [...prev, interest]
     );
+  };
+
+  const getTransportForLocation = (location: string) => {
+    if (location.includes("Girne")) return transportationOptions["Girne"];
+    if (location.includes("Gazimağusa") || location.includes("Salamis")) return transportationOptions["Gazimağusa"];
+    if (location.includes("Karpaz")) return transportationOptions["Karpaz"];
+    return transportationOptions["Girne"]; // Default
   };
 
   const generateTravelPlan = () => {
@@ -64,7 +164,19 @@ const TravelPlanner = () => {
                 ? 'KKTC\'nin en güzel bölgelerinden biri olan Girne Limanı\'nda yürüyüş ve tarihi binalar.' 
                 : index === 1 
                 ? 'Gotik mimarinin en güzel örneklerinden biri olan Bellapais Manastırı\'nı ziyaret.' 
-                : 'Antik dönemden kalma muhteşem Salamis Harabeleri\'ni keşfetme.'
+                : 'Antik dönemden kalma muhteşem Salamis Harabeleri\'ni keşfetme.',
+              location: index === 0 ? 'Girne Merkez' : index === 1 ? 'Girne, Bellapais Köyü' : 'Gazimağusa yakınları',
+              cost: index === 0 ? 'Ücretsiz' : index === 1 ? 'Giriş: 45 TL' : 'Giriş: 45 TL',
+              image: index === 0 
+                ? activityImages["Girne Limanı"] 
+                : index === 1 
+                ? activityImages["Bellapais Manastırı"] 
+                : activityImages["Salamis Harabeleri"],
+              transportation: index === 0 
+                ? getTransportForLocation("Girne") 
+                : index === 1 
+                ? getTransportForLocation("Girne") 
+                : getTransportForLocation("Gazimağusa"),
             },
             {
               time: '12:30',
@@ -73,7 +185,9 @@ const TravelPlanner = () => {
                 ? 'Girne Limanı\'ndaki otantik bir restoranda yerel KKTC lezzetleri.' 
                 : index === 1 
                 ? 'Bellapais bölgesindeki tarihi bir restoranda geleneksel yemekler.' 
-                : 'Salamis çevresindeki bir restoranda taze balık keyfi.'
+                : 'Salamis çevresindeki bir restoranda taze balık keyfi.',
+              location: index === 0 ? 'Girne Limanı Restoranları' : index === 1 ? 'Bellapais Abbey Restaurant' : 'Salamis Bay Restaurant',
+              cost: 'Kişi başı 250-350 TL (yaklaşık 12-18 €)',
             },
             {
               time: '14:00',
@@ -82,7 +196,19 @@ const TravelPlanner = () => {
                 ? 'Eşsiz manzarası ile St. Hilarion Kalesi\'ni ziyaret ve fotoğraf çekimi.' 
                 : index === 1 
                 ? 'Muhteşem Karpaz Milli Parkı\'nda doğa yürüyüşü ve yabani eşekleri gözlemleme.' 
-                : 'Venedikliler tarafından inşa edilen tarihi Gazimağusa Surları\'nı keşfetme.'
+                : 'Venedikliler tarafından inşa edilen tarihi Gazimağusa Surları\'nı keşfetme.',
+              location: index === 0 ? 'Girne dağları' : index === 1 ? 'Karpaz Yarımadası' : 'Gazimağusa Merkez',
+              cost: index === 0 ? 'Giriş: 45 TL' : index === 1 ? 'Giriş: Ücretsiz' : 'Giriş: Ücretsiz',
+              image: index === 0 
+                ? activityImages["St. Hilarion Kalesi"] 
+                : index === 1 
+                ? activityImages["Karpaz Milli Parkı"] 
+                : activityImages["Gazimağusa Surları"],
+              transportation: index === 0 
+                ? getTransportForLocation("Girne")
+                : index === 1 
+                ? getTransportForLocation("Karpaz") 
+                : getTransportForLocation("Gazimağusa"),
             },
             {
               time: '17:00',
@@ -91,7 +217,14 @@ const TravelPlanner = () => {
                 ? 'Tarihi Girne Kalesi\'ni ve içindeki Batık Gemi Müzesi\'ni ziyaret.' 
                 : index === 1 
                 ? 'Karpaz Yarımadası\'nın ucundaki önemli dini merkez Apostolos Andreas Manastırı\'nı ziyaret.' 
-                : 'Tarihi öneme sahip Namık Kemal Zindanı ve Gazimağusa\'nın tarihi merkezini keşfetme.'
+                : 'Tarihi öneme sahip Namık Kemal Zindanı ve Gazimağusa\'nın tarihi merkezini keşfetme.',
+              location: index === 0 ? 'Girne Limanı yanı' : index === 1 ? 'Karpaz Yarımadası ucu' : 'Gazimağusa Suriçi',
+              cost: index === 0 ? 'Giriş: 45 TL' : index === 1 ? 'Giriş: Ücretsiz (Bağış yapılabilir)' : 'Giriş: 30 TL',
+              image: index === 0 
+                ? activityImages["Girne Kalesi"] 
+                : index === 1 
+                ? activityImages["Apostolos Andreas Manastırı"] 
+                : activityImages["Namık Kemal Zindanı"],
             },
             {
               time: '20:00',
@@ -100,7 +233,9 @@ const TravelPlanner = () => {
                 ? 'Girne\'de deniz manzaralı bir restoranda hellim ve şeftali kebabı tadımı.' 
                 : index === 1 
                 ? 'Yerel bir restoranda KKTC mutfağının özel lezzetleri molehiya ve kolakas.' 
-                : 'Gazimağusa\'da tarihi bir mekanda geleneksel Kıbrıs mezelerini tatma.'
+                : 'Gazimağusa\'da tarihi bir mekanda geleneksel Kıbrıs mezelerini tatma.',
+              location: index === 0 ? 'The Harbour Restaurant, Girne' : index === 1 ? 'Oasis Restaurant, Dipkarpaz' : 'Monk\'s Inn Restaurant, Gazimağusa',
+              cost: 'Kişi başı 300-450 TL (yaklaşık 15-22 €)',
             }
           ]
         }))
@@ -204,7 +339,7 @@ const TravelPlanner = () => {
           </div>
           
           <Button 
-            className="w-full" 
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" 
             onClick={generateTravelPlan} 
             disabled={isGenerating}
           >
@@ -240,12 +375,17 @@ const TravelPlanner = () => {
             ))}
           </div>
           
-          <ScrollArea className="h-[400px]">
+          <ScrollArea className="h-[600px]">
             <div className="space-y-6">
               {generatedPlan?.days.map((day: DayPlan) => (
-                <Card key={day.day}>
-                  <CardHeader className="pb-2">
-                    <CardTitle>Gün {day.day}</CardTitle>
+                <Card key={day.day} className="overflow-hidden">
+                  <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-purple-50">
+                    <CardTitle className="flex items-center text-blue-700">
+                      <span className="bg-blue-100 text-blue-700 rounded-full w-8 h-8 flex items-center justify-center mr-2">
+                        {day.day}
+                      </span>
+                      Gün {day.day}
+                    </CardTitle>
                     <CardDescription>
                       {planDate ? format(
                         new Date(new Date(planDate).setDate(new Date(planDate).getDate() + day.day - 1)), 
@@ -255,18 +395,110 @@ const TravelPlanner = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       {day.activities.map((activity, index) => (
-                        <div key={index} className="flex gap-4">
-                          <div className="w-16 font-medium text-right">{activity.time}</div>
-                          <div className="flex-1">
-                            <div className="font-medium">{activity.activity}</div>
-                            <div className="text-sm text-muted-foreground">{activity.description}</div>
+                        <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                          <div className="flex gap-4">
+                            <div className="min-w-16 text-center">
+                              <div className="bg-blue-100 text-blue-700 rounded-lg py-1 font-medium">{activity.time}</div>
+                            </div>
+                            <div className="flex-1 space-y-2">
+                              <div className="font-medium text-lg">{activity.activity}</div>
+                              
+                              {activity.location && (
+                                <div className="flex items-center text-sm text-muted-foreground">
+                                  <MapPin className="h-3.5 w-3.5 mr-1" />
+                                  {activity.location}
+                                </div>
+                              )}
+                              
+                              {activity.cost && (
+                                <div className="flex items-center text-sm text-muted-foreground">
+                                  <Euro className="h-3.5 w-3.5 mr-1" />
+                                  {activity.cost}
+                                </div>
+                              )}
+                              
+                              <div className="text-sm text-muted-foreground">{activity.description}</div>
+                              
+                              {activity.image && (
+                                <div className="mt-3">
+                                  <img 
+                                    src={activity.image} 
+                                    alt={activity.activity} 
+                                    className="rounded-lg w-full h-40 object-cover"
+                                  />
+                                </div>
+                              )}
+                              
+                              {activity.transportation && (
+                                <div className="mt-3 border-t pt-3">
+                                  <p className="text-sm font-medium mb-2 flex items-center">
+                                    <Bus className="h-4 w-4 mr-1" /> 
+                                    Ulaşım Seçenekleri
+                                  </p>
+                                  
+                                  <Tabs value={selectedTransportTab} onValueChange={setSelectedTransportTab}>
+                                    <TabsList className="mb-2">
+                                      {activity.transportation.map((option, idx) => (
+                                        <TabsTrigger 
+                                          key={idx} 
+                                          value={option.type.toLowerCase().replace(" ", "-")}
+                                          className="text-xs"
+                                        >
+                                          {option.icon} 
+                                          <span className="ml-1">{option.type}</span>
+                                        </TabsTrigger>
+                                      ))}
+                                    </TabsList>
+                                    
+                                    {activity.transportation.map((option, idx) => (
+                                      <TabsContent 
+                                        key={idx} 
+                                        value={option.type.toLowerCase().replace(" ", "-")}
+                                        className="border rounded-lg p-3"
+                                      >
+                                        <div className="space-y-2">
+                                          <div className="text-sm">{option.description}</div>
+                                          <div className="grid grid-cols-2 gap-2 text-xs">
+                                            <div className="flex items-center">
+                                              <Clock className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
+                                              <span>{option.duration}</span>
+                                            </div>
+                                            <div className="flex items-center">
+                                              <Euro className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
+                                              <span>{option.price}</span>
+                                            </div>
+                                            {option.frequency && (
+                                              <div className="flex items-center col-span-2">
+                                                <Info className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
+                                                <span>Sefer Sıklığı: {option.frequency}</span>
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </TabsContent>
+                                    ))}
+                                  </Tabs>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ))}
                     </div>
                   </CardContent>
+                  <CardFooter className="bg-blue-50/50 px-6 py-3">
+                    <div className="w-full flex flex-wrap gap-2 items-center justify-between">
+                      <div className="flex items-center">
+                        <Bus className="h-4 w-4 mr-1.5 text-blue-700" />
+                        <span className="text-sm font-medium text-blue-700">Günlük Ulaşım Tavsiyesi:</span>
+                      </div>
+                      <Badge variant="outline" className="bg-white">
+                        {day.day === 1 ? "Taksi + Yaya" : day.day === 2 ? "Kiralık Araç" : "Otobüs Turu"}
+                      </Badge>
+                    </div>
+                  </CardFooter>
                 </Card>
               ))}
             </div>
