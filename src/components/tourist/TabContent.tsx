@@ -10,6 +10,7 @@ import FeedbackAssistant from "./FeedbackAssistant";
 import ReportAssistant from "./ReportAssistant";
 import FlightInfo from "./FlightInfo";
 import TravelChat from "./TravelChat";
+import BusinessDemoPanel from "./BusinessDemoPanel";
 
 interface TabContentProps {
   activeTab: string;
@@ -30,6 +31,8 @@ const TabContent = ({ activeTab }: TabContentProps) => {
         return <FlightInfo />;
       case "publicBuildings":
         return <PublicBuildingsMap />;
+      case "businessDemo":
+        return <BusinessDemoPanel />;
       case "assistant":
         return <TravelChat />;
       case "feedback":
@@ -42,7 +45,7 @@ const TabContent = ({ activeTab }: TabContentProps) => {
   };
 
   return (
-    <div className="border rounded-lg p-6 bg-white shadow-lg backdrop-blur-sm bg-white/95">
+    <div className="border rounded-lg p-6 bg-white/95 shadow-lg backdrop-blur-sm">
       {renderContent()}
     </div>
   );
