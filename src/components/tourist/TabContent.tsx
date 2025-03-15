@@ -36,6 +36,8 @@ const TabContent = ({ activeTab }: TabContentProps) => {
         return <FeedbackAssistant />;
       case "report":
         return <ReportAssistant />;
+      case "chat":
+        return <TravelChat />;
       default:
         return <NearbyPlaces />;
     }

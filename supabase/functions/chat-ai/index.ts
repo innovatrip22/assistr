@@ -26,64 +26,82 @@ serve(async (req) => {
       Aşağıdaki konularda detaylı bilgi verebilirsin:
       
       TURİSTİK BÖLGELER:
-      - Lefkoşa: Venedik surları, Selimiye Camii, Büyük Han, Arasta Sokağı.
-      - Girne: Tarihi liman, Girne Kalesi, Bellapais Manastırı, St. Hilarion Kalesi.
-      - Gazimağusa: Suriçi, Othello Kalesi, Lala Mustafa Paşa Camii, Salamis Harabeleri.
-      - Güzelyurt: Soli Harabeleri, St. Mamas Manastırı.
-      - İskele: Karpaz Yarımadası, Altın Kumsal, Apostolos Andreas Manastırı.
+      - Lefkoşa: Venedik surları (giriş ücretsiz), Selimiye Camii (giriş ücretsiz), Büyük Han (giriş ücretsiz, hediyelik eşya dükkanları ve kafeler mevcut), Arasta Sokağı (alışveriş bölgesi).
+      - Girne: Tarihi liman (giriş ücretsiz, çevresi restoran ve kafelerle dolu), Girne Kalesi (giriş 15TL, içinde Batık Gemi Müzesi bulunur), Bellapais Manastırı (giriş 15TL), St. Hilarion Kalesi (giriş 15TL, muhteşem manzara sunar).
+      - Gazimağusa: Suriçi (tarihi alan, giriş ücretsiz), Othello Kalesi (giriş 10TL), Lala Mustafa Paşa Camii (eski St. Nicholas Katedrali, giriş ücretsiz), Salamis Harabeleri (giriş 15TL, Roma dönemi kalıntıları).
+      - Güzelyurt: Soli Harabeleri (giriş 10TL, M.Ö. 6. yüzyıldan kalma mozaikler), St. Mamas Manastırı (giriş 10TL, 18. yüzyıldan dini eserler).
+      - İskele: Karpaz Yarımadası (doğal park, giriş ücretsiz), Altın Kumsal (giriş ücretsiz), Apostolos Andreas Manastırı (bağış yapılabilir).
       
       PLAJLAR:
-      - Glapsides Plajı (Gazimağusa): Mavi bayraklı, altın kumlu, sığ suları ile aileler için ideal.
-      - Altın Kumsal (Karpaz): Bozulmamış doğası ve altın sarısı kumuyla ünlü. 
-      - Escape Beach (Girne): Su sporları aktiviteleri için uygun, beach club'ı var.
-      - Alagadi Plajı (Girne): Deniz kaplumbağası yumurtlama alanı olarak ünlü.
-      - Silver Beach (Girne): Şezlong ve şemsiye kiralama servisi var, giriş ücreti 5-10 Euro arası.
+      - Glapsides Plajı (Gazimağusa): Mavi bayraklı, altın kumlu, sığ suları ile aileler için ideal. Giriş ücretsiz, şezlong ve şemsiye kiralama 5-10 Euro.
+      - Altın Kumsal (Karpaz): Bozulmamış doğası ve altın sarısı kumuyla ünlü. Giriş ücretsiz, temel tesisler mevcut. 
+      - Escape Beach (Girne): Su sporları aktiviteleri için uygun (jet ski 30-50 Euro/30 dk), beach club'ı var. Giriş 5-10 Euro, şezlong dahil.
+      - Alagadi Plajı (Girne): Deniz kaplumbağası yumurtlama alanı olarak ünlü. Giriş ücretsiz, temel tesisler mevcut.
+      - Silver Beach (Girne): Şezlong ve şemsiye kiralama servisi var, giriş ücreti 5-10 Euro arası. Restoran ve bar hizmetleri mevcut.
       
       OTELLER:
-      - Merit Crystal Cove (Girne): 5 yıldızlı, gecelik 150-250 Euro, casino, spa, deniz manzaralı.
-      - Acapulco Resort (Girne): 5 yıldızlı, gecelik 120-220 Euro, özel plaj, aquapark.
-      - Colony Hotel (Girne): 5 yıldızlı, tarihi merkezde, gecelik 100-180 Euro.
-      - Salamis Bay Conti (Gazimağusa): 5 yıldızlı, gecelik 110-200 Euro, antik Salamis'e yakın.
-      - The Arkin Colony (Girne): Butik otel, gecelik 90-160 Euro, tarihi binada.
+      - Merit Crystal Cove (Girne): 5 yıldızlı, gecelik 150-250 Euro, casino, spa, deniz manzaralı odalar. Full rezervasyon için: +90 392 650 02 00
+      - Acapulco Resort (Girne): 5 yıldızlı, gecelik 120-220 Euro, özel plaj, aquapark. Rezervasyon: +90 392 650 28 00
+      - Colony Hotel (Girne): 5 yıldızlı, tarihi merkezde, gecelik 100-180 Euro. Rezervasyon: +90 392 815 24 50
+      - Salamis Bay Conti (Gazimağusa): 5 yıldızlı, gecelik 110-200 Euro, antik Salamis'e yakın. Rezervasyon: +90 392 378 82 00
+      - The Arkin Colony (Girne): Butik otel, gecelik 90-160 Euro, tarihi binada. Rezervasyon: +90 392 815 15 00
       
       RESTORANLAR:
-      - Niazi's Restaurant (Girne): Geleneksel Kıbrıs kebapları, kişi başı 15-25 Euro.
-      - Hamur Restaurant (Lefkoşa): Yerel ve uluslararası mutfak, kişi başı 20-35 Euro.
-      - The Stone Castle (Girne): Deniz ürünleri, kişi başı 25-40 Euro, manzaralı terasa sahip.
-      - Set Fish Restaurant (Girne): Premium deniz ürünleri, kişi başı 30-50 Euro.
-      - Kervan Kebap (Gazimağusa): Otantik Kıbrıs kebabı, kişi başı 10-20 Euro.
+      - Niazi's Restaurant (Girne): Geleneksel Kıbrıs kebapları, kişi başı 15-25 Euro. Şeftali kebabı önerilen menüsü. Rezervasyon: +90 392 815 20 80
+      - Hamur Restaurant (Lefkoşa): Yerel ve uluslararası mutfak, kişi başı 20-35 Euro. Molehiya yemeği spesiyali. Rezervasyon: +90 392 229 33 27
+      - The Stone Castle (Girne): Deniz ürünleri, kişi başı 25-40 Euro, manzaralı terasa sahip. Ahtapot ızgara önerilir. Rezervasyon: +90 392 815 73 73
+      - Set Fish Restaurant (Girne): Premium deniz ürünleri, kişi başı 30-50 Euro. Mezeleri ve taze balıkları ile ünlü. Rezervasyon: +90 392 821 80 65
+      - Kervan Kebap (Gazimağusa): Otantik Kıbrıs kebabı, kişi başı 10-20 Euro. Kuzu şiş kebap spesiyali. Rezervasyon: +90 392 366 44 33
       
       YÖRESEL YEMEKLER:
-      - Hellim peyniri: Keçi ve koyun sütünden yapılan, ızgara veya çiğ yenebilen peynir.
-      - Şeftali kebabı: Koyun bağırsağına sarılmış köfte.
-      - Molehiya: Orta Doğu kökenli yeşil yapraklı bitki ile hazırlanan et yemeği.
-      - Kolokas: Ada'ya özgü bir çeşit göbek ile yapılan yahni.
-      - Magarina bulli: Tavuk suyu ile pişirilmiş makarna.
+      - Hellim peyniri: Keçi ve koyun sütünden yapılan, ızgara veya çiğ yenebilen peynir. Restoranlar ve marketlerde 5-15 Euro.
+      - Şeftali kebabı: Koyun bağırsağına sarılmış köfte. Kebapçılarda 8-12 Euro porsiyonu.
+      - Molehiya: Orta Doğu kökenli yeşil yapraklı bitki ile hazırlanan et yemeği. Yerel restoranlarda 10-15 Euro.
+      - Kolokas: Ada'ya özgü bir çeşit göbek ile yapılan yahni. 8-12 Euro.
+      - Magarina bulli: Tavuk suyu ile pişirilmiş makarna. 7-10 Euro.
       
       ULAŞIM SEÇENEKLERİ:
-      - Otobüsler: Şehirlerarası otobüsler saatte bir kalkar, bilet fiyatları 5-10 Euro arası.
-      - Taksiler: Şehir içi 10-15 Euro, şehirlerarası 30-60 Euro arası.
-      - Araç kiralama: Günlük 30-70 Euro arası, uluslararası ehliyet gerekli.
-      - Minibüsler: Yerel halkın kullandığı, daha uygun fiyatlı alternatif, 3-5 Euro.
+      - Otobüsler: Şehirlerarası otobüsler saatte bir kalkar, bilet fiyatları 5-10 Euro arası. Lefkoşa-Girne arası 40 dakika sürer.
+      - Taksiler: Şehir içi 10-15 Euro, şehirlerarası 30-60 Euro arası. Havaalanı-Girne arası yaklaşık 45-60 Euro.
+      - Araç kiralama: Günlük 30-70 Euro arası, uluslararası ehliyet gerekli. Akaryakıt fiyatları Türkiye'den biraz daha yüksek.
+      - Minibüsler: Yerel halkın kullandığı, daha uygun fiyatlı alternatif, 3-5 Euro. Düzenli sefer saatleri yok.
+      
+      OTOBÜS DURAKLARI:
+      - Lefkoşa Terminal: Merkezi konumda, Girne, Gazimağusa ve Güzelyurt'a seferler her saat başı 07:00-22:00 arası, Cuma-Cumartesi 07:00-00:00 arası. Bekleme salonu, kafeterya, ATM ve WiFi mevcut.
+      - Girne Terminal: Lefkoşa, Lapta ve Karşıyaka'ya seferler her saat başı 07:00-21:00 arası, hafta sonu 08:00-22:00 arası. Bilet gişesi, bekleme alanı ve restoran var.
+      - Gazimağusa Terminal: Lefkoşa, İskele ve Yeniboğaziçi'ne seferler her yarım saatte 06:30-20:30 arası, Pazar günleri 08:00-20:00 arası. Bilet ofisi, kiosk ve market bulunur.
       
       KÜLTÜR VE ETKİNLİKLER:
-      - Kıbrıs Tiyatro Festivali (Mayıs): Salamis antik tiyatrosunda düzenlenir.
-      - Uluslararası Bellapais Müzik Festivali (Haziran): Klasik müzik konserleri.
-      - Portakal Festivali (Haziran): Güzelyurt'ta düzenlenen narenciye festivali.
-      - Zeytin Festivali (Ekim): Zeytinyağı ve ürünlerinin tanıtıldığı festival.
+      - Kıbrıs Tiyatro Festivali (Mayıs): Salamis antik tiyatrosunda düzenlenir. Biletler 10-30 Euro arası.
+      - Uluslararası Bellapais Müzik Festivali (Haziran): Klasik müzik konserleri. Biletler 15-40 Euro arası.
+      - Portakal Festivali (Haziran): Güzelyurt'ta düzenlenen narenciye festivali. Giriş genellikle ücretsiz.
+      - Zeytin Festivali (Ekim): Zeytinyağı ve ürünlerinin tanıtıldığı festival. Giriş ücretsiz, etkinliklere katılım için ücret alınabilir.
       
       ALIŞVERİŞ:
-      - Lefkoşa: Arasta Sokağı, Büyük Han, Bandabuliya (kapalı pazar).
-      - Girne: Carsi bölgesi, antika dükkanları.
-      - Gazimağusa: Suriçi tarihi çarşı.
-      - Duty-free alışveriş: Ercan Havalimanı ve sınır kapılarında.
+      - Lefkoşa: Arasta Sokağı (geleneksel hediyelik eşyalar), Büyük Han (el sanatları), Bandabuliya (kapalı pazar, yerel ürünler).
+      - Girne: Carsi bölgesi (butikler), antika dükkanları (eski kent).
+      - Gazimağusa: Suriçi tarihi çarşı (geleneksel Kıbrıs ürünleri).
+      - Duty-free alışveriş: Ercan Havalimanı ve sınır kapılarında (alkol ve sigara ürünleri %30-40 daha uygun).
+      
+      REZERVASYON BİLGİLERİ:
+      - Oteller: Yüksek sezonda (Haziran-Ağustos) en az 1-2 ay önceden rezervasyon yapılması önerilir. Online seyahat platformları veya otellerin kendi web siteleri kullanılabilir.
+      - Turlar: Ada turu (30-50 Euro/kişi), Tekne turu (40-60 Euro/kişi), Doğa yürüyüşü (20-30 Euro/kişi) gibi seçenekler var. Çoğu tur şirketi ve otel rezervasyon kabul eder.
+      - Araç kiralama: Havaalanında veya şehir merkezlerinde birçok firma mevcut. Yüksek sezonda 1 hafta önceden rezervasyon önerilir. Uluslararası ehliyet ve kredi kartı gereklidir.
+      - Restoranlar: Popüler restoranlarda özellikle akşam yemekleri için 1-2 gün önceden rezervasyon yapılması önerilir. Telefon veya online rezervasyon kabul eden yerler var.
       
       PRATİK BİLGİLER:
-      - Para birimi: Türk Lirası (TL), çoğu yerde Euro da kabul edilir.
-      - Dil: Resmi dil Türkçe, turistik bölgelerde İngilizce yaygın.
-      - Elektrik: 240V, İngiliz tipi G priz kullanılır.
-      - Vize: Türkiye üzerinden seyahat edenler için gerekmez.
-      - Sağlık: Özel hastaneler kaliteli hizmet verir, seyahat sigortası önerilir.
+      - Para birimi: Türk Lirası (TL), çoğu yerde Euro da kabul edilir. Döviz büroları commission oranları %1-3 arasında değişir.
+      - Dil: Resmi dil Türkçe, turistik bölgelerde İngilizce yaygın. Rusça ve Almanca da bazı tesislerde konuşulur.
+      - Elektrik: 240V, İngiliz tipi G priz kullanılır. Adaptör getirmeniz önerilir.
+      - Vize: Türkiye üzerinden seyahat edenler için gerekmez. Diğer ülkelerden gelenler için vize gereklilikleri farklılık gösterebilir.
+      - Sağlık: Özel hastaneler kaliteli hizmet verir (Lefkoşa ve Girne'de bulunan Near East Hospital, 7/24 acil servis), seyahat sigortası önerilir.
+      
+      ZİYARETÇİ GÖRÜŞLERİ:
+      - "Bellapais Manastırı harika bir yer. Rehberimiz çok bilgiliydi ve bölgenin tarihi hakkında detaylı bilgi verdi." - Mehmet K.
+      - "Salamis antik kenti görülmeye değer. Yalnız yazın şapka ve su almayı unutmayın, çok sıcak oluyor." - Ayşe T.
+      - "Girne Kalesi ve Batık Gemi Müzesi muhteşemdi. Giriş ücreti 15TL ve kesinlikle değer." - Can B.
+      - "Altın Kumsal plajı güzel ama hafta sonları çok kalabalık oluyor. Hafta içi gitmenizi öneririm." - Zeynep A.
+      - "Merit Royal otelinde kaldık. Biraz pahalı ama hizmet kalitesi çok yüksek. Havuz ve plaj alanları mükemmeldi." - Ali R.
       
       Yanıtların kısa, öz, bilgilendirici ve en önemlisi TURİSTLERE YARDIMCI OLMALI. Eğer bir konuda kesin bilgin yoksa, bunu belirtmeli ve yanıtında bu bilgiyi içermemelisin.`
       : userType === 'institution'
@@ -137,33 +155,29 @@ serve(async (req) => {
     } else {
       // Comprehensive fallback responses with detailed KKTC information
       const topics = {
-        'plaj': 'KKTC\'de en popüler plajlar Glapsides (Gazimağusa), Altın Kumsal (Karpaz), Escape Beach ve Alagadi (Girne) plajlarıdır. Glapsides mavi bayraklı, altın kumlu ve sığ suları ile aileler için idealdir. Altın Kumsal, bozulmamış doğası ve kilometrelerce uzanan altın sarısı kumuyla ünlüdür. Escape Beach su sporları için uygun olup beach club hizmeti sunar, giriş ücreti 5-10 Euro arasıdır. Alagadi, deniz kaplumbağalarının yumurtlama alanı olarak korunan bir bölgedir ve giriş ücretsizdir.',
+        'plaj': 'KKTC\'de en popüler plajlar Glapsides (Gazimağusa), Altın Kumsal (Karpaz), Escape Beach ve Alagadi (Girne) plajlarıdır. Glapsides mavi bayraklı, altın kumlu ve sığ suları ile aileler için idealdir. Giriş ücretsiz, şezlong ve şemsiye kiralama 5-10 Euro. Altın Kumsal, bozulmamış doğası ve kilometrelerce uzanan altın sarısı kumuyla ünlüdür, giriş ücretsiz, temel tesisler mevcuttur. Escape Beach su sporları için uygun olup beach club hizmeti sunar, jet ski 30-50 Euro/30 dk, giriş ücreti 5-10 Euro, şezlong dahildir. Alagadi, deniz kaplumbağalarının yumurtlama alanı olarak korunan bir bölgedir ve giriş ücretsizdir.',
         
-        'müze': 'KKTC\'deki önemli müzeler arasında Girne Kalesi\'ndeki Batık Gemi Müzesi (giriş 15TL), Mevlevi Tekke Müzesi (Lefkoşa, giriş 10TL), Gazimağusa\'daki Namık Kemal Zindanı ve Müzesi (giriş 8TL), ve St. Barnabas Manastırı (İkon ve Arkeoloji Müzesi, giriş 15TL) bulunmaktadır. Girne Kalesi\'ndeki Batık Gemi Müzesi dünyanın en eski ticaret gemisini sergiler ve mutlaka görülmelidir. Müzeler genellikle 09:00-17:00 arası açıktır ve fotoğraf çekimine izin verilir.',
+        'müze': 'KKTC\'deki önemli müzeler arasında Girne Kalesi\'ndeki Batık Gemi Müzesi (giriş 15TL), Mevlevi Tekke Müzesi (Lefkoşa, giriş 10TL), Gazimağusa\'daki Namık Kemal Zindanı ve Müzesi (giriş 8TL), ve St. Barnabas Manastırı (İkon ve Arkeoloji Müzesi, giriş 15TL) bulunmaktadır. Girne Kalesi\'ndeki Batık Gemi Müzesi dünyanın en eski ticaret gemisini sergiler ve mutlaka görülmelidir. Müzeler genellikle 09:00-17:00 arası açıktır ve fotoğraf çekimine izin verilir. Ziyaretçilerin yorum kartlarında özellikle Batık Gemi Müzesi\'nin etkileyici olduğu belirtilmiştir.',
         
-        'yemek': 'KKTC mutfağında hellim, şeftali kebabı, molehiya ve kolokas öne çıkar. Girne\'deki Niazi\'s Restaurant\'ta şeftali kebabı (kişi başı 15-25 Euro), Lefkoşa\'daki Hamur Restaurant\'ta molehiya (kişi başı 20-35 Euro), Girne\'deki The Stone Castle\'da deniz ürünleri (kişi başı 25-40 Euro) tadabilirsiniz. Hellim peyniri, hem taze hem de ızgara olarak servis edilir ve kahvaltıların vazgeçilmezidir. Şeftali kebabı, isminin aksine şeftaliden değil, koyun bağırsağına sarılmış köfteden yapılır ve genellikle 10-20 Euro arası fiyatlandırılır.',
+        'yemek': 'KKTC mutfağında hellim (5-15 Euro), şeftali kebabı (8-12 Euro porsiyon), molehiya (10-15 Euro) ve kolokas (8-12 Euro) öne çıkar. Girne\'deki Niazi\'s Restaurant\'ta şeftali kebabı (kişi başı 15-25 Euro), Lefkoşa\'daki Hamur Restaurant\'ta molehiya (kişi başı 20-35 Euro), Girne\'deki The Stone Castle\'da deniz ürünleri (kişi başı 25-40 Euro) tadabilirsiniz. Hellim peyniri, hem taze hem de ızgara olarak servis edilir ve kahvaltıların vazgeçilmezidir. Şeftali kebabı, isminin aksine şeftaliden değil, koyun bağırsağına sarılmış köfteden yapılır. Restoran rezervasyonları için 1-2 gün önceden aramak önerilir. Niazi\'s Restaurant: +90 392 815 20 80, Hamur Restaurant: +90 392 229 33 27, The Stone Castle: +90 392 815 73 73.',
         
-        'hava': 'KKTC\'de Akdeniz iklimi hakimdir. Yazlar sıcak ve kurak (Haziran-Eylül arası ortalama 30-35°C), kışlar ılık ve yağışlı geçer (Aralık-Şubat arası ortalama 10-15°C). En yağışlı aylar Aralık ve Ocak\'tır. Yaz aylarında nem oranı %60-80 arasındadır ve UV indeksi yüksektir, güneş kremi kullanılması önerilir. En ideal ziyaret zamanı Nisan-Mayıs veya Eylül-Ekim aylarıdır, bu dönemlerde sıcaklık 20-25°C civarında seyreder.',
+        'hava': 'KKTC\'de Akdeniz iklimi hakimdir. Yazlar sıcak ve kurak (Haziran-Eylül arası ortalama 30-35°C), kışlar ılık ve yağışlı geçer (Aralık-Şubat arası ortalama 10-15°C). En yağışlı aylar Aralık ve Ocak\'tır. Yaz aylarında nem oranı %60-80 arasındadır ve UV indeksi yüksektir, güneş kremi kullanılması önerilir. En ideal ziyaret zamanı Nisan-Mayıs veya Eylül-Ekim aylarıdır, bu dönemlerde sıcaklık 20-25°C civarında seyreder, turist yoğunluğu daha azdır ve fiyatlar daha uygundur.',
         
-        'ulaşım': 'KKTC\'ye ulaşım genellikle Türkiye üzerinden yapılır. Ercan Havalimanı\'na İstanbul, Ankara, İzmir ve diğer büyük şehirlerden direkt uçuşlar mevcuttur (bilet fiyatları sezona göre 800-2000TL arası). Ada içinde şehirler arası otobüsler saatte bir kalkar ve bilet fiyatları 5-10 Euro arasıdır. Taksi ücretleri şehir içi 10-15 Euro, şehirlerarası 30-60 Euro civarındadır. Araç kiralama günlük 30-70 Euro arasında değişir ve uluslararası ehliyet gerektirir. Minibüsler yerel halkın kullandığı, daha uygun fiyatlı bir alternatiftir (3-5 Euro).',
+        'ulaşım': 'KKTC\'ye ulaşım genellikle Türkiye üzerinden yapılır. Ercan Havalimanı\'na İstanbul, Ankara, İzmir ve diğer büyük şehirlerden direkt uçuşlar mevcuttur (bilet fiyatları sezona göre 800-2000TL arası). Ada içinde şehirler arası otobüsler saatte bir kalkar ve bilet fiyatları 5-10 Euro arasıdır. Lefkoşa-Girne arası 40 dakika sürer. Taksi ücretleri şehir içi 10-15 Euro, şehirlerarası 30-60 Euro civarındadır. Havaalanı-Girne arası yaklaşık 45-60 Euro\'dur. Araç kiralama günlük 30-70 Euro arasında değişir ve uluslararası ehliyet gerektirir. Akaryakıt fiyatları Türkiye\'den biraz daha yüksektir. Minibüsler yerel halkın kullandığı, daha uygun fiyatlı bir alternatiftir (3-5 Euro), ancak düzenli sefer saatleri yoktur.',
         
-        'para': 'KKTC\'de resmi para birimi Türk Lirası\'dır (TL). Büyük oteller, restoranlar ve turistik mekanlar genellikle Euro ve İngiliz Sterlini de kabul eder. Döviz kurları için güncel bilgiyi KKTC Merkez Bankası\'ndan alabilirsiniz. Ada genelinde ATM\'ler yaygındır ve uluslararası kredi kartları (Visa, Mastercard) çoğu yerde geçerlidir. Turistik bölgelerde döviz büroları bulunur ve commission oranları %1-3 arasında değişir. Küçük işletmeler ve pazarlar genellikle sadece TL kabul eder.',
+        'para': 'KKTC\'de resmi para birimi Türk Lirası\'dır (TL). Büyük oteller, restoranlar ve turistik mekanlar genellikle Euro ve İngiliz Sterlini de kabul eder. Döviz kurları için güncel bilgiyi KKTC Merkez Bankası\'ndan alabilirsiniz. Ada genelinde ATM\'ler yaygındır ve uluslararası kredi kartları (Visa, Mastercard) çoğu yerde geçerlidir. Turistik bölgelerde döviz büroları bulunur ve commission oranları %1-3 arasında değişir. Küçük işletmeler ve pazarlar genellikle sadece TL kabul eder. Yanınızda hem TL hem de Euro bulundurmanız önerilir.',
         
-        'konaklama': 'KKTC\'de her bütçeye uygun konaklama seçenekleri bulunur. Girne\'deki 5 yıldızlı Merit Crystal Cove otel gecelik 150-250 Euro, Acapulco Resort 120-220 Euro, Colony Hotel 100-180 Euro fiyat aralığındadır. Gazimağusa\'daki Salamis Bay Conti 5 yıldızlı, gecelik 110-200 Euro, antik Salamis\'e yakındır. Butik oteller ise Girne\'deki The Arkin Colony (90-160 Euro) gibi 4 yıldızlı hizmet sunar. Daha ekonomik seçenekler için Lefkoşa\'da pansiyonlar (30-60 Euro) mevcuttur. Yüksek sezonda (Haziran-Ağustos) fiyatlar %30-50 artabilir, erken rezervasyon önerilir.',
+        'konaklama': 'KKTC\'de her bütçeye uygun konaklama seçenekleri bulunur. Girne\'deki 5 yıldızlı Merit Crystal Cove otel gecelik 150-250 Euro, Acapulco Resort 120-220 Euro, Colony Hotel 100-180 Euro fiyat aralığındadır. Gazimağusa\'daki Salamis Bay Conti 5 yıldızlı, gecelik 110-200 Euro, antik Salamis\'e yakındır. Butik oteller ise Girne\'deki The Arkin Colony (90-160 Euro) gibi 4 yıldızlı hizmet sunar. Daha ekonomik seçenekler için Lefkoşa\'da pansiyonlar (30-60 Euro) mevcuttur. Yüksek sezonda (Haziran-Ağustos) fiyatlar %30-50 artabilir, erken rezervasyon önerilir. Rezervasyon için Merit Crystal Cove: +90 392 650 02 00, Acapulco Resort: +90 392 650 28 00, Colony Hotel: +90 392 815 24 50.',
         
-        'casino': 'KKTC, kumarhane ve casino sektöründe önemli bir merkez haline gelmiştir. Ada genelinde 30\'dan fazla casino hizmet vermektedir. Özellikle Girne ve Lefkoşa\'daki büyük otellerin içinde bulunan casinolar 24 saat hizmet vermekte ve blackjack, rulet, poker, slot makineleri gibi farklı oyun seçenekleri sunmaktadır. Merit Royal Hotel & Casino, Cratos Premium Hotel & Casino, ve Elexus Hotel & Casino en lüks casino otellerindendir. Girişlerde pasaport kontrolü yapılır ve minimum yaş sınırı 18\'dir. Çoğu casino ücretsiz içki servisi ve casino misafirlerine özel indirimli konaklama imkanı sunar.',
+        'durak': 'KKTC\'de üç ana otobüs terminali bulunmaktadır. Lefkoşa Terminal merkezi konumda olup Girne, Gazimağusa ve Güzelyurt\'a seferler düzenler. Seferler her saat başı 07:00-22:00 arası, Cuma-Cumartesi günleri 07:00-00:00 arası gerçekleşir. Bekleme salonu, kafeterya, ATM ve WiFi gibi imkanlar mevcuttur. Girne Terminal\'den Lefkoşa, Lapta ve Karşıyaka\'ya seferler her saat başı 07:00-21:00 arası, hafta sonu 08:00-22:00 arası yapılır. Bilet gişesi, bekleme alanı ve restoran bulunur. Gazimağusa Terminal\'den Lefkoşa, İskele ve Yeniboğaziçi\'ne seferler her yarım saatte 06:30-20:30 arası, Pazar günleri 08:00-20:00 arası düzenlenir. Bilet ofisi, kiosk ve market mevcuttur.',
         
-        'üniversite': 'KKTC, 21 üniversitesiyle bir eğitim merkezi haline gelmiştir. En köklü kurumlar arasında 1979\'da kurulan Doğu Akdeniz Üniversitesi (DAÜ), 1988\'de kurulan Yakın Doğu Üniversitesi ve 1985\'te kurulan Girne Amerikan Üniversitesi bulunur. Yıllık ücretler bölüme göre 3000-10000 Euro arasında değişir. Üniversiteler genellikle Eylül ve Şubat aylarında öğrenci kabul eder. Programların çoğunda eğitim dili İngilizce\'dir. KKTC üniversiteleri Türkiye\'de YÖK tarafından tanınmakta olup, dünya genelinde 100\'den fazla ülkeden öğrenciye ev sahipliği yapmaktadır.',
+        'rezervasyon': 'KKTC\'de tatil planı yaparken rezervasyonlarınızı önceden yapmanız önerilir. Oteller için yüksek sezonda (Haziran-Ağustos) en az 1-2 ay önceden rezervasyon yapılması gerekir. Online seyahat platformları veya otellerin kendi web siteleri kullanılabilir. Turlar için ada turu (30-50 Euro/kişi), tekne turu (40-60 Euro/kişi), doğa yürüyüşü (20-30 Euro/kişi) gibi seçenekler mevcuttur. Çoğu tur şirketi ve otel rezervasyon kabul eder. Araç kiralama için havaalanında veya şehir merkezlerinde birçok firma bulunur. Yüksek sezonda 1 hafta önceden rezervasyon yapılması, uluslararası ehliyet ve kredi kartı bulundurulması gerekir. Popüler restoranlarda özellikle akşam yemekleri için 1-2 gün önceden rezervasyon yapılması tavsiye edilir. Telefon veya online rezervasyon kabul eden yerler vardır.',
         
-        'lefkoşa': 'Lefkoşa (Nicosia), KKTC\'nin başkentidir ve halen dünyada bölünmüş tek başkenttir. Venedik surları içindeki eski şehirde bulunan Selimiye Camii (eski St. Sophia Katedrali, giriş ücretsiz), Büyük Han (16. yy Osmanlı kervansarayı, ücretsiz), Arasta Sokağı (alışveriş bölgesi) ve Bandabuliya (kapalı pazar) mutlaka görülmesi gereken yerlerdir. Şehir içi ulaşım için yerel otobüsler (3-5TL) veya taksiler (10-15 Euro) kullanılabilir. Lefkoşa\'nın en iyi restoranları Hamur Restaurant (kişi başı 20-35 Euro) ve Sabor Restaurant\'tır (kişi başı 15-30 Euro). Konaklama için Merit Lefkoşa Hotel (gecelik 80-130 Euro) veya Centrum Hotel (50-90 Euro) tercih edilebilir.',
+        'görüş': 'KKTC\'yi ziyaret eden turistler genellikle olumlu deneyimlerini paylaşıyor. Mehmet K.: "Bellapais Manastırı harika bir yer. Rehberimiz çok bilgiliydi ve bölgenin tarihi hakkında detaylı bilgi verdi." Ayşe T.: "Salamis antik kenti görülmeye değer. Yalnız yazın şapka ve su almayı unutmayın, çok sıcak oluyor." Can B.: "Girne Kalesi ve Batık Gemi Müzesi muhteşemdi. Giriş ücreti 15TL ve kesinlikle değer." Zeynep A.: "Altın Kumsal plajı güzel ama hafta sonları çok kalabalık oluyor. Hafta içi gitmenizi öneririm." Ali R.: "Merit Royal otelinde kaldık. Biraz pahalı ama hizmet kalitesi çok yüksek. Havuz ve plaj alanları mükemmeldi." Bu değerlendirmeler 2023 yılı ziyaretlerine aittir.',
         
-        'girne': 'Girne (Kyrenia), KKTC\'nin en popüler turistik şehridir. Tarihi limanı, Girne Kalesi (giriş 15TL), Bellapais Manastırı (giriş 15TL) ve St. Hilarion Kalesi (giriş 15TL) mutlaka görülmesi gereken yerlerdir. Şehrin en iyi plajları Escape Beach ve Denizkızı\'dır (giriş 5-10 Euro). Girne\'de deniz ürünleri için The Stone Castle (kişi başı 25-40 Euro), geleneksel Kıbrıs mutfağı için Niazi\'s Restaurant (kişi başı 15-25 Euro) önerilir. Lüks konaklama için Merit Crystal Cove (gecelik 150-250 Euro), orta bütçe için Colony Hotel (100-180 Euro) tercih edilebilir. Şehir içi ulaşım taksi (10-15 Euro) veya dolmuşlarla (3-5TL) sağlanır.',
+        'festival': 'KKTC\'de yıl boyunca çeşitli festivaller düzenlenir. Bunlar arasında Uluslararası Bellapais Müzik Festivali (Haziran, Bellapais Manastırı\'nda klasik müzik konserleri, biletler 15-40 Euro arası), Girne Festivali (Temmuz, konserler ve kültürel etkinlikler, çoğu etkinlik ücretsiz), Güzelyurt Portakal Festivali (Haziran, narenciye ürünleri sergileri ve konserler, giriş genellikle ücretsiz) ve Zeytin Festivali (Ekim, zeytinyağı ürünleri ve yerel yemek stantları, giriş ücretsiz) en popüler olanlardır. Bu festivaller sırasında konaklama fiyatları %20-30 artabilir, erken rezervasyon önerilir. Festival konser biletleri genellikle 10-30 Euro arasındadır ve çoğu açık hava etkinliği ücretsiz izlenebilir.',
         
-        'festival': 'KKTC\'de yıl boyunca çeşitli festivaller düzenlenir. Bunlar arasında Uluslararası Bellapais Müzik Festivali (Haziran, Bellapais Manastırı\'nda klasik müzik konserleri), Girne Festivali (Temmuz, konserler ve kültürel etkinlikler), Güzelyurt Portakal Festivali (Haziran, narenciye ürünleri sergileri ve konserler) ve Zeytin Festivali (Ekim, zeytinyağı ürünleri ve yerel yemek stantları) en popüler olanlardır. Bu festivaller sırasında konaklama fiyatları %20-30 artabilir, erken rezervasyon önerilir. Festival konser biletleri genellikle 10-30 Euro arasındadır ve çoğu açık hava etkinliği ücretsiz izlenebilir.',
-        
-        'gazimağusa': 'Gazimağusa (Famagusta), KKTC\'nin önemli liman ve üniversite şehridir. Suriçi bölgesindeki tarihi surlar, Othello Kalesi (Shakespeare\'in eserine ilham vermiştir, giriş 10TL), Lala Mustafa Paşa Camii (eski St. Nicholas Katedrali, giriş ücretsiz) ve hayalet şehir Maraş görülmeye değerdir. Şehrin kuzeyindeki Salamis antik kenti (giriş 15TL) Roma döneminden kalma tiyatro, hamam ve sütunlarıyla ünlüdür. Plaj olarak Glapsides tercih edilebilir (mavi bayraklı, giriş ücretsiz). Konaklama için Salamis Bay Conti Resort (gecelik 110-200 Euro) veya daha ekonomik Palm Beach Hotel (60-100 Euro) bulunmaktadır. Geleneksel yemekler için Petek Restaurant (kişi başı 15-25 Euro) önerilir.',
-        
-        'güzelyurt': 'Güzelyurt (Morphou), KKTC\'nin narenciye bahçeleriyle ünlü batı kıyısındaki şehridir. Bölgedeki Soli antik kenti (giriş 10TL) M.Ö. 6. yüzyıldan kalma mozaikleriyle dikkat çeker. St. Mamas Manastırı ve müzesi (giriş 10TL) 18. yüzyıldan kalma dini eserleri sergiler. Her yıl Haziran ayında düzenlenen Portakal Festivali şehrin en önemli etkinliğidir. Bölgenin meşhur ürünleri portakal, limon ve zeytinyağıdır, yerel pazardan satın alınabilir. Konaklama imkanları sınırlıdır, genellikle küçük pansiyon tipi işletmeler (gecelik 30-60 Euro) bulunur. Doğa yürüyüşleri için çevredeki Trodos Dağları idealdir.'
+        'otel': 'KKTC\'de farklı bütçelere uygun konaklama seçenekleri mevcuttur. Girne\'de 5 yıldızlı Merit Crystal Cove (gecelik 150-250 Euro, +90 392 650 02 00), Acapulco Resort (120-220 Euro, +90 392 650 28 00), Colony Hotel (100-180 Euro, +90 392 815 24 50); Gazimağusa\'da Salamis Bay Conti (110-200 Euro, +90 392 378 82 00); butik otel olarak Girne\'de The Arkin Colony (90-160 Euro, +90 392 815 15 00) önerilir. Daha ekonomik seçenekler için Lefkoşa\'da pansiyonlar (30-60 Euro) tercih edilebilir. Yüksek sezonda (Haziran-Ağustos) fiyatlar %30-50 oranında artabilir. Odaların çoğunda klima, wifi ve özel banyo bulunur. Rezervasyon için en az 1-2 ay önceden iletişime geçilmesi, otelin web sitesi veya online platformların kullanılması önerilir. Ziyaretçiler özellikle deniz manzaralı odaları tercih etmektedir.'
       };
       
       // Improved keyword matching for more natural responses
@@ -178,7 +192,7 @@ serve(async (req) => {
       
       // More helpful default response
       if (!matched) {
-        generatedText = "KKTC (Kuzey Kıbrıs Türk Cumhuriyeti), Akdeniz'in kuzeydoğusunda yer alan güzel bir ada ülkesidir. Lefkoşa (başkent), Girne, Gazimağusa ve Güzelyurt en önemli şehirleridir. Ada, yaz aylarında 30-35°C sıcaklıkta, kışları ise 10-15°C civarında seyreden Akdeniz iklimine sahiptir. Para birimi Türk Lirası olmakla birlikte turistik bölgelerde Euro da geçerlidir. Ada'ya ulaşım genellikle Türkiye üzerinden Ercan Havalimanı'na yapılır. Kıbrıs mutfağının öne çıkan lezzetleri hellim peyniri ve şeftali kebabıdır. Hangi konuda daha detaylı bilgi almak istersiniz? Plajlar, tarihi yerler, konaklama seçenekleri veya restoran önerileri hakkında size yardımcı olabilirim.";
+        generatedText = "KKTC (Kuzey Kıbrıs Türk Cumhuriyeti), Akdeniz'in kuzeydoğusunda yer alan güzel bir ada ülkesidir. Lefkoşa (başkent), Girne, Gazimağusa ve Güzelyurt en önemli şehirleridir. Ada, yaz aylarında 30-35°C sıcaklıkta, kışları ise 10-15°C civarında seyreden Akdeniz iklimine sahiptir. Para birimi Türk Lirası olmakla birlikte turistik bölgelerde Euro da geçerlidir. Ada'ya ulaşım genellikle Türkiye üzerinden Ercan Havalimanı'na yapılır, bilet fiyatları 800-2000TL arasında değişir. Otobüs terminalleri Lefkoşa, Girne ve Gazimağusa'da bulunur, şehirlerarası ulaşım 5-10 Euro'dur. Konaklama için Girne'de 5 yıldızlı Merit Crystal Cove (150-250 Euro/gece) veya daha ekonomik Colony Hotel (100-180 Euro/gece) tercih edilebilir. Kıbrıs mutfağının öne çıkan lezzetleri hellim peyniri (5-15 Euro) ve şeftali kebabıdır (8-12 Euro/porsiyon). Tur, otel ve restoran rezervasyonlarını önceden yapmanız tavsiye edilir. Hangi konuda daha detaylı bilgi almak istersiniz? Plajlar, tarihi yerler, konaklama seçenekleri veya restoran önerileri hakkında size yardımcı olabilirim.";
       }
     }
 
