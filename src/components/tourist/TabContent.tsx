@@ -5,11 +5,11 @@ import TravelPlanner from "./TravelPlanner";
 import HotelReservation from "./HotelReservation";
 import RestaurantReservation from "./RestaurantReservation";
 import PublicBuildingsMap from "./PublicBuildingsMap";
-import BusinessDemoPanel from "./BusinessDemoPanel";
 import TravelAssistant from "./TravelAssistant";
 import FeedbackAssistant from "./FeedbackAssistant";
 import ReportAssistant from "./ReportAssistant";
 import FlightInfo from "./FlightInfo";
+import TravelChat from "./TravelChat";
 
 interface TabContentProps {
   activeTab: string;
@@ -30,10 +30,8 @@ const TabContent = ({ activeTab }: TabContentProps) => {
         return <FlightInfo />;
       case "publicBuildings":
         return <PublicBuildingsMap />;
-      case "businessDemo":
-        return <BusinessDemoPanel />;
       case "assistant":
-        return <TravelAssistant />;
+        return <TravelChat />;
       case "feedback":
         return <FeedbackAssistant />;
       case "report":
