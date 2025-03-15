@@ -42,7 +42,7 @@ const TabContent = ({ activeTab }: TabContentProps) => {
   };
 
   return (
-    <div className="border rounded-lg p-6 bg-white shadow-sm">
+    <div className="border rounded-lg p-6 bg-white shadow-lg backdrop-blur-sm bg-white/95">
       {renderContent()}
     </div>
   );

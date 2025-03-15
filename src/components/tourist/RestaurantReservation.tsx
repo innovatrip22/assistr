@@ -22,7 +22,7 @@ import {
   SelectValue, 
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Utensils, Star, Users, Clock, Calendar as CalendarIcon, CheckCircle } from "lucide-react";
+import { Utensils, Star, Users, Clock, Calendar as CalendarIcon, CheckCircle, MapPin } from "lucide-react";
 import { toast } from "sonner";
 
 const RestaurantReservation = () => {
@@ -149,8 +149,12 @@ const RestaurantReservation = () => {
               <Badge variant="outline" className="ml-2">{restaurant.priceRange}</Badge>
             </div>
             <p className="text-sm text-muted-foreground flex items-center gap-1">
+              <MapPin className="h-3 w-3" />
+              <span>{restaurant.location}</span>
+            </p>
+            <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
               <Clock className="h-3 w-3" />
-              {restaurant.openingHours}
+              <span>{restaurant.openingHours}</span>
             </p>
           </div>
           
@@ -162,7 +166,7 @@ const RestaurantReservation = () => {
                 mode="single"
                 selected={selectedDate}
                 onSelect={setSelectedDate}
-                className="border rounded-md"
+                className="border rounded-md p-3 bg-white shadow-sm"
               />
             </div>
             
@@ -243,7 +247,7 @@ const RestaurantReservation = () => {
           {restaurant.name} restoranında {selectedDate?.toLocaleDateString('tr-TR')} tarihinde saat {reservationDetails.time}'da {reservationDetails.people} kişilik rezervasyonunuz oluşturuldu.
         </p>
         
-        <div className="bg-muted p-4 rounded-lg w-full mb-6">
+        <div className="bg-muted p-4 rounded-lg w-full mb-6 shadow-inner">
           <div className="text-sm text-muted-foreground mb-2">Rezervasyon Kodu</div>
           <div className="text-xl font-mono font-bold">{reservationCode}</div>
         </div>
@@ -252,7 +256,7 @@ const RestaurantReservation = () => {
           Bu kodu kaybetmeyin! Rezervasyonunuzu görüntülemek veya iptal etmek için bu kodu kullanacaksınız.
         </p>
         
-        <Button onClick={resetReservation}>
+        <Button onClick={resetReservation} className="bg-gradient-to-r from-blue-600 to-purple-600 transition-all hover:from-blue-700 hover:to-purple-700">
           Yeni Rezervasyon
         </Button>
       </div>
@@ -262,123 +266,137 @@ const RestaurantReservation = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Restoran Rezervasyonu</h2>
-        <div>
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList>
-              <TabsTrigger value="restaurants">Restoranlar</TabsTrigger>
-              <TabsTrigger value="reservations">Rezervasyonlarım</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Restoran Rezervasyonu</h2>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-auto">
+          <TabsList className="bg-gradient-to-r from-blue-50 to-purple-50">
+            <TabsTrigger value="restaurants" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white">Restoranlar</TabsTrigger>
+            <TabsTrigger value="reservations" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white">Rezervasyonlarım</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
       <div>
-        <TabsContent value="restaurants" className="mt-0">
-          {bookingStep === 1 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {restaurants.map((restaurant) => (
-                <Card key={restaurant.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="relative h-48">
-                    <img 
-                      src={restaurant.image} 
-                      alt={restaurant.name} 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <CardContent className="pt-6">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="text-lg font-semibold">{restaurant.name}</h3>
-                        <p className="text-sm text-muted-foreground">{restaurant.cuisine}</p>
-                      </div>
-                      <div className="flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-md">
-                        <Star className="h-4 w-4 fill-primary text-primary" />
-                        <span className="text-sm font-medium text-primary">{restaurant.rating}</span>
+        {activeTab === "restaurants" && (
+          <div className="mt-0">
+            {bookingStep === 1 && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {restaurants.map((restaurant) => (
+                  <Card key={restaurant.id} className="overflow-hidden hover:shadow-md transition-shadow border-none shadow-lg">
+                    <div className="relative h-48">
+                      <img 
+                        src={restaurant.image} 
+                        alt={restaurant.name} 
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                      <div className="absolute bottom-3 left-3 right-3">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="text-lg font-semibold text-white">{restaurant.name}</h3>
+                            <p className="text-sm text-white/80">{restaurant.cuisine}</p>
+                          </div>
+                          <div className="flex items-center gap-1 bg-white/90 px-2 py-1 rounded-md">
+                            <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                            <span className="text-sm font-medium">{restaurant.rating}</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    
-                    <div className="flex items-center mt-4 text-sm text-muted-foreground">
-                      <Users className="h-4 w-4 mr-1" />
-                      <span>{restaurant.priceRange}</span>
-                      <Separator orientation="vertical" className="mx-2 h-4" />
-                      <Clock className="h-4 w-4 mr-1" />
-                      <span>{restaurant.openingHours}</span>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="pt-0">
-                    <Button variant="outline" className="w-full" onClick={() => startReservation(restaurant.id)}>
-                      <Utensils className="mr-2 h-4 w-4" />
-                      Rezervasyon Yap
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-          )}
-          
-          {bookingStep === 2 && renderReservationForm()}
-          {bookingStep === 3 && renderConfirmation()}
-        </TabsContent>
+                    <CardContent className="pt-4">
+                      <div className="flex items-center mt-1 text-sm text-muted-foreground">
+                        <MapPin className="h-4 w-4 mr-1" />
+                        <span>{restaurant.location}</span>
+                      </div>
+                      <div className="flex items-center mt-2 text-sm text-muted-foreground">
+                        <Users className="h-4 w-4 mr-1" />
+                        <span>{restaurant.priceRange}</span>
+                        <Separator orientation="vertical" className="mx-2 h-4" />
+                        <Clock className="h-4 w-4 mr-1" />
+                        <span>{restaurant.openingHours}</span>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="pt-0">
+                      <Button 
+                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 transition-all hover:from-blue-700 hover:to-purple-700" 
+                        onClick={() => startReservation(restaurant.id)}
+                      >
+                        <Utensils className="mr-2 h-4 w-4" />
+                        Rezervasyon Yap
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+            )}
+            
+            {bookingStep === 2 && renderReservationForm()}
+            {bookingStep === 3 && renderConfirmation()}
+          </div>
+        )}
         
-        <TabsContent value="reservations" className="mt-0">
-          {bookedReservations.length > 0 ? (
-            <div className="space-y-4">
-              {bookedReservations.map((reservation) => (
-                <Card key={reservation.id}>
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle>{reservation.restaurant}</CardTitle>
-                        <CardDescription>
-                          Rezervasyon Kodu: {reservation.id}
-                        </CardDescription>
+        {activeTab === "reservations" && (
+          <div className="mt-0">
+            {bookedReservations.length > 0 ? (
+              <div className="space-y-4">
+                {bookedReservations.map((reservation) => (
+                  <Card key={reservation.id} className="border-none shadow-lg overflow-hidden">
+                    <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 pb-4">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle className="text-xl">{reservation.restaurant}</CardTitle>
+                          <CardDescription>
+                            Rezervasyon Kodu: {reservation.id}
+                          </CardDescription>
+                        </div>
+                        <Badge className={reservation.status === "confirmed" ? "bg-gradient-to-r from-green-500 to-emerald-500" : "bg-amber-500"}>
+                          {reservation.status === "confirmed" ? "Onaylandı" : "Beklemede"}
+                        </Badge>
                       </div>
-                      <Badge className={reservation.status === "confirmed" ? "bg-green-500" : "bg-amber-500"}>
-                        {reservation.status === "confirmed" ? "Onaylandı" : "Beklemede"}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-4 text-sm">
-                      <div className="flex items-center">
-                        <CalendarIcon className="h-4 w-4 mr-1 text-muted-foreground" />
-                        <span>{new Date(reservation.date).toLocaleDateString('tr-TR')}</span>
+                    </CardHeader>
+                    <CardContent className="pt-4">
+                      <div className="flex flex-wrap items-center gap-4 text-sm">
+                        <div className="flex items-center">
+                          <CalendarIcon className="h-4 w-4 mr-1 text-muted-foreground" />
+                          <span>{new Date(reservation.date).toLocaleDateString('tr-TR')}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Clock className="h-4 w-4 mr-1 text-muted-foreground" />
+                          <span>{reservation.time}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <Users className="h-4 w-4 mr-1 text-muted-foreground" />
+                          <span>{reservation.people} Kişi</span>
+                        </div>
                       </div>
-                      <div className="flex items-center">
-                        <Clock className="h-4 w-4 mr-1 text-muted-foreground" />
-                        <span>{reservation.time}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Users className="h-4 w-4 mr-1 text-muted-foreground" />
-                        <span>{reservation.people} Kişi</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex justify-end gap-2">
-                    <Button variant="outline" size="sm">
-                      Değiştir
-                    </Button>
-                    <Button variant="destructive" size="sm">
-                      İptal Et
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <Utensils className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-medium">Henüz rezervasyonunuz yok</h3>
-              <p className="text-muted-foreground mt-1 mb-4">
-                Hemen bir restoran seçerek rezervasyon yapabilirsiniz.
-              </p>
-              <Button onClick={() => setActiveTab("restaurants")}>
-                Restoranlara Göz At
-              </Button>
-            </div>
-          )}
-        </TabsContent>
+                    </CardContent>
+                    <CardFooter className="flex justify-end gap-2 pt-2 pb-4">
+                      <Button variant="outline" size="sm">
+                        Değiştir
+                      </Button>
+                      <Button variant="destructive" size="sm">
+                        İptal Et
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg shadow-inner">
+                <Utensils className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium">Henüz rezervasyonunuz yok</h3>
+                <p className="text-muted-foreground mt-1 mb-4">
+                  Hemen bir restoran seçerek rezervasyon yapabilirsiniz.
+                </p>
+                <Button 
+                  onClick={() => setActiveTab("restaurants")}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 transition-all hover:from-blue-700 hover:to-purple-700"
+                >
+                  Restoranlara Göz At
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
