@@ -31,7 +31,7 @@ const TabContent = ({ activeTab }: TabContentProps) => {
       case "publicBuildings":
         return <PublicBuildingsMap />;
       case "assistant":
-        return <TravelChat />;
+        return <TravelAssistant />;
       case "feedback":
         return <FeedbackAssistant />;
       case "report":
