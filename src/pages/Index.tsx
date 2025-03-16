@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import AuthDialog from "@/components/auth/AuthDialog";
 import { Button } from "@/components/ui/button";
-import { Building, User, Briefcase, Info } from "lucide-react";
+import { Building, User, Briefcase, Info, FileText } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const Index = () => {
@@ -51,10 +51,16 @@ const Index = () => {
         <p className="text-gray-600 max-w-md mx-auto">
           KKTC'yi ziyaret eden turistler, işletmeler ve kurumlar için tek durak hizmet noktası
         </p>
-        <Button variant="outline" size="sm" className="mt-4" onClick={() => setShowDemoInfo(!showDemoInfo)}>
-          <Info className="w-4 h-4 mr-2" />
-          Demo Bilgileri
-        </Button>
+        <div className="flex flex-wrap justify-center gap-2 mt-4">
+          <Button variant="outline" size="sm" onClick={() => setShowDemoInfo(!showDemoInfo)}>
+            <Info className="w-4 h-4 mr-2" />
+            Demo Bilgileri
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => navigate('/project-summary')}>
+            <FileText className="w-4 h-4 mr-2" />
+            Proje Özeti
+          </Button>
+        </div>
       </motion.div>
 
       {showDemoInfo && <motion.div initial={{
