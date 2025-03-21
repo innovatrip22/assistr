@@ -6,6 +6,7 @@ import Business from "./pages/Business";
 import Institution from "./pages/Institution";
 import NotFound from "./pages/NotFound";
 import ProjectSummary from "./pages/ProjectSummary";
+import ProjectMethodology from "./pages/ProjectMethodology";
 import AuthRequired from "./components/AuthRequired";
 import { Toaster } from "./components/ui/sonner";
 import "./App.css";
@@ -16,10 +17,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/project-summary" element={<ProjectSummary />} />
+        <Route path="/project-methodology" element={<ProjectMethodology />} />
         <Route 
           path="/tourist" 
           element={
-            <AuthRequired>
+            <AuthRequired userType="tourist">
               <Tourist />
             </AuthRequired>
           } 
@@ -27,7 +29,7 @@ function App() {
         <Route 
           path="/business" 
           element={
-            <AuthRequired>
+            <AuthRequired userType="business">
               <Business />
             </AuthRequired>
           } 
@@ -35,7 +37,7 @@ function App() {
         <Route 
           path="/institution" 
           element={
-            <AuthRequired>
+            <AuthRequired userType="institution">
               <Institution />
             </AuthRequired>
           } 

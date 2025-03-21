@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +26,15 @@ const ProjectSummary = () => {
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Ana Sayfaya Dön
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => navigate('/project-methodology')}
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            Teknik Yöntem
           </Button>
         </div>
 
@@ -110,6 +119,13 @@ const ProjectSummary = () => {
             </div>
           </CardContent>
         </Card>
+        
+        <div className="text-center mt-6">
+          <Button onClick={() => navigate('/project-methodology')} variant="default">
+            <FileText className="h-4 w-4 mr-2" />
+            Teknik Yöntem Sayfasına Git
+          </Button>
+        </div>
       </motion.div>
     </div>
   );
