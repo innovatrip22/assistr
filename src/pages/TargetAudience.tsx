@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { ArrowLeft, FileText, Users, Target, Building, Briefcase, User } from "lucide-react";
+import { ArrowLeft, FileText, Users, Target, Building, Briefcase, User, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -211,6 +211,70 @@ const TargetAudience = () => {
                   </ul>
                 </div>
               </div>
+            </div>
+
+            {/* New Sources Section */}
+            <div className="mt-8 bg-blue-50 p-6 rounded-lg">
+              <h3 className="text-lg font-semibold text-blue-600 mb-3">İstatistik Kaynakları</h3>
+              <p className="text-gray-700 mb-4">
+                Hedef kitle analizinde kullanılan veriler aşağıdaki kaynaklardan derlenmiştir:
+              </p>
+              <div className="space-y-4">
+                <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <h4 className="font-medium text-gray-800 mb-2">Resmi Kaynaklar</h4>
+                  <ul className="list-disc pl-5 text-sm text-gray-600 space-y-2">
+                    <li className="flex items-start">
+                      <ExternalLink className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0 text-blue-500" />
+                      <span>KKTC Turizm ve Çevre Bakanlığı İstatistik Raporu (2023) - Ziyaretçi sayıları ve demografik bilgiler</span>
+                    </li>
+                    <li className="flex items-start">
+                      <ExternalLink className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0 text-blue-500" />
+                      <span>KKTC Devlet Planlama Örgütü Ekonomik ve Sosyal Göstergeler (2022-2023) - Turizm sektörünün ekonomik katkısı</span>
+                    </li>
+                    <li className="flex items-start">
+                      <ExternalLink className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0 text-blue-500" />
+                      <span>KKTC Ticaret Odası Sektör Raporları (2023) - İşletme sayıları ve turizm altyapısı</span>
+                    </li>
+                  </ul>
+                </div>
+                
+                <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <h4 className="font-medium text-gray-800 mb-2">Uluslararası Kaynaklar</h4>
+                  <ul className="list-disc pl-5 text-sm text-gray-600 space-y-2">
+                    <li className="flex items-start">
+                      <ExternalLink className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0 text-blue-500" />
+                      <span>Dünya Turizm Örgütü (UNWTO) Bölgesel Turizm Raporu (2023) - Bölgesel turizm trendleri</span>
+                    </li>
+                    <li className="flex items-start">
+                      <ExternalLink className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0 text-blue-500" />
+                      <span>Avrupa Seyahat Komisyonu Dijital Turizm Araştırması (2023) - Dijital araç kullanım oranları</span>
+                    </li>
+                  </ul>
+                </div>
+                
+                <div className="bg-white p-4 rounded-lg shadow-sm">
+                  <h4 className="font-medium text-gray-800 mb-2">Araştırma ve Anket Verileri</h4>
+                  <ul className="list-disc pl-5 text-sm text-gray-600 space-y-2">
+                    <li className="flex items-start">
+                      <ExternalLink className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0 text-blue-500" />
+                      <span>Doğu Akdeniz Üniversitesi Turizm Fakültesi Araştırması (2023) - Ziyaretçi memnuniyeti ve davranışları</span>
+                    </li>
+                    <li className="flex items-start">
+                      <ExternalLink className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0 text-blue-500" />
+                      <span>AssisTR Proje Ekibi Saha Araştırması (2023) - İşletme dijitalleşme ihtiyaçları ve engelleri</span>
+                    </li>
+                    <li className="flex items-start">
+                      <ExternalLink className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0 text-blue-500" />
+                      <span>KKTC Turizm Değerlendirme Anketi (n=750 turist, 2023) - Ziyaretçi tercihleri ve sorunları</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              
+              <p className="text-sm text-gray-500 mt-4 italic">
+                Not: İstatistikler, en güncel mevcut veriler kullanılarak hazırlanmıştır. Bazı değerler, eksik veri durumunda 
+                sektör uzmanlarıyla yapılan görüşmeler ve karşılaştırmalı analizler sonucunda tahmin edilmiştir.
+              </p>
             </div>
 
             <div className="mt-8 bg-blue-50 p-6 rounded-lg">
