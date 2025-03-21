@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import AuthDialog from "@/components/auth/AuthDialog";
 import { Button } from "@/components/ui/button";
-import { Building, User, Briefcase, Info, FileText } from "lucide-react";
+import { Building, User, Briefcase, Info, FileText, Target } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const Index = () => {
@@ -59,6 +59,10 @@ const Index = () => {
           <Button variant="outline" size="sm" onClick={() => navigate('/project-summary')}>
             <FileText className="w-4 h-4 mr-2" />
             Proje Özeti
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => navigate('/target-audience')}>
+            <Target className="w-4 h-4 mr-2" />
+            Hedef Kitle
           </Button>
         </div>
       </motion.div>

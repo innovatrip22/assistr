@@ -7,6 +7,7 @@ import Institution from "./pages/Institution";
 import NotFound from "./pages/NotFound";
 import ProjectSummary from "./pages/ProjectSummary";
 import ProjectMethodology from "./pages/ProjectMethodology";
+import TargetAudience from "./pages/TargetAudience";
 import AuthRequired from "./components/AuthRequired";
 import { Toaster } from "./components/ui/sonner";
 import "./App.css";
@@ -18,6 +19,7 @@ function App() {
         <Route path="/" element={<Index />} />
         <Route path="/project-summary" element={<ProjectSummary />} />
         <Route path="/project-methodology" element={<ProjectMethodology />} />
+        <Route path="/target-audience" element={<TargetAudience />} />
         <Route 
           path="/tourist" 
           element={
