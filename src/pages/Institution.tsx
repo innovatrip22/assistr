@@ -48,6 +48,7 @@ import ResponseDialog from "@/components/institution/ResponseDialog";
 import AssignReportDialog from "@/components/institution/AssignReportDialog";
 import { toast } from "sonner";
 import { INSTITUTIONS } from "@/services/feedbackService";
+import { Menu } from "lucide-react";
 
 const Institution = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -664,40 +665,4 @@ const Institution = () => {
                         <h4 className="font-medium">Lefkoşa - Kumsal</h4>
                         <span className="text-red-600 text-sm">Acil</span>
                       </div>
-                      <p className="text-sm text-gray-600 mt-1">Ana boru hattı patlaması, yaklaşık 500 haneyi etkiliyor</p>
-                      <div className="flex justify-between items-center mt-2">
-                        <span className="text-xs text-gray-500">08:45'de bildirildi</span>
-                        <Button size="sm" variant="outline">Detaylar</Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        );
-      }
-
-      return (
-        <div className="space-y-6">
-          <h1 className="text-2xl font-bold">{sectionTitle}</h1>
-          {sectionContent ? (
-            sectionContent
-          ) : (
-            <div className="bg-muted rounded-lg p-8 text-center">
-              <h3 className="text-lg font-medium mb-2">Bu modül henüz tam olarak yapılandırılmamıştır.</h3>
-              <p className="text-gray-600 mb-4">
-                Bu alandaki içerik yakında eklenecektir. Şu anda demo amaçlı görüntülenmektedir.
-              </p>
-              <Button onClick={() => toast.success("Modül yapılandırması başlatıldı")}>
-                Modülü Yapılandır
-              </Button>
-            </div>
-          )}
-        </div>
-      );
-    }
-  };
-
-  return
-
+                      <p className="text-
