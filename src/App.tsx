@@ -11,7 +11,8 @@ import TargetAudience from "./pages/TargetAudience";
 import AuthRequired from "./components/AuthRequired";
 import { Toaster } from "./components/ui/sonner";
 
-// Patch lucide-react to include our custom Tool icon
+// Patch lucide-react to include our custom icons
+// This import needs to be before any component that uses icons
 import "./utils/iconUtils";
 
 import "./App.css";
