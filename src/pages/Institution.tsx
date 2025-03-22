@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -152,13 +151,16 @@ const Institution = () => {
 
   const handleRespond = (response: string) => {
     toast.success("Yanıt gönderildi");
-    handleCloseResponseDialog();
+    setShowResponseDialog(false);
+    setSelectedItemId(null);
+    setSelectedItemType(null);
     loadData();
   };
 
   const handleAssign = (unitId: string) => {
     toast.success(`Rapor ${unitId} birimine atandı`);
-    handleCloseAssignDialog();
+    setShowAssignDialog(false);
+    setSelectedItemId(null);
     loadData();
   };
 
@@ -664,106 +666,4 @@ const Institution = () => {
                     <div className="p-3 bg-red-50 border border-red-200 rounded-md">
                       <div className="flex justify-between">
                         <h4 className="font-medium">Lefkoşa - Kumsal</h4>
-                        <span className="text-red-600 text-sm">Acil</span>
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">Ana boru hattı patlaması, yaklaşık 500 haneyi etkiliyor</p>
-                      <div className="flex justify-between items-center mt-2">
-                        <span className="text-xs text-gray-500">08:45'de bildirildi</span>
-                        <Button size="sm" variant="outline">Detaylar</Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        );
-      }
-
-      return (
-        <div className="space-y-6">
-          <h1 className="text-2xl font-bold">{sectionTitle}</h1>
-          {sectionContent ? (
-            sectionContent
-          ) : (
-            <div className="bg-muted rounded-lg p-8 text-center">
-              <h3 className="text-lg font-medium mb-2">Bu modül henüz tam olarak yapılandırılmamıştır.</h3>
-              <p className="text-gray-600 mb-4">
-                Bu alandaki içerik yakında eklenecektir. Şu anda demo amaçlı görüntülenmektedir.
-              </p>
-              <Button onClick={() => toast.success("Modül yapılandırması başlatıldı")}>
-                Modülü Yapılandır
-              </Button>
-            </div>
-          )}
-        </div>
-      );
-    }
-  };
-
-  return (
-    <div className="flex flex-col min-h-screen">
-      <header className="bg-background border-b">
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Menu className="w-6 h-6 md:hidden" />
-            <h1 className="text-xl font-bold">{institutionName}</h1>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button variant="outline" onClick={handleSignOut}>Çıkış Yap</Button>
-            <Avatar>
-              <AvatarImage src="" />
-              <AvatarFallback>KY</AvatarFallback>
-            </Avatar>
-          </div>
-        </div>
-      </header>
-      
-      <div className="flex flex-1">
-        <aside className="w-64 border-r hidden md:block">
-          <ScrollArea className="h-[calc(100vh-4rem)]">
-            <div className="py-6 px-4">
-              <h2 className="text-lg font-semibold mb-4">Kontrol Paneli</h2>
-              <nav className="space-y-2">
-                {menuItems.map((item) => (
-                  <Button
-                    key={item.id}
-                    variant={activeSection === item.id ? "secondary" : "ghost"}
-                    className={`w-full justify-start ${
-                      activeSection === item.id ? "bg-muted" : ""
-                    }`}
-                    onClick={() => setActiveSection(item.id)}
-                  >
-                    {item.icon}
-                    <span className="ml-2">{item.label}</span>
-                  </Button>
-                ))}
-              </nav>
-            </div>
-          </ScrollArea>
-        </aside>
-        <main className="flex-1 p-6 overflow-auto">
-          {renderActiveSection()}
-        </main>
-      </div>
-      
-      {showResponseDialog && selectedItemId && (
-        <ResponseDialog
-          open={showResponseDialog}
-          onClose={handleCloseResponseDialog}
-          onRespond={handleRespond}
-        />
-      )}
-      
-      {showAssignDialog && selectedItemId && (
-        <AssignReportDialog
-          open={showAssignDialog}
-          onClose={handleCloseAssignDialog}
-          onAssign={handleAssign}
-        />
-      )}
-    </div>
-  );
-};
-
-export default Institution;
+                        <span className="text-red-600 text-sm

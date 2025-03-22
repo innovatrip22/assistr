@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -156,7 +155,7 @@ const Business = () => {
           <main className="flex-1 overflow-auto">
             {/* Mobile tabs - only visible on mobile */}
             <div className="md:hidden px-4 py-3 overflow-x-auto">
-              <ScrollArea className="w-full" orientation="horizontal">
+              <ScrollArea className="w-full">
                 <div className="flex gap-2 min-w-max">
                   {menuItems.map((item) => (
                     <Button
