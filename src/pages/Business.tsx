@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { LogOut, Activity, ShoppingBag, Settings, MessageSquare, BellRing, BarChart3, FileText, Users, MapPin, Calendar, BadgePercent, MessageCircle } from "lucide-react";
+import { LogOut, Activity, ShoppingBag, Settings, MessageSquare, BellRing, BarChart3, FileText, Users, MapPin, Calendar, BadgePercent, MessageCircle, CoffeeIcon, UtensilsIcon, HotelIcon, CameraIcon, ShipIcon, HeartIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -57,13 +57,13 @@ const Business = () => {
   }
 
   const menuItems = [
-    { id: "dashboard", label: "Panel", icon: <Activity className="w-4 h-4" /> },
-    { id: "products", label: "Ürünler", icon: <ShoppingBag className="w-4 h-4" /> },
+    { id: "dashboard", label: "Gösterge Paneli", icon: <Activity className="w-4 h-4" /> },
+    { id: "products", label: "Ürünler ve Hizmetler", icon: <ShoppingBag className="w-4 h-4" /> },
     { id: "reservations", label: "Rezervasyonlar", icon: <Calendar className="w-4 h-4" /> },
-    { id: "events", label: "Etkinlikler", icon: <Calendar className="w-4 h-4" /> },
+    { id: "events", label: "KKTC Etkinlikleri", icon: <CameraIcon className="w-4 h-4" /> },
     { id: "promotions", label: "Promosyonlar", icon: <BadgePercent className="w-4 h-4" /> },
-    { id: "employees", label: "Personel", icon: <Users className="w-4 h-4" /> },
-    { id: "feedback", label: "Geri Bildirimler", icon: <FileText className="w-4 h-4" /> },
+    { id: "employees", label: "Personel Yönetimi", icon: <Users className="w-4 h-4" /> },
+    { id: "feedback", label: "Müşteri Yorumları", icon: <FileText className="w-4 h-4" /> },
     { id: "livechat", label: "Canlı Destek", icon: <MessageCircle className="w-4 h-4" /> },
     { id: "messages", label: "Mesajlar", icon: <MessageSquare className="w-4 h-4" /> },
     { id: "notifications", label: "Bildirimler", icon: <BellRing className="w-4 h-4" /> },
@@ -100,9 +100,19 @@ const Business = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="flex flex-col h-screen">
-        <header className="bg-white border-b shadow-sm">
+    <div className="min-h-screen bg-gray-100 bg-opacity-90 relative">
+      {/* Background image with overlay */}
+      <div className="fixed inset-0 z-0">
+        <img
+          src="https://images.unsplash.com/photo-1589909202802-8f4aadce1849?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2670&q=80"
+          alt="KKTC Manzarası"
+          className="w-full h-full object-cover opacity-15"
+        />
+        <div className="absolute inset-0 bg-white bg-opacity-85"></div>
+      </div>
+
+      <div className="relative z-10 flex flex-col h-screen">
+        <header className="bg-white bg-opacity-90 border-b shadow-sm">
           <div className="container mx-auto px-4 py-3 flex justify-between items-center">
             <motion.h1
               initial={{ opacity: 0, y: -20 }}
@@ -120,7 +130,7 @@ const Business = () => {
 
         <div className="flex flex-1 overflow-hidden">
           {/* Sidebar - visible on desktop */}
-          <aside className="hidden md:block w-64 bg-white border-r">
+          <aside className="hidden md:block w-64 bg-white bg-opacity-90 border-r shadow-sm">
             <ScrollArea className="h-[calc(100vh-4rem)]">
               <div className="p-4">
                 <nav className="space-y-1">
@@ -146,7 +156,7 @@ const Business = () => {
           <main className="flex-1 overflow-auto">
             {/* Mobile tabs - only visible on mobile */}
             <div className="md:hidden px-4 py-3 overflow-x-auto">
-              <ScrollArea orientation="horizontal" className="w-full">
+              <ScrollArea className="w-full" orientation="horizontal">
                 <div className="flex gap-2 min-w-max">
                   {menuItems.map((item) => (
                     <Button

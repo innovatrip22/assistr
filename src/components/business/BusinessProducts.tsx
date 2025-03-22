@@ -6,17 +6,20 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2, Plus, Tag } from "lucide-react";
 
-const dummyProducts = [
-  { id: 1, name: "Akdeniz Salatası", price: 75, category: "Yemek", stock: 999, image: "https://picsum.photos/id/20/200/200" },
-  { id: 2, name: "Türk Kahvesi", price: 40, category: "İçecek", stock: 999, image: "https://picsum.photos/id/30/200/200" },
-  { id: 3, name: "Baklava (Porsiyon)", price: 120, category: "Tatlı", stock: 50, image: "https://picsum.photos/id/40/200/200" },
-  { id: 4, name: "Antalya Turu", price: 500, category: "Tur", stock: 15, image: "https://picsum.photos/id/50/200/200" },
-  { id: 5, name: "Plaj Havlusu", price: 150, category: "Eşya", stock: 200, image: "https://picsum.photos/id/60/200/200" },
-  { id: 6, name: "Antalya Hatırası", price: 85, category: "Hediyelik", stock: 75, image: "https://picsum.photos/id/70/200/200" },
+const kktcProducts = [
+  { id: 1, name: "Hellim Peyniri", price: 120, category: "Yiyecek", stock: 85, image: "https://images.unsplash.com/photo-1624806992066-5ffecaf220db?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1760&q=80" },
+  { id: 2, name: "Kıbrıs Kahvesi", price: 40, category: "İçecek", stock: 150, image: "https://images.unsplash.com/photo-1635443544894-e2c7bb0053e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1640&q=80" },
+  { id: 3, name: "Macun Tatlısı", price: 90, category: "Tatlı", stock: 45, image: "https://images.unsplash.com/photo-1587248720327-8eb72564be1e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1674&q=80" },
+  { id: 4, name: "Girne Kalesi Turu", price: 250, category: "Tur", stock: 20, image: "https://images.unsplash.com/photo-1585938389612-a552a28d6914?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1760&q=80" },
+  { id: 5, name: "Karpaz Plaj Şemsiyesi", price: 180, category: "Eşya", stock: 35, image: "https://images.unsplash.com/photo-1533614767844-1b444a492db0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1760&q=80" },
+  { id: 6, name: "St. Hilarion Kalesi Hatırası", price: 75, category: "Hediyelik", stock: 60, image: "https://images.unsplash.com/photo-1583144568008-76903e8e1107?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1674&q=80" },
+  { id: 7, name: "Kıbrıs Zeytinyağı", price: 150, category: "Yiyecek", stock: 70, image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1760&q=80" },
+  { id: 8, name: "Salamis Harabeleri Gezisi", price: 300, category: "Tur", stock: 15, image: "https://images.unsplash.com/photo-1532939454649-30d618a20e63?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1674&q=80" },
+  { id: 9, name: "Kıbrıs El Dokuması", price: 220, category: "Hediyelik", stock: 25, image: "https://images.unsplash.com/photo-1459186667841-31a2cda574da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1674&q=80" },
 ];
 
 const BusinessProducts = () => {
-  const [products, setProducts] = useState(dummyProducts);
+  const [products, setProducts] = useState(kktcProducts);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -29,13 +32,13 @@ const BusinessProducts = () => {
   });
 
   return (
-    <div className="space-y-6">
-      <Card>
+    <div className="space-y-6 relative z-10">
+      <Card className="bg-white bg-opacity-95">
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle>Ürün ve Hizmetler</CardTitle>
-              <CardDescription>İşletmenizin sunduğu ürün ve hizmetleri yönetin</CardDescription>
+              <CardTitle>KKTC Ürün ve Hizmetleri</CardTitle>
+              <CardDescription>İşletmenizin sunduğu yerel ürün ve hizmetleri yönetin</CardDescription>
             </div>
             <Button className="flex items-center gap-1">
               <Plus className="h-4 w-4" />
@@ -75,12 +78,14 @@ const BusinessProducts = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredProducts.map(product => (
-              <Card key={product.id} className="overflow-hidden">
-                <img 
-                  src={product.image} 
-                  alt={product.name} 
-                  className="w-full h-40 object-cover"
-                />
+              <Card key={product.id} className="overflow-hidden bg-white">
+                <div className="h-40 overflow-hidden">
+                  <img 
+                    src={product.image} 
+                    alt={product.name} 
+                    className="w-full h-full object-cover transition-transform hover:scale-105"
+                  />
+                </div>
                 <CardContent className="p-4">
                   <div className="flex justify-between items-start">
                     <div>
