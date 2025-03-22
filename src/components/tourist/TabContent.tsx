@@ -12,6 +12,39 @@ import RestaurantBusinessDemo from "./RestaurantBusinessDemo";
 import HotelBusinessDemo from "./HotelBusinessDemo";
 import InstitutionDemoPanel from "./InstitutionDemoPanel";
 
+// Define props interfaces for components that need userData
+interface TravelPlannerProps {
+  userData: any;
+}
+
+interface HotelReservationProps {
+  userData: any;
+}
+
+interface RestaurantReservationProps {
+  userData: any;
+}
+
+interface FlightInfoProps {
+  userData: any;
+}
+
+interface BusinessDemoProps {
+  userData: any;
+}
+
+interface TravelAssistantProps {
+  userData: any;
+}
+
+interface FeedbackAssistantProps {
+  userData: any;
+}
+
+interface ReportAssistantProps {
+  userData: any;
+}
+
 interface TabContentProps {
   activeTab: string;
   userData?: any;
