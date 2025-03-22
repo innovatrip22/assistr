@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { 
   Map, MessageSquare, Calendar, Navigation, 
   FileText, Hotel, Plane, Utensils, 
-  Building, Store, MapPin
+  Building, MapPin
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { getFeedbacks, getReports } from "@/services";
@@ -80,14 +80,19 @@ const Tourist = () => {
     }
   };
 
+  // Reorganized menu items with better grouping
   const menuItems = [
+    // Main Services Group
     { value: "nearby", label: "Yakındakiler", icon: <Navigation className="w-4 h-4" /> },
     { value: "plan", label: "Gezi Planla", icon: <Calendar className="w-4 h-4" /> },
-    { value: "hotel", label: "Otel Rezervasyonu", icon: <Hotel className="w-4 h-4" /> },
-    { value: "restaurant", label: "Restoran Rezervasyonu", icon: <Utensils className="w-4 h-4" /> },
-    { value: "flights", label: "Uçuş Bilgileri", icon: <Plane className="w-4 h-4" /> },
-    { value: "publicBuildings", label: "Yakın Kamu Binaları", icon: <Building className="w-4 h-4" /> },
-    { value: "businessDemo", label: "İşletme Paneli (Demo)", icon: <Store className="w-4 h-4" /> },
+    { value: "publicBuildings", label: "Kamu Binaları", icon: <Building className="w-4 h-4" /> },
+    
+    // Reservations Group
+    { value: "hotel", label: "Otel", icon: <Hotel className="w-4 h-4" /> },
+    { value: "restaurant", label: "Restoran", icon: <Utensils className="w-4 h-4" /> },
+    { value: "flights", label: "Uçuşlar", icon: <Plane className="w-4 h-4" /> },
+    
+    // Support & Feedback Group
     { value: "assistant", label: "Asistan", icon: <Map className="w-4 h-4" /> },
     { value: "feedback", label: "Geri Bildirim", icon: <MessageSquare className="w-4 h-4" /> },
     { value: "report", label: "Raporlar", icon: <FileText className="w-4 h-4" /> },
