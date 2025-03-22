@@ -22,7 +22,7 @@ const cypriotProducts = [
     price: 65, 
     category: "Meze", 
     stock: 999, 
-    image: "https://images.unsplash.com/photo-1609501676725-7186f017d49a?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGhhbG91bWl8ZW58MHx8MHx8fDA%3D"
+    image: "public/lovable-uploads/07280e24-6ad1-441d-bc04-94c444ce86dc.png"
   },
   { 
     id: 3, 
