@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Navigation, Calendar, Hotel, Utensils, MessageSquare } from "lucide-react";
+import { Navigation, Calendar, Hotel, Utensils, Plane } from "lucide-react";
 
 interface TouristMobileNavProps {
   activeTab: string;
@@ -27,7 +27,7 @@ const TouristMobileNav = ({ activeTab, handleTabChange }: TouristMobileNavProps)
           onClick={() => handleTabChange("plan")}
         >
           <Calendar className="h-5 w-5 mb-1" />
-          Planla
+          Gezi Planla
         </Button>
         <Button 
           variant={activeTab === "hotel" ? "default" : "ghost"} 
@@ -36,7 +36,7 @@ const TouristMobileNav = ({ activeTab, handleTabChange }: TouristMobileNavProps)
           onClick={() => handleTabChange("hotel")}
         >
           <Hotel className="h-5 w-5 mb-1" />
-          Otel
+          Konaklama
         </Button>
         <Button 
           variant={activeTab === "restaurant" ? "default" : "ghost"} 
@@ -48,13 +48,13 @@ const TouristMobileNav = ({ activeTab, handleTabChange }: TouristMobileNavProps)
           Restoran
         </Button>
         <Button 
-          variant={activeTab === "feedback" ? "default" : "ghost"} 
+          variant={activeTab === "flights" ? "default" : "ghost"} 
           size="sm"
           className="flex flex-col items-center h-16 text-xs p-1"
-          onClick={() => handleTabChange("feedback")}
+          onClick={() => handleTabChange("flights")}
         >
-          <MessageSquare className="h-5 w-5 mb-1" />
-          Bildirim
+          <Plane className="h-5 w-5 mb-1" />
+          Uçuşlar
         </Button>
       </div>
     </div>

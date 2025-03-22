@@ -1,10 +1,13 @@
 
-// Re-export services for easier imports
-export * from './touristDataService';
-export * from './chatService';
-export * from './businessService';
-export * from './institutionService';
-export * from './notificationService';
+
+// Re-export all services for easier imports
 export * from './feedbackService';
 export * from './reportService';
-export * from './reportSubmitService';
+export * from './notificationService';
+export * from './businessService';
+export * from './chatService';
+export * from './touristDataService';
+
+// Export the type
+export type { Business } from './businessService';
+

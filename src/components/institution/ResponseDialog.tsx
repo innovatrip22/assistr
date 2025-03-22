@@ -1,46 +1,72 @@
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { addFeedbackResponse, addReportResponse } from "@/services";
+import { toast } from "sonner";
 
-export interface ResponseDialogProps {
+interface ResponseDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onRespond: (response: string) => void;
+  selectedId: string | null;
+  selectedType: 'feedback' | 'report' | null;
+  onSubmitSuccess: () => void;
 }
 
-const ResponseDialog = ({ open, onOpenChange, onRespond }: ResponseDialogProps) => {
-  const [response, setResponse] = useState("");
+const ResponseDialog = ({ open, onOpenChange, selectedId, selectedType, onSubmitSuccess }: ResponseDialogProps) => {
+  const [responseText, setResponseText] = useState("");
 
-  const handleSubmit = () => {
-    if (response.trim()) {
-      onRespond(response);
-      setResponse("");
-      onOpenChange(false);
+  const handleSubmitResponse = () => {
+    if (!responseText.trim()) {
+      toast.error("Lütfen bir yanıt girin");
+      return;
     }
+
+    if (selectedType === 'feedback' && selectedId) {
+      addFeedbackResponse(selectedId, responseText);
+      toast.success("Yanıtınız başarıyla gönderildi");
+    } else if (selectedType === 'report' && selectedId) {
+      addReportResponse(selectedId, responseText);
+      toast.success("Yanıtınız başarıyla gönderildi");
+    }
+
+    onOpenChange(false);
+    setResponseText("");
+    onSubmitSuccess();
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Yanıt Gönder</DialogTitle>
           <DialogDescription>
-            Geri bildirime verdiğiniz yanıt kullanıcıya doğrudan iletilecektir.
+            Kullanıcıya gönderilecek yanıtı yazın. Bu yanıt kullanıcının turist panelinde görüntülenecektir.
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4">
-          <Textarea
-            placeholder="Yanıtınızı buraya yazın..."
-            value={response}
-            onChange={(e) => setResponse(e.target.value)}
-            className="min-h-[120px]"
-          />
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>İptal</Button>
-          <Button onClick={handleSubmit}>Yanıt Gönder</Button>
+        
+        <Textarea
+          value={responseText}
+          onChange={(e) => setResponseText(e.target.value)}
+          placeholder="Yanıtınızı buraya yazın..."
+          className="min-h-[120px]"
+        />
+        
+        <DialogFooter className="flex justify-end gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            İptal
+          </Button>
+          <Button onClick={handleSubmitResponse}>
+            Yanıt Gönder
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
