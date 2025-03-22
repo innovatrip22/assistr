@@ -76,7 +76,7 @@ const Institution = () => {
     { id: 3, title: "Yazılım güncellemesi", date: "12 Mayıs 2023", status: "completed" },
   ]);
   
-  const [demoNotices, setDemoNotices] = useState([
+  const [demoNotices, setDemoNotices = useState([
     { id: 1, title: "Acil durum tatbikatı", date: "14 Mayıs 2023", important: true },
     { id: 2, title: "Yeni yönetmelik duyurusu", date: "10 Mayıs 2023", important: false },
   ]);
@@ -489,7 +489,7 @@ const Institution = () => {
     }
   };
 
-  // Kuruma özgü içerik oluştur
+  // Fixing the section with the unclosed tags around line 652-668
   const renderActiveSection = () => {
     if (activeSection === "dashboard") {
       return (
@@ -664,4 +664,4 @@ const Institution = () => {
                         <h4 className="font-medium">Lefkoşa - Kumsal</h4>
                         <span className="text-red-600 text-sm">Acil</span>
                       </div>
-                      <p className="text-sm text-gray-600 mt-1">Ana boru hattı patlaması,
+                      <p className="text-sm text-gray-600 mt-1
