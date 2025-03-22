@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Institution } from "@/services";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -13,7 +12,21 @@ interface DepartmentContentProps {
 }
 
 const DepartmentContent = ({ activeTab, institution }: DepartmentContentProps) => {
-  // Get title and icon based on the active tab
+  const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
+  
+  const handleOpenResponseDialog = (id: string, type: 'report') => {
+    setSelectedReportId(id);
+    console.log(`Opening response dialog for ${type} with ID: ${id}`);
+  };
+  
+  const handleAssignReport = (id: string) => {
+    console.log(`Assigning report with ID: ${id}`);
+  };
+  
+  const loadData = () => {
+    console.log("Loading data...");
+  };
+
   const getTabInfo = () => {
     switch (activeTab) {
       case "reports":
@@ -93,7 +106,6 @@ const DepartmentContent = ({ activeTab, institution }: DepartmentContentProps) =
 
   const tabInfo = getTabInfo();
   
-  // Special content for reports tab
   if (activeTab === "reports") {
     return (
       <div className="space-y-6">
@@ -109,9 +121,21 @@ const DepartmentContent = ({ activeTab, institution }: DepartmentContentProps) =
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 gap-6">
-              <EmergencyReportsList institution={institution} />
-              <PriceReportsList institution={institution} />
-              <FraudReportsList institution={institution} />
+              <EmergencyReportsList 
+                onOpenResponseDialog={handleOpenResponseDialog}
+                onAssignReport={handleAssignReport}
+                loadData={loadData}
+              />
+              <PriceReportsList 
+                onOpenResponseDialog={handleOpenResponseDialog}
+                onAssignReport={handleAssignReport}
+                loadData={loadData}
+              />
+              <FraudReportsList 
+                onOpenResponseDialog={handleOpenResponseDialog}
+                onAssignReport={handleAssignReport}
+                loadData={loadData}
+              />
             </div>
           </CardContent>
         </Card>
@@ -119,7 +143,6 @@ const DepartmentContent = ({ activeTab, institution }: DepartmentContentProps) =
     );
   }
 
-  // Special content for feedback tab
   if (activeTab === "feedback") {
     return (
       <div className="space-y-6">
@@ -186,7 +209,6 @@ const DepartmentContent = ({ activeTab, institution }: DepartmentContentProps) =
     );
   }
 
-  // Special content for electricity tab
   if (activeTab === "electricity") {
     return (
       <div className="space-y-6">
@@ -261,7 +283,6 @@ const DepartmentContent = ({ activeTab, institution }: DepartmentContentProps) =
     );
   }
 
-  // Generic content for other tabs
   return (
     <div className="space-y-6">
       <Card>
@@ -290,7 +311,6 @@ const DepartmentContent = ({ activeTab, institution }: DepartmentContentProps) =
   );
 };
 
-// Import the MessageSquare icon
 import { MessageSquare } from "lucide-react";
 
 export default DepartmentContent;

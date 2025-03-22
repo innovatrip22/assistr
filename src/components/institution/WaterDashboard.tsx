@@ -19,7 +19,7 @@ import {
   LineChart,
   Line,
 } from "recharts";
-import { Droplet, Users, AlertTriangle, Flask, MapPin } from "lucide-react";
+import { Droplet, Users, AlertTriangle, Beaker, MapPin } from "lucide-react";
 
 const waterUsageData = [
   { name: "Ocak", value: 1420 },
@@ -102,7 +102,7 @@ const WaterDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center">
-                  <Flask className="h-4 w-4 mr-2 text-purple-500" />
+                  <Beaker className="h-4 w-4 mr-2 text-purple-500" />
                   <span className="text-2xl font-bold">94/100</span>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">

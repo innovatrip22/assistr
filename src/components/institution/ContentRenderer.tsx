@@ -61,7 +61,8 @@ const ContentRenderer = ({
       return (
         <SettingsContent
           institution={institution}
-          handleUpdate={handleUpdate}
+          onUpdate={handleUpdate}
+          setInstitution={setInstitution}
         />
       );
     default:
