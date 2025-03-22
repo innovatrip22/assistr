@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 // Define the Business type
@@ -16,6 +15,12 @@ export type Business = {
   priceReports?: number;
   fraudReports?: number;
   registrationDate?: string;
+  // Cyprus-specific fields
+  region?: string;
+  isHistorical?: boolean;
+  establishedYear?: number; 
+  servesTraditionalFood?: boolean;
+  hasLocalArtisans?: boolean;
 }
 
 // Business methods
@@ -60,19 +65,24 @@ export const getBusinessById = async (id: string) => {
 
 // Ensure these functions are properly implemented
 export const getBusinessDetails = async (): Promise<Business> => {
-  // Mocked data for demonstration
+  // Mocked data for demonstration - now with Cyprus-specific details
   return {
     id: "1",
-    name: "Sample Business",
+    name: "Kıbrıs Lezzetleri",
     type: "restaurant",
-    address: "123 Main St",
+    address: "Girne Caddesi No:42, Lefkoşa",
     status: "verified",
     owner_id: "user-123",
     created_at: new Date().toISOString(),
-    description: "A sample business description",
-    location: "Antalya, Turkey",
+    description: "Geleneksel Kıbrıs mutfağının en lezzetli örneklerini sunan restoranımız, taze ve yerel malzemelerle hazırlanan özgün tariflerimizle hizmetinizdedir.",
+    location: "Lefkoşa, KKTC",
     priceReports: 2,
-    fraudReports: 0
+    fraudReports: 0,
+    region: "Lefkoşa",
+    isHistorical: true,
+    establishedYear: 1985,
+    servesTraditionalFood: true,
+    hasLocalArtisans: true
   };
 };
 
