@@ -1,13 +1,14 @@
 
 import { useState } from "react";
-import { BarChart3, LineChart, DownloadCloud, Filter, RefreshCcw, Calendar } from "lucide-react";
+import { BarChart3, DownloadCloud, RefreshCcw, Calendar as CalendarIcon } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { Progress } from "@/components/ui/progress";
-import { BarChart, LineChart as RechartsLineChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, Bar, Line } from "recharts";
+import { BarChart, LineChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, Bar, Line } from "recharts";
+import { DateRange } from "react-day-picker";
 
 // Mock data
 const consumptionData = [
@@ -55,13 +56,17 @@ const paymentRateData = [
 
 const ReportingContent = () => {
   const [period, setPeriod] = useState("monthly");
-  const [date, setDate] = useState<{
-    from: Date | undefined;
-    to: Date | undefined;
-  }>({
+  const [date, setDate] = useState<DateRange>({
     from: new Date(new Date().getFullYear(), 0, 1),
     to: new Date()
   });
+
+  // Ensure the date handler accepts DateRange
+  const handleDateChange = (newDate: DateRange | undefined) => {
+    if (newDate) {
+      setDate(newDate);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -102,7 +107,7 @@ const ReportingContent = () => {
               </SelectContent>
             </Select>
             
-            <DatePickerWithRange date={date} setDate={setDate} />
+            <DatePickerWithRange date={date} setDate={handleDateChange} />
           </div>
           
           <Tabs defaultValue="consumption">

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { MessageSquare, Calendar, Smile, Frown, ThumbsUp, Filter, CheckCircle, Archive } from "lucide-react";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
-import { getFeedback } from "@/services";
+import { getFeedbacks } from "@/services"; // Fixed function name from getFeedback to getFeedbacks
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,7 +39,7 @@ const FeedbackManagement = ({ onOpenResponseDialog }: FeedbackManagementProps) =
 
   const loadFeedback = async () => {
     try {
-      const data = await getFeedback();
+      const data = await getFeedbacks(); // Using the correct function name
       setFeedbackItems(data);
     } catch (error) {
       console.error("Error loading feedback:", error);
