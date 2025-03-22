@@ -666,4 +666,4 @@ const Institution = () => {
                     <div className="p-3 bg-red-50 border border-red-200 rounded-md">
                       <div className="flex justify-between">
                         <h4 className="font-medium">Lefkoşa - Kumsal</h4>
-                        <span className="text-red-600 text-sm
+                        <span className="text-red-600
