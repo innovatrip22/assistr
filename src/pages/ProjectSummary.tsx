@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { ArrowLeft, FileText, Target } from "lucide-react";
+import { ArrowLeft, FileText, Target, Presentation } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -42,9 +42,19 @@ const ProjectSummary = () => {
             variant="outline" 
             size="sm" 
             onClick={() => navigate('/target-audience')}
+            className="mr-2"
           >
             <Target className="h-4 w-4 mr-2" />
             Hedef Kitle
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => navigate('/methodology-slide')}
+          >
+            <Presentation className="h-4 w-4 mr-2" />
+            Sunum Slaytı
           </Button>
         </div>
 
@@ -135,9 +145,13 @@ const ProjectSummary = () => {
             <FileText className="h-4 w-4 mr-2" />
             Teknik Yöntem
           </Button>
-          <Button onClick={() => navigate('/target-audience')} variant="default">
+          <Button onClick={() => navigate('/target-audience')} variant="default" className="mr-2">
             <Target className="h-4 w-4 mr-2" />
             Hedef Kitle Analizi
+          </Button>
+          <Button onClick={() => navigate('/methodology-slide')} variant="default">
+            <Presentation className="h-4 w-4 mr-2" />
+            Sunum Slaytı
           </Button>
         </div>
       </motion.div>
