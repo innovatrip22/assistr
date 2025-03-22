@@ -53,15 +53,26 @@ const InstitutionPage = () => {
     }
   };
 
+  // Determine institution type for menu filtering
+  const institutionType = institution?.type || "";
+
   return (
     <InstitutionBackground>
       <InstitutionHeader signOut={signOut} />
 
       <div className="flex flex-1 overflow-hidden">
-        <InstitutionSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <InstitutionSidebar 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+          institutionType={institutionType}
+        />
 
         <main className="flex-1 overflow-auto">
-          <InstitutionMobileNav activeTab={activeTab} setActiveTab={setActiveTab} />
+          <InstitutionMobileNav 
+            activeTab={activeTab} 
+            setActiveTab={setActiveTab} 
+            institutionType={institutionType}
+          />
 
           <div className="container mx-auto px-4 py-6">
             <ContentRenderer 

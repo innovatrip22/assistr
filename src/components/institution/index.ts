@@ -13,3 +13,8 @@ export { default as FraudReportsList } from './FraudReportsList';
 export { default as ResponseDialog } from './ResponseDialog';
 export { default as AssignReportDialog } from './AssignReportDialog';
 export { default as DepartmentContent } from './DepartmentContent';
+export { default as ElectricityDashboard } from './ElectricityDashboard';
+export { default as WaterDashboard } from './WaterDashboard';
+export { default as TourismDashboard } from './TourismDashboard';
+export { default as SubscriberManagement } from './SubscriberManagement';
+export { default as BillingSystem } from './BillingSystem';
