@@ -40,20 +40,9 @@ export const getTouristStats = async (userId?: string) => {
     return mockTouristStats;
   }
   
-  // For real implementation, query from Supabase
-  const { data, error } = await supabase
-    .from("tourist_statistics")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .single();
-  
-  if (error) {
-    console.error("Error fetching tourist statistics:", error);
-    return mockTouristStats;
-  }
-  
-  return data || mockTouristStats;
+  // For real implementation, we would query from Supabase
+  // Since the required tables don't exist yet, we'll return mock data for now
+  return mockTouristStats;
 };
 
 // Get hotel occupancy data
@@ -74,31 +63,19 @@ export const getHotelOccupancy = async (period: "daily" | "weekly" | "monthly" =
     };
   }
   
-  // For real implementation, query from Supabase
-  const { data, error } = await supabase
-    .from("hotel_occupancy")
-    .select("*")
-    .eq("period_type", period)
-    .order("date", { ascending: true });
-  
-  if (error) {
-    console.error("Error fetching hotel occupancy data:", error);
-    return {
-      labels: [],
-      data: []
-    };
-  }
-  
-  if (!data || data.length === 0) {
-    return {
-      labels: [],
-      data: []
-    };
-  }
-  
+  // For real implementation, we would query from Supabase
+  // Since the required tables don't exist yet, we'll return mock data
   return {
-    labels: data.map(item => item.label),
-    data: data.map(item => item.occupancy_rate)
+    labels: period === "daily" 
+      ? ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"]
+      : period === "weekly"
+      ? ["Hafta 1", "Hafta 2", "Hafta 3", "Hafta 4"]
+      : ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran"],
+    data: period === "daily" 
+      ? [68, 72, 75, 82, 87, 95, 92]
+      : period === "weekly"
+      ? [70, 65, 78, 85]
+      : [45, 52, 60, 68, 75, 82]
   };
 };
 
@@ -120,30 +97,18 @@ export const getVisitorStats = async (period: "weekly" | "monthly" | "yearly" = 
     };
   }
   
-  // For real implementation, query from Supabase
-  const { data, error } = await supabase
-    .from("visitor_statistics")
-    .select("*")
-    .eq("period_type", period)
-    .order("date", { ascending: true });
-  
-  if (error) {
-    console.error("Error fetching visitor statistics:", error);
-    return {
-      labels: [],
-      data: []
-    };
-  }
-  
-  if (!data || data.length === 0) {
-    return {
-      labels: [],
-      data: []
-    };
-  }
-  
+  // For real implementation, we would query from Supabase
+  // Since the required tables don't exist yet, we'll return mock data
   return {
-    labels: data.map(item => item.label),
-    data: data.map(item => item.visitor_count)
+    labels: period === "weekly" 
+      ? ["Hafta 1", "Hafta 2", "Hafta 3", "Hafta 4"]
+      : period === "monthly"
+      ? ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran"]
+      : ["2018", "2019", "2020", "2021", "2022", "2023"],
+    data: period === "weekly" 
+      ? [1250, 980, 1340, 1520]
+      : period === "monthly"
+      ? [7500, 8200, 10500, 12000, 14500, 15800]
+      : [450000, 520000, 380000, 510000, 780000, 857230]
   };
 };

@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
-import { getTouristDataStats, getBusinessDetails, updateBusinessDetails, getBusiness } from "@/services";
+import { getTouristStats, getBusinessDetails, updateBusinessDetails, getBusiness } from "@/services";
 import BusinessAnalytics from "@/components/business/BusinessAnalytics";
 import BusinessProducts from "@/components/business/BusinessProducts";
 import BusinessSettings from "@/components/business/BusinessSettings";
@@ -40,7 +40,7 @@ const Business = () => {
       const businessData = await getBusinessDetails();
       setBusiness(businessData);
 
-      const stats = await getTouristDataStats();
+      const stats = await getTouristStats();
       setTouristStats(stats);
     } catch (error: any) {
       console.error("Error fetching data:", error);

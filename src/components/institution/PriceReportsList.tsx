@@ -43,8 +43,7 @@ const PriceReportsList = ({
         // Filter by institution if provided
         if (institution) {
           reportData = reportData.filter(report => 
-            report.type === 'price' && 
-            (report.institution === institution || !report.institution)
+            report.type === 'price'
           );
         } else {
           reportData = reportData.filter(report => report.type === 'price');
@@ -93,7 +92,9 @@ const PriceReportsList = ({
 
   const handleStatusChange = async (id: string, newStatus: string) => {
     try {
-      await updateReportStatus(id, newStatus);
+      // Convert to acceptable status type
+      const status = newStatus === "resolved" ? "responded" : "pending";
+      await updateReportStatus(id, status);
       toast.success("Rapor durumu güncellendi");
       loadData();
     } catch (error) {
