@@ -1,3 +1,5 @@
+
+// Import the iconUtils first to ensure our icon patches are applied
 import "./utils/iconUtils";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
