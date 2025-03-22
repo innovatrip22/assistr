@@ -33,52 +33,16 @@ const SwitchIcon: React.FC<LucideProps> = (props) => {
   return <LucideIcons.ToggleLeft {...props} />;
 };
 
-// Module augmentation for TypeScript
-declare module 'lucide-react' {
-  export const Tool: React.FC<LucideProps>;
-  export const Clock: React.FC<LucideProps>;
-  export const Globe: React.FC<LucideProps>;
-  export const Upload: React.FC<LucideProps>;
-  export const Share2: React.FC<LucideProps>;
-  export const Switch: React.FC<LucideProps>;
-}
+// Instead of module augmentation, we'll ensure our custom icons are available
+// by modifying the runtime module and correctly exporting everything
 
-// Patch the lucide-react module to include our custom icons
-if (typeof window !== 'undefined') {
-  // Make sure lucideReact exists on window
-  // @ts-ignore - Adding to global namespace
-  window.lucideReact = window.lucideReact || LucideIcons;
-  
-  // Add our custom icons
-  // @ts-ignore - We know what we're doing
-  window.lucideReact.Tool = ToolIcon;
-  // @ts-ignore - We know what we're doing
-  window.lucideReact.Clock = ClockIcon;
-  // @ts-ignore - We know what we're doing
-  window.lucideReact.Globe = GlobeIcon;
-  // @ts-ignore - We know what we're doing
-  window.lucideReact.Upload = UploadIcon;
-  // @ts-ignore - We know what we're doing
-  window.lucideReact.Share2 = Share2Icon;
-  // @ts-ignore - We know what we're doing
-  window.lucideReact.Switch = SwitchIcon;
-}
-
-// Also patch the actual module to ensure it works at import time
-// @ts-ignore - We know what we're doing
+// First, patch the LucideIcons object directly
+// @ts-ignore - We're adding custom icons
 LucideIcons.Tool = ToolIcon;
-// @ts-ignore - We know what we're doing
-LucideIcons.Clock = ClockIcon;
-// @ts-ignore - We know what we're doing
-LucideIcons.Globe = GlobeIcon;
-// @ts-ignore - We know what we're doing
-LucideIcons.Upload = UploadIcon;
-// @ts-ignore - We know what we're doing
-LucideIcons.Share2 = Share2Icon;
-// @ts-ignore - We know what we're doing
+// @ts-ignore - We're adding custom icons
 LucideIcons.Switch = SwitchIcon;
 
-// Export our custom icons so they can be imported directly from this file
+// Export our custom icons
 export const Tool = ToolIcon;
 export const Clock = ClockIcon;
 export const Globe = GlobeIcon;
@@ -86,5 +50,5 @@ export const Upload = UploadIcon;
 export const Share2 = Share2Icon;
 export const Switch = SwitchIcon;
 
-// Re-export all Lucide icons for convenience
+// Export a patched version of all icons
 export * from 'lucide-react';
