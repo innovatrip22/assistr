@@ -1,6 +1,6 @@
 
-// Import the iconUtils first to ensure our icon patches are applied
-import "./utils/iconUtils";
+// Import all icons from our utils layer instead of directly from lucide-react
+import * as Icons from "./utils/iconUtils";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
