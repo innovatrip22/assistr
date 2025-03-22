@@ -50,39 +50,51 @@ interface TabContentProps {
   userData?: any;
 }
 
+// Update component declarations with proper type annotations
+const TravelPlannerWithProps = TravelPlanner as React.ComponentType<TravelPlannerProps>;
+const HotelReservationWithProps = HotelReservation as React.ComponentType<HotelReservationProps>;
+const RestaurantReservationWithProps = RestaurantReservation as React.ComponentType<RestaurantReservationProps>;
+const FlightInfoWithProps = FlightInfo as React.ComponentType<FlightInfoProps>;
+const RestaurantBusinessDemoWithProps = RestaurantBusinessDemo as React.ComponentType<BusinessDemoProps>;
+const HotelBusinessDemoWithProps = HotelBusinessDemo as React.ComponentType<BusinessDemoProps>;
+const InstitutionDemoPanelWithProps = InstitutionDemoPanel as React.ComponentType<BusinessDemoProps>;
+const TravelAssistantWithProps = TravelAssistant as React.ComponentType<TravelAssistantProps>;
+const FeedbackAssistantWithProps = FeedbackAssistant as React.ComponentType<FeedbackAssistantProps>;
+const ReportAssistantWithProps = ReportAssistant as React.ComponentType<ReportAssistantProps>;
+
 const TabContent = ({ activeTab, userData }: TabContentProps) => {
   const renderContent = () => {
     switch (activeTab) {
       case "nearby":
         return <NearbyPlaces />;
       case "plan":
-        return <TravelPlanner userData={userData} />;
+        return <TravelPlannerWithProps userData={userData} />;
       case "hotel":
-        return <HotelReservation userData={userData} />;
+        return <HotelReservationWithProps userData={userData} />;
       case "restaurant":
-        return <RestaurantReservation userData={userData} />;
+        return <RestaurantReservationWithProps userData={userData} />;
       case "flights":
-        return <FlightInfo userData={userData} />;
+        return <FlightInfoWithProps userData={userData} />;
       case "publicBuildings":
         return <PublicBuildingsMap />;
       case "businessDemo":
         return (
           <div className="space-y-8">
-            <RestaurantBusinessDemo userData={userData} />
+            <RestaurantBusinessDemoWithProps userData={userData} />
             <div className="pt-8 border-t">
-              <HotelBusinessDemo userData={userData} />
+              <HotelBusinessDemoWithProps userData={userData} />
             </div>
             <div className="pt-8 border-t">
-              <InstitutionDemoPanel userData={userData} />
+              <InstitutionDemoPanelWithProps userData={userData} />
             </div>
           </div>
         );
       case "assistant":
-        return <TravelAssistant userData={userData} />;
+        return <TravelAssistantWithProps userData={userData} />;
       case "feedback":
-        return <FeedbackAssistant userData={userData} />;
+        return <FeedbackAssistantWithProps userData={userData} />;
       case "report":
-        return <ReportAssistant userData={userData} />;
+        return <ReportAssistantWithProps userData={userData} />;
       default:
         return <div>İçerik bulunamadı</div>;
     }
