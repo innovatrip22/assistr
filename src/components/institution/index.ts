@@ -6,3 +6,4 @@ export { default as InstitutionBackground } from './InstitutionBackground';
 export { default as DashboardContent } from './DashboardContent';
 export { default as SettingsContent } from './SettingsContent';
 export { default as ContentRenderer } from './ContentRenderer';
+export { default as MapSection } from './MapSection';

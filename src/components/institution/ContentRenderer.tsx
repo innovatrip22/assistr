@@ -1,6 +1,7 @@
 
 import { DashboardContent } from "@/components/institution";
 import { SettingsContent } from "@/components/institution";
+import { MapSection } from "@/components/institution";
 import type { Institution } from "@/services";
 
 interface ContentRendererProps {
@@ -18,7 +19,12 @@ const ContentRenderer = ({
 }: ContentRendererProps) => {
   switch (activeTab) {
     case "dashboard":
-      return <DashboardContent institution={institution} />;
+      return (
+        <div className="space-y-6">
+          <DashboardContent institution={institution} />
+          <MapSection />
+        </div>
+      );
     case "settings":
       return (
         <SettingsContent 
