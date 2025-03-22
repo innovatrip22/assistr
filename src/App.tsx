@@ -1,3 +1,4 @@
+import "./utils/iconUtils";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
@@ -10,10 +11,6 @@ import ProjectMethodology from "./pages/ProjectMethodology";
 import TargetAudience from "./pages/TargetAudience";
 import AuthRequired from "./components/AuthRequired";
 import { Toaster } from "./components/ui/sonner";
-
-// Patch lucide-react to include our custom icons
-// This import needs to be before any component that uses icons
-import "./utils/iconUtils";
 
 import "./App.css";
 
