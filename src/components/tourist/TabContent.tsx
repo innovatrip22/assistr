@@ -45,6 +45,10 @@ interface ReportAssistantProps {
   userData: any;
 }
 
+interface InstitutionDemoPanelProps {
+  userData: any;
+}
+
 interface TabContentProps {
   activeTab: string;
   userData?: any;
@@ -57,7 +61,7 @@ const RestaurantReservationWithProps = RestaurantReservation as React.ComponentT
 const FlightInfoWithProps = FlightInfo as React.ComponentType<FlightInfoProps>;
 const RestaurantBusinessDemoWithProps = RestaurantBusinessDemo as React.ComponentType<BusinessDemoProps>;
 const HotelBusinessDemoWithProps = HotelBusinessDemo as React.ComponentType<BusinessDemoProps>;
-const InstitutionDemoPanelWithProps = InstitutionDemoPanel as React.ComponentType<BusinessDemoProps>;
+const InstitutionDemoPanelWithProps = InstitutionDemoPanel as React.ComponentType<InstitutionDemoPanelProps>;
 const TravelAssistantWithProps = TravelAssistant as React.ComponentType<TravelAssistantProps>;
 const FeedbackAssistantWithProps = FeedbackAssistant as React.ComponentType<FeedbackAssistantProps>;
 const ReportAssistantWithProps = ReportAssistant as React.ComponentType<ReportAssistantProps>;
