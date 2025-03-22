@@ -1,50 +1,62 @@
 
-import { ReactNode } from "react";
 import NearbyPlaces from "./NearbyPlaces";
 import TravelPlanner from "./TravelPlanner";
 import HotelReservation from "./HotelReservation";
 import RestaurantReservation from "./RestaurantReservation";
+import FlightInfo from "./FlightInfo";
 import PublicBuildingsMap from "./PublicBuildingsMap";
 import TravelAssistant from "./TravelAssistant";
 import FeedbackAssistant from "./FeedbackAssistant";
 import ReportAssistant from "./ReportAssistant";
-import FlightInfo from "./FlightInfo";
-import TravelChat from "./TravelChat";
+import RestaurantBusinessDemo from "./RestaurantBusinessDemo";
+import HotelBusinessDemo from "./HotelBusinessDemo";
+import InstitutionDemoPanel from "./InstitutionDemoPanel";
 
 interface TabContentProps {
   activeTab: string;
+  userData?: any;
 }
 
-const TabContent = ({ activeTab }: TabContentProps) => {
-  const renderContent = (): ReactNode => {
+const TabContent = ({ activeTab, userData }: TabContentProps) => {
+  const renderContent = () => {
     switch (activeTab) {
       case "nearby":
         return <NearbyPlaces />;
       case "plan":
-        return <TravelPlanner />;
+        return <TravelPlanner userData={userData} />;
       case "hotel":
-        return <HotelReservation />;
+        return <HotelReservation userData={userData} />;
       case "restaurant":
-        return <RestaurantReservation />;
+        return <RestaurantReservation userData={userData} />;
       case "flights":
-        return <FlightInfo />;
+        return <FlightInfo userData={userData} />;
       case "publicBuildings":
         return <PublicBuildingsMap />;
+      case "businessDemo":
+        return (
+          <div className="space-y-8">
+            <RestaurantBusinessDemo userData={userData} />
+            <div className="pt-8 border-t">
+              <HotelBusinessDemo userData={userData} />
+            </div>
+            <div className="pt-8 border-t">
+              <InstitutionDemoPanel userData={userData} />
+            </div>
+          </div>
+        );
       case "assistant":
-        return <TravelAssistant />;
+        return <TravelAssistant userData={userData} />;
       case "feedback":
-        return <FeedbackAssistant />;
+        return <FeedbackAssistant userData={userData} />;
       case "report":
-        return <ReportAssistant />;
-      case "chat":
-        return <TravelChat />;
+        return <ReportAssistant userData={userData} />;
       default:
-        return <NearbyPlaces />;
+        return <div>İçerik bulunamadı</div>;
     }
   };
 
   return (
-    <div className="border rounded-xl p-6 bg-white shadow-xl backdrop-blur-sm border-blue-100">
+    <div className="bg-white rounded-md shadow-sm p-4 md:p-6">
       {renderContent()}
     </div>
   );
