@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +10,8 @@ import FraudReportsList from "@/components/institution/FraudReportsList";
 import FeedbackList from "@/components/institution/FeedbackList";
 import MapSection from "@/components/institution/MapSection";
 import InstitutionDemoPanel from "@/components/tourist/InstitutionDemoPanel";
+import ResponseDialog from "@/components/institution/ResponseDialog";
+import AssignReportDialog from "@/components/institution/AssignReportDialog";
 
 // Import the custom icons from our utils folder
 import { Tool, Clock, Globe, Upload, Share2, Switch } from "@/utils/iconUtils";
@@ -20,6 +22,34 @@ const Institution: React.FC = () => {
     type: "Belediye",
     announcement: "Önemli duyurular burada yer alacaktır...",
   });
+
+  // State for response dialog
+  const [responseDialogOpen, setResponseDialogOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedType, setSelectedType] = useState<'report' | 'feedback' | null>(null);
+  
+  // State for assign dialog
+  const [assignDialogOpen, setAssignDialogOpen] = useState(false);
+  const [assignReportId, setAssignReportId] = useState<string | null>(null);
+
+  // Open response dialog handler
+  const handleOpenResponseDialog = useCallback((id: string, type: 'report' | 'feedback') => {
+    setSelectedId(id);
+    setSelectedType(type);
+    setResponseDialogOpen(true);
+  }, []);
+
+  // Open assign dialog handler
+  const handleAssignReport = useCallback((id: string) => {
+    setAssignReportId(id);
+    setAssignDialogOpen(true);
+  }, []);
+
+  // Reload data handler
+  const loadData = useCallback(() => {
+    toast.success("Veriler güncellendi");
+    // This would typically fetch new data from an API
+  }, []);
 
   return (
     <div className="container mx-auto py-10">
@@ -54,21 +84,52 @@ const Institution: React.FC = () => {
           <InstitutionDemoPanel userData={userData} />
         </TabsContent>
         <TabsContent value="panel-2">
-          <EmergencyReportsList />
+          <EmergencyReportsList 
+            onOpenResponseDialog={handleOpenResponseDialog}
+            onAssignReport={handleAssignReport}
+            loadData={loadData}
+          />
         </TabsContent>
         <TabsContent value="panel-3">
-          <PriceReportsList />
+          <PriceReportsList 
+            onOpenResponseDialog={handleOpenResponseDialog}
+            onAssignReport={handleAssignReport}
+            loadData={loadData}
+          />
         </TabsContent>
         <TabsContent value="panel-4">
-          <FraudReportsList />
+          <FraudReportsList 
+            onOpenResponseDialog={handleOpenResponseDialog}
+            onAssignReport={handleAssignReport}
+            loadData={loadData}
+          />
         </TabsContent>
         <TabsContent value="panel-5">
-          <FeedbackList />
+          <FeedbackList 
+            onOpenResponseDialog={handleOpenResponseDialog}
+            loadData={loadData}
+          />
         </TabsContent>
         <TabsContent value="panel-6">
           <MapSection />
         </TabsContent>
       </Tabs>
+      
+      {/* Dialogs */}
+      <ResponseDialog 
+        open={responseDialogOpen}
+        onOpenChange={setResponseDialogOpen}
+        selectedId={selectedId}
+        selectedType={selectedType}
+        onSubmitSuccess={loadData}
+      />
+      
+      <AssignReportDialog 
+        open={assignDialogOpen}
+        onOpenChange={setAssignDialogOpen}
+        selectedId={assignReportId}
+        onSubmitSuccess={loadData}
+      />
     </div>
   );
 };
