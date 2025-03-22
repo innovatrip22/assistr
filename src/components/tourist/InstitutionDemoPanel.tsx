@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Clock, Globe, Upload, Share2 } from "lucide-react";
+import { Clock, Globe, Upload, Share2 } from "../../utils/iconUtils";
 
 interface InstitutionDemoPanelProps {
   userData: any;
