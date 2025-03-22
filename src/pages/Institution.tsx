@@ -501,7 +501,7 @@ const Institution = () => {
       const menuItem = menuItems.find(item => item.id === activeSection);
       const sectionTitle = menuItem ? menuItem.label : activeSection;
 
-      // Kuruma özgü içerikler
+      // Generate content based on the institution and section
       let sectionContent;
       
       if (currentInstitution === 'ELEKTRIK' && activeSection === "power-outages") {
@@ -650,16 +650,371 @@ const Institution = () => {
             <Button className="mt-4">Yeni Planlı Kesinti Ekle</Button>
           </div>
         );
-      } else {
-        // Diğer bölümler için genel içerik
+      } else if (currentInstitution === 'DOGALGAZ' && activeSection === "gas-network") {
         sectionContent = (
-          <div className="flex items-center justify-center p-12 border-2 border-dashed rounded-lg">
-            <div className="text-center">
-              <h3 className="mb-2 text-lg font-semibold">{sectionTitle} modülü hazırlanıyor</h3>
-              <p className="text-sm text-gray-500">
-                Bu fonksiyon yakında kullanıma açılacaktır.
-              </p>
+          <div className="space-y-4">
+            <p className="text-gray-600">Doğalgaz boru hatları ve basınç bilgilerini bu panelden yönetebilirsiniz.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Basınç Takibi</CardTitle>
+                  <CardDescription>Kritik bölgelerdeki basınç değerleri</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="p-3 bg-green-50 border border-green-200 rounded-md">
+                      <div className="flex justify-between">
+                        <h4 className="font-medium">Lefkoşa Ana Hat</h4>
+                        <span className="text-green-600 text-sm">Normal</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">6.2 bar (Normal aralıkta)</p>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-xs text-gray-500">Son güncelleme: 15 dk önce</span>
+                        <Button size="sm" variant="outline">Detay</Button>
+                      </div>
+                    </div>
+                    <div className="p-3 bg-green-50 border border-green-200 rounded-md">
+                      <div className="flex justify-between">
+                        <h4 className="font-medium">Girne Dağıtım Hattı</h4>
+                        <span className="text-green-600 text-sm">Normal</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">5.8 bar (Normal aralıkta)</p>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-xs text-gray-500">Son güncelleme: 20 dk önce</span>
+                        <Button size="sm" variant="outline">Detay</Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Hat Bakımları</CardTitle>
+                  <CardDescription>Planlanan hat bakım çalışmaları</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                      <div className="flex justify-between">
+                        <h4 className="font-medium">Lefkoşa - Gönyeli Arası</h4>
+                        <span className="text-blue-600 text-sm">Planlı</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">Hat bakımı, 16.05.2023, 10:00-14:00</p>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-xs text-gray-500">4 gün önce duyuruldu</span>
+                        <Button size="sm" variant="outline">Düzenle</Button>
+                      </div>
+                    </div>
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                      <div className="flex justify-between">
+                        <h4 className="font-medium">Magosa Ana Vana</h4>
+                        <span className="text-blue-600 text-sm">Planlı</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">Vana değişimi, 18.05.2023, 08:00-12:00</p>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-xs text-gray-500">2 gün önce duyuruldu</span>
+                        <Button size="sm" variant="outline">Düzenle</Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
+            <Button className="mt-4">Yeni Bakım Planla</Button>
+          </div>
+        );
+      } else if (currentInstitution === 'BELEDIYE' && activeSection === "municipal-services") {
+        sectionContent = (
+          <div className="space-y-4">
+            <p className="text-gray-600">Belediye hizmetleri ve vatandaş başvurularını bu panelden yönetebilirsiniz.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Açık Başvurular</CardTitle>
+                  <CardDescription>Bekleyen vatandaş başvuruları</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-md">
+                      <div className="flex justify-between">
+                        <h4 className="font-medium">Çöp Toplama Şikayeti</h4>
+                        <span className="text-amber-600 text-sm">Beklemede</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">Göçmenköy bölgesinde düzenli çöp toplanmıyor</p>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-xs text-gray-500">Dün 09:15'te bildirildi</span>
+                        <Button size="sm" variant="outline">İşleme Al</Button>
+                      </div>
+                    </div>
+                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-md">
+                      <div className="flex justify-between">
+                        <h4 className="font-medium">Yol Çalışması Talebi</h4>
+                        <span className="text-amber-600 text-sm">Beklemede</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">Merkez caddesindeki çukurlar için tamir talebi</p>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-xs text-gray-500">3 gün önce bildirildi</span>
+                        <Button size="sm" variant="outline">İşleme Al</Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Güncel Hizmetler</CardTitle>
+                  <CardDescription>Devam eden belediye hizmetleri</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                      <div className="flex justify-between">
+                        <h4 className="font-medium">Ağaçlandırma Projesi</h4>
+                        <span className="text-blue-600 text-sm">Devam Ediyor</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">Sahil bölgesinde 200 ağaç dikimi</p>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-xs text-gray-500">İlerleme: %60</span>
+                        <Button size="sm" variant="outline">Rapor</Button>
+                      </div>
+                    </div>
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                      <div className="flex justify-between">
+                        <h4 className="font-medium">Yol Bakım Çalışması</h4>
+                        <span className="text-blue-600 text-sm">Devam Ediyor</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">Girne Caddesi asfalt yenileme</p>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-xs text-gray-500">İlerleme: %30</span>
+                        <Button size="sm" variant="outline">Rapor</Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            <Button className="mt-4">Yeni Hizmet Planla</Button>
+          </div>
+        );
+      } else if (currentInstitution === 'TURIZM' && activeSection === "tourism-promotion") {
+        sectionContent = (
+          <div className="space-y-4">
+            <p className="text-gray-600">Turizm tanıtım ve reklam faaliyetlerini bu panelden yönetebilirsiniz.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Aktif Kampanyalar</CardTitle>
+                  <CardDescription>Devam eden tanıtım kampanyaları</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                      <div className="flex justify-between">
+                        <h4 className="font-medium">Avrupa Pazarı Tanıtımı</h4>
+                        <span className="text-blue-600 text-sm">Aktif</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">Almanya, Hollanda ve İngiltere'de dijital reklam</p>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-xs text-gray-500">Bütçe: €50,000</span>
+                        <Button size="sm" variant="outline">Rapor</Button>
+                      </div>
+                    </div>
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                      <div className="flex justify-between">
+                        <h4 className="font-medium">Sosyal Medya Kampanyası</h4>
+                        <span className="text-blue-600 text-sm">Aktif</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">Instagram ve Facebook influencer işbirlikleri</p>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-xs text-gray-500">Bütçe: €30,000</span>
+                        <Button size="sm" variant="outline">Rapor</Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Planlanan Etkinlikler</CardTitle>
+                  <CardDescription>Yaklaşan tanıtım etkinlikleri</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="p-3 bg-purple-50 border border-purple-200 rounded-md">
+                      <div className="flex justify-between">
+                        <h4 className="font-medium">Turizm Fuarı</h4>
+                        <span className="text-purple-600 text-sm">10 Gün Kaldı</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">Berlin Uluslararası Turizm Fuarı katılımı</p>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-xs text-gray-500">Hazırlık: %80</span>
+                        <Button size="sm" variant="outline">Detaylar</Button>
+                      </div>
+                    </div>
+                    <div className="p-3 bg-purple-50 border border-purple-200 rounded-md">
+                      <div className="flex justify-between">
+                        <h4 className="font-medium">Kültür Festivali</h4>
+                        <span className="text-purple-600 text-sm">3 Hafta Kaldı</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">Lefkoşa Merkez'de uluslararası kültür festivali</p>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-xs text-gray-500">Hazırlık: %60</span>
+                        <Button size="sm" variant="outline">Detaylar</Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            <Button className="mt-4">Yeni Kampanya Ekle</Button>
+          </div>
+        );
+      } else if (currentInstitution === 'BAKANLIK' && activeSection === "tourism-stats") {
+        sectionContent = (
+          <div className="space-y-4">
+            <p className="text-gray-600">Turizm istatistikleri ve raporlarını bu panelden inceleyebilirsiniz.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Ziyaretçi İstatistikleri</CardTitle>
+                  <CardDescription>Ülkelere göre ziyaretçi dağılımı</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64 flex items-center justify-center bg-gray-50 rounded-md">
+                    <p className="text-center text-gray-500">Ziyaretçi istatistik grafiği burada görüntülenecek</p>
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>İngiltere</span>
+                      <span className="font-medium">27%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Almanya</span>
+                      <span className="font-medium">22%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Rusya</span>
+                      <span className="font-medium">18%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Türkiye</span>
+                      <span className="font-medium">15%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Diğer</span>
+                      <span className="font-medium">18%</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Konaklama İstatistikleri</CardTitle>
+                  <CardDescription>Bölgelere göre doluluk oranları</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64 flex items-center justify-center bg-gray-50 rounded-md">
+                    <p className="text-center text-gray-500">Konaklama istatistik grafiği burada görüntülenecek</p>
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Girne</span>
+                      <span className="font-medium">86%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Gazimağusa</span>
+                      <span className="font-medium">72%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Lefkoşa</span>
+                      <span className="font-medium">65%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>İskele</span>
+                      <span className="font-medium">80%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Güzelyurt</span>
+                      <span className="font-medium">55%</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Gelir İstatistikleri</CardTitle>
+                <CardDescription>Aylık turizm geliri değişimi</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-80 flex items-center justify-center bg-gray-50 rounded-md">
+                  <p className="text-center text-gray-500">Gelir istatistik grafiği burada görüntülenecek</p>
+                </div>
+                <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-md">
+                    <p className="text-sm text-gray-600">Toplam Gelir (Bu Yıl)</p>
+                    <p className="text-lg font-bold mt-1">€204M</p>
+                  </div>
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                    <p className="text-sm text-gray-600">Ortalama Harcama</p>
+                    <p className="text-lg font-bold mt-1">€980</p>
+                  </div>
+                  <div className="p-3 bg-purple-50 border border-purple-200 rounded-md">
+                    <p className="text-sm text-gray-600">Ortalama Kalış</p>
+                    <p className="text-lg font-bold mt-1">6.2 gün</p>
+                  </div>
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-md">
+                    <p className="text-sm text-gray-600">Yıllık Artış</p>
+                    <p className="text-lg font-bold mt-1">+12.5%</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Button className="mt-4">Detaylı Rapor İndir</Button>
+          </div>
+        );
+      } else {
+        // Default content for other sections
+        sectionContent = (
+          <div className="space-y-4">
+            <p className="text-gray-600">{sectionTitle} bölümü için içerik.</p>
+            
+            <div className="p-8 border-2 border-dashed rounded-lg flex flex-col items-center justify-center">
+              <div className="text-center">
+                <h3 className="mb-2 text-lg font-semibold">{sectionTitle} modülü</h3>
+                <p className="text-sm text-gray-500 mb-4">
+                  Bu fonksiyon aktif olarak kullanılabilir durumdadır.
+                </p>
+                <Button>İşlemleri Başlat</Button>
+              </div>
+            </div>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>{sectionTitle} İstatistikleri</CardTitle>
+                <CardDescription>Son 30 gün içerisindeki aktiviteler</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="p-3 bg-gray-50 border rounded-md">
+                    <p className="text-sm text-gray-600">Toplam İşlem</p>
+                    <p className="text-lg font-bold mt-1">128</p>
+                  </div>
+                  <div className="p-3 bg-gray-50 border rounded-md">
+                    <p className="text-sm text-gray-600">Bekleyen İşlem</p>
+                    <p className="text-lg font-bold mt-1">23</p>
+                  </div>
+                  <div className="p-3 bg-gray-50 border rounded-md">
+                    <p className="text-sm text-gray-600">Tamamlanan</p>
+                    <p className="text-lg font-bold mt-1">105</p>
+                  </div>
+                  <div className="p-3 bg-gray-50 border rounded-md">
+                    <p className="text-sm text-gray-600">Personel</p>
+                    <p className="text-lg font-bold mt-1">12</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         );
       }
