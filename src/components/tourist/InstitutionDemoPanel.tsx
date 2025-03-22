@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { clock, globe, upload, share2 } from "lucide-react";
+import { Clock, Globe, Upload, Share2 } from "lucide-react";
 
 interface InstitutionDemoPanelProps {
   userData: any;
@@ -109,7 +109,7 @@ const InstitutionDemoPanel: React.FC<InstitutionDemoPanelProps> = ({ userData })
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="p-4 border rounded-md flex items-center space-x-3">
-            <clock className="h-5 w-5 text-gray-500" />
+            <Clock className="h-5 w-5 text-gray-500" />
             <div>
               <h4 className="font-medium">Çalışma Saatleri</h4>
               <p className="text-sm text-gray-500">Pazartesi - Cuma: 09:00 - 17:00</p>
@@ -117,7 +117,7 @@ const InstitutionDemoPanel: React.FC<InstitutionDemoPanelProps> = ({ userData })
           </div>
           
           <div className="p-4 border rounded-md flex items-center space-x-3">
-            <globe className="h-5 w-5 text-gray-500" />
+            <Globe className="h-5 w-5 text-gray-500" />
             <div>
               <h4 className="font-medium">Web Sitesi</h4>
               <p className="text-sm text-gray-500">www.ornekurum.com.tr</p>
@@ -127,7 +127,7 @@ const InstitutionDemoPanel: React.FC<InstitutionDemoPanelProps> = ({ userData })
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="p-4 border rounded-md flex items-center space-x-3">
-            <upload className="h-5 w-5 text-gray-500" />
+            <Upload className="h-5 w-5 text-gray-500" />
             <div>
               <h4 className="font-medium">Dokuman Yükleme</h4>
               <p className="text-sm text-gray-500">Belge ve evrakları yükleyin</p>
@@ -135,7 +135,7 @@ const InstitutionDemoPanel: React.FC<InstitutionDemoPanelProps> = ({ userData })
           </div>
           
           <div className="p-4 border rounded-md flex items-center space-x-3">
-            <share2 className="h-5 w-5 text-gray-500" />
+            <Share2 className="h-5 w-5 text-gray-500" />
             <div>
               <h4 className="font-medium">Bilgi Paylaşımı</h4>
               <p className="text-sm text-gray-500">Diğer kurumlarla bilgi paylaşımı</p>
