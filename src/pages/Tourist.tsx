@@ -9,7 +9,7 @@ import TouristMobileNav from "@/components/tourist/TouristMobileNav";
 import TabContent from "@/components/tourist/TabContent";
 import BusinessDemoPanel from "@/components/tourist/BusinessDemoPanel";
 import TouristDemoList from "@/components/tourist/TouristDemoList";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useMobile } from "@/hooks/use-mobile";
 import { useNavigate } from "react-router-dom";
 import { Building, Menu, Store, Users } from "lucide-react";
 import BusinessDemoPanelSelector from "@/components/business/BusinessDemoPanelSelector";
@@ -18,7 +18,7 @@ import InstitutionDemoPanel from "@/components/institution/InstitutionDemoPanel"
 const Tourist = () => {
   const [activeMenuTab, setActiveMenuTab] = useState<string>("travel");
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
+  const isMobile = useMobile();
   const [showSideMenu, setShowSideMenu] = useState<boolean>(!isMobile);
   const [activeDemoTab, setActiveDemoTab] = useState<string>("tourists");
 
@@ -34,38 +34,9 @@ const Tourist = () => {
     setShowSideMenu(!showSideMenu);
   };
 
-  // Mock data for TouristHeader props
-  const notifications = [
-    { id: 1, title: "New message", read: false },
-    { id: 2, title: "Booking confirmed", read: true }
-  ];
-
-  // Mock data for menuItems
-  const menuItems = [
-    { value: "travel", label: "Seyahat", icon: <Menu className="h-5 w-5" /> },
-    { value: "nearby", label: "Keşfet", icon: <Menu className="h-5 w-5" /> },
-    { value: "plan", label: "Gezi Planla", icon: <Menu className="h-5 w-5" /> },
-    { value: "hotel", label: "Konaklama", icon: <Menu className="h-5 w-5" /> },
-    { value: "restaurant", label: "Restoran", icon: <Menu className="h-5 w-5" /> },
-    { value: "flights", label: "Uçuşlar", icon: <Menu className="h-5 w-5" /> }
-  ];
-
-  // Mock function for signout
-  const handleSignOut = () => {
-    navigate("/");
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <TouristHeader 
-        showMobileMenu={showSideMenu}
-        setShowMobileMenu={setShowSideMenu}
-        handleSignOut={handleSignOut}
-        notifications={notifications}
-        handleTabChange={setActiveMenuTab}
-        activeTab={activeMenuTab}
-        menuItems={menuItems}
-      />
+      <TouristHeader toggleMenu={toggleMenu} />
       
       <div className="flex-1 flex">
         {/* Side Navigation - Hidden on mobile when menu is closed */}
@@ -73,8 +44,9 @@ const Tourist = () => {
           <div className={`${isMobile ? "absolute z-20 h-[calc(100vh-64px)] shadow-xl" : "w-64"} bg-white border-r`}>
             <TouristNavigation 
               activeTab={activeMenuTab}
-              handleTabChange={setActiveMenuTab}
-              menuItems={menuItems}
+              onTabChange={setActiveMenuTab}
+              isMobile={isMobile}
+              onClose={() => setShowSideMenu(false)}
             />
           </div>
         )}
@@ -137,12 +109,7 @@ const Tourist = () => {
       </div>
       
       {/* Mobile Bottom Navigation */}
-      {isMobile && (
-        <TouristMobileNav 
-          activeTab={activeMenuTab}
-          handleTabChange={setActiveMenuTab}
-        />
-      )}
+      {isMobile && <TouristMobileNav activeTab={activeMenuTab} onTabChange={setActiveMenuTab} />}
     </div>
   );
 };

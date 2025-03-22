@@ -33,8 +33,6 @@ import FeedbackList from "./FeedbackList";
 
 const InstitutionDemoPanel = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [reportToRespond, setReportToRespond] = useState<string | null>(null);
-  const [reportType, setReportType] = useState<'report' | 'feedback'>('report');
 
   const statistics = {
     totalReports: 1243,
@@ -83,22 +81,6 @@ const InstitutionDemoPanel = () => {
     { region: "İskele", count: 1020, percent: 10 },
     { region: "Güzelyurt", count: 510, percent: 5 }
   ];
-
-  // Mock functions for props
-  const handleOpenResponseDialog = (id: string, type: 'report' | 'feedback') => {
-    setReportToRespond(id);
-    setReportType(type);
-    console.log(`Opening response dialog for ${type} with ID: ${id}`);
-  };
-
-  const handleAssignReport = (id: string) => {
-    console.log(`Assigning report with ID: ${id}`);
-  };
-
-  const loadData = () => {
-    console.log("Reloading data...");
-    // In a real app, this would fetch fresh data
-  };
 
   return (
     <div className="space-y-4">
@@ -396,27 +378,15 @@ const InstitutionDemoPanel = () => {
                     </TabsList>
                     
                     <TabsContent value="emergency">
-                      <EmergencyReportsList 
-                        onOpenResponseDialog={handleOpenResponseDialog}
-                        onAssignReport={handleAssignReport}
-                        loadData={loadData}
-                      />
+                      <EmergencyReportsList />
                     </TabsContent>
                     
                     <TabsContent value="price">
-                      <PriceReportsList 
-                        onOpenResponseDialog={handleOpenResponseDialog}
-                        onAssignReport={handleAssignReport}
-                        loadData={loadData}
-                      />
+                      <PriceReportsList />
                     </TabsContent>
                     
                     <TabsContent value="fraud">
-                      <FraudReportsList 
-                        onOpenResponseDialog={handleOpenResponseDialog}
-                        onAssignReport={handleAssignReport}
-                        loadData={loadData}
-                      />
+                      <FraudReportsList />
                     </TabsContent>
                   </Tabs>
                 </CardContent>
@@ -429,10 +399,7 @@ const InstitutionDemoPanel = () => {
                   <CardTitle>Geri Bildirimler</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <FeedbackList 
-                    onOpenResponseDialog={handleOpenResponseDialog}
-                    loadData={loadData}
-                  />
+                  <FeedbackList />
                 </CardContent>
               </Card>
             </TabsContent>
