@@ -7,3 +7,4 @@ export * from './institutionService';
 export * from './notificationService';
 export * from './feedbackService';
 export * from './reportService';
+export * from './reportSubmitService';

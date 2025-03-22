@@ -10,3 +10,5 @@ export { default as MapSection } from './MapSection';
 export { default as EmergencyReportsList } from './EmergencyReportsList';
 export { default as PriceReportsList } from './PriceReportsList';
 export { default as FraudReportsList } from './FraudReportsList';
+export { default as ResponseDialog } from './ResponseDialog';
+export { default as AssignReportDialog } from './AssignReportDialog';

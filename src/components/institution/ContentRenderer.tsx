@@ -112,7 +112,7 @@ const ContentRenderer = ({
           <ResponseDialog 
             open={responseDialogOpen} 
             onOpenChange={setResponseDialogOpen} 
-            onSubmit={handleSendResponse} 
+            onRespond={handleSendResponse} 
           />
           
           <AssignReportDialog 
