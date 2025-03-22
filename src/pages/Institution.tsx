@@ -76,7 +76,7 @@ const Institution = () => {
     { id: 3, title: "Yazılım güncellemesi", date: "12 Mayıs 2023", status: "completed" },
   ]);
   
-  const [demoNotices, setDemoNotices = useState([
+  const [demoNotices, setDemoNotices] = useState([
     { id: 1, title: "Acil durum tatbikatı", date: "14 Mayıs 2023", important: true },
     { id: 2, title: "Yeni yönetmelik duyurusu", date: "10 Mayıs 2023", important: false },
   ]);
@@ -240,7 +240,7 @@ const Institution = () => {
           <>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-xl">Elektrik Arızaları</CardTitle>
+                <CardTitle className="text-xl">Elektrik Arıza Yönetimi</CardTitle>
                 <CardDescription>Son 24 saat</CardDescription>
               </CardHeader>
               <CardContent>
@@ -664,4 +664,40 @@ const Institution = () => {
                         <h4 className="font-medium">Lefkoşa - Kumsal</h4>
                         <span className="text-red-600 text-sm">Acil</span>
                       </div>
-                      <p className="text-sm text-gray-600 mt-1
+                      <p className="text-sm text-gray-600 mt-1">Ana boru hattı patlaması, yaklaşık 500 haneyi etkiliyor</p>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-xs text-gray-500">08:45'de bildirildi</span>
+                        <Button size="sm" variant="outline">Detaylar</Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="space-y-6">
+          <h1 className="text-2xl font-bold">{sectionTitle}</h1>
+          {sectionContent ? (
+            sectionContent
+          ) : (
+            <div className="bg-muted rounded-lg p-8 text-center">
+              <h3 className="text-lg font-medium mb-2">Bu modül henüz tam olarak yapılandırılmamıştır.</h3>
+              <p className="text-gray-600 mb-4">
+                Bu alandaki içerik yakında eklenecektir. Şu anda demo amaçlı görüntülenmektedir.
+              </p>
+              <Button onClick={() => toast.success("Modül yapılandırması başlatıldı")}>
+                Modülü Yapılandır
+              </Button>
+            </div>
+          )}
+        </div>
+      );
+    }
+  };
+
+  return
+
