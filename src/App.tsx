@@ -1,7 +1,4 @@
 
-// Import all icons from our utils layer instead of directly from lucide-react
-import * as Icons from "./utils/iconUtils";
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Tourist from "./pages/Tourist";
@@ -13,7 +10,6 @@ import ProjectMethodology from "./pages/ProjectMethodology";
 import TargetAudience from "./pages/TargetAudience";
 import AuthRequired from "./components/AuthRequired";
 import { Toaster } from "./components/ui/sonner";
-
 import "./App.css";
 
 function App() {
