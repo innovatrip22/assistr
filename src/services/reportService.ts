@@ -1,183 +1,91 @@
 
-import { supabase } from "@/integrations/supabase/client";
+import { delay } from "./testUtils";
 
-// Define the Report type
-export type Report = {
-  id?: string;
-  type: "price" | "fraud" | "emergency";
-  title?: string;
-  description: string;
-  location?: string;
-  business_name?: string;
-  product_name?: string;
-  normal_price?: number;
-  paid_price?: number;
-  user_id: string;
-  status?: "pending" | "processed" | "responded";
-  timestamp?: string;
-  response?: string | null;
-  response_timestamp?: string | null;
-  has_audio?: boolean;
-  has_photo?: boolean;
+// Simulates sending a response to a report
+export const sendReportResponse = async (reportId: string, response: string): Promise<void> => {
+  // Simulate API delay
+  await delay(800);
+  
+  console.log(`Sending response to report ${reportId}: ${response}`);
+  // In a real app, this would make an API call to update the report
+  return Promise.resolve();
 };
 
-// Function to add report response
-export const addReportResponse = async (id: string, response: string) => {
-  const { data, error } = await supabase
-    .from("reports")
-    .update({
-      response,
-      response_timestamp: new Date().toISOString(),
-      status: "responded",
-    })
-    .eq("id", id)
-    .select()
-    .single();
-
-  if (error) {
-    console.error("Error adding report response:", error);
-    throw error;
-  }
-  return data;
+// Simulates assigning a report to a department
+export const assignReport = async (reportId: string, departmentId: string): Promise<void> => {
+  // Simulate API delay
+  await delay(800);
+  
+  console.log(`Assigning report ${reportId} to department ${departmentId}`);
+  // In a real app, this would make an API call to assign the report
+  return Promise.resolve();
 };
 
-// Function to submit reports
-export const submitReports = async (type: string, data: any) => {
-  const reportData = {
-    ...data,
-    type,
-    user_id: data.user_id || "anonymous", // In a real app, this would be the user's ID
-    timestamp: new Date().toISOString(),
-    status: "pending",
-    title: type === "price" ? `${data.business_name} - ${data.product_name}` : 
-           type === "fraud" ? `Dolandırıcılık Bildirimi - ${data.location}` :
-           `Acil Durum - ${data.location}`,
-  };
-
-  const { error } = await supabase
-    .from("reports")
-    .insert([reportData]);
-
-  if (error) {
-    console.error("Error submitting report:", error);
-    throw error;
-  }
-  return true;
-};
-
-// Function to get reports
-export const getReports = async () => {
-  const { data, error } = await supabase
-    .from("reports")
-    .select("*")
-    .order("timestamp", { ascending: false });
-
-  if (error) {
-    console.error("Error getting reports:", error);
-    throw error;
-  }
-  return data;
-};
-
-// Function to get price reports
-export const getPriceReports = async () => {
-  const { data, error } = await supabase
-    .from("reports")
-    .select("*")
-    .eq("type", "price")
-    .order("timestamp", { ascending: false });
-
-  if (error) {
-    console.error("Error getting price reports:", error);
-    throw error;
-  }
-  return data;
-};
-
-// Function to get fraud reports
-export const getFraudReports = async () => {
-  const { data, error } = await supabase
-    .from("reports")
-    .select("*")
-    .eq("type", "fraud")
-    .order("timestamp", { ascending: false });
-
-  if (error) {
-    console.error("Error getting fraud reports:", error);
-    throw error;
-  }
-  return data;
-};
-
-// Function to get emergency reports
-export const getEmergencyReports = async () => {
-  const { data, error } = await supabase
-    .from("reports")
-    .select("*")
-    .eq("type", "emergency")
-    .order("timestamp", { ascending: false });
-
-  if (error) {
-    console.error("Error getting emergency reports:", error);
-    throw error;
-  }
-  return data;
-};
-
-// Function to update report status
-export const updateReportStatus = async (id: string, status: 'pending' | 'processed' | 'responded') => {
-  const { data, error } = await supabase
-    .from("reports")
-    .update({ status })
-    .eq("id", id)
-    .select()
-    .single();
-
-  if (error) {
-    console.error("Error updating report status:", error);
-    throw error;
-  }
-  return data;
-};
-
-// Function to add a new report
-export const addReport = async (reportData: any) => {
-  const { error } = await supabase.from("reports").insert([
+// Gets a list of available reports
+export const getReports = async (): Promise<any[]> => {
+  // Simulate API delay
+  await delay(800);
+  
+  // Mock data for testing
+  return [
     {
-      ...reportData,
+      id: "rep-1",
+      type: "emergency",
+      title: "Acil Tıbbi Yardım Gerekli",
+      description: "Girne sahilinde yaşlı bir turist denizde boğulma tehlikesi geçirdi. Hızlı müdahale gerekiyor.",
+      location: "Girne Sahili",
+      status: "pending",
       timestamp: new Date().toISOString(),
-      status: reportData.status || "pending",
     },
-  ]);
-
-  if (error) {
-    console.error("Error adding report:", error);
-    throw error;
-  }
-  return true;
+    {
+      id: "rep-2",
+      type: "emergency",
+      title: "Kaza Bildirimi",
+      description: "Lefkoşa-Girne anayolunda turistlerin bulunduğu araç kaza yaptı. Yaralılar var.",
+      location: "Lefkoşa-Girne Anayolu",
+      status: "processed",
+      timestamp: new Date(Date.now() - 3600000).toISOString(),
+      response: "Ambulans ve trafik ekipleri olay yerine yönlendirildi.",
+      response_timestamp: new Date(Date.now() - 3000000).toISOString(),
+    },
+    {
+      id: "rep-3",
+      type: "price",
+      business_name: "Sahil Restaurant",
+      description: "Menüde yazan fiyatların iki katı ücret talep edildi. İngilizce menüde fiyatlar farklı.",
+      location: "Gazimağusa",
+      status: "pending",
+      timestamp: new Date(Date.now() - 86400000).toISOString(),
+    },
+    {
+      id: "rep-4",
+      type: "price",
+      business_name: "Blue Diamond Hotel",
+      description: "Rezervasyon sırasında belirtilen fiyattan daha yüksek ücret talep edildi. Ekstra hizmet bedeli olarak açıklandı.",
+      location: "Girne",
+      status: "responded",
+      timestamp: new Date(Date.now() - 172800000).toISOString(),
+      response: "Şikayetiniz ilgili birimlerimize iletilmiştir. Otel yetkilileri ile görüşülüp gerekli uyarılar yapılacaktır.",
+      response_timestamp: new Date(Date.now() - 100000000).toISOString(),
+    },
+    {
+      id: "rep-5",
+      type: "fraud",
+      business_name: "Sahte Tur Operatörü",
+      description: "Bize tur satarak para alan kişi ortadan kayboldu. Hiçbir tur hizmeti alamadık.",
+      location: "Lefkoşa",
+      status: "pending",
+      timestamp: new Date(Date.now() - 259200000).toISOString(),
+    }
+  ];
 };
 
-// Get report statistics
-export const getReportSummary = async () => {
-  const { data, error } = await supabase
-    .from("reports")
-    .select("type, status");
-
-  if (error) {
-    console.error("Error getting report summary:", error);
-    throw error;
-  }
-
-  const totalPriceReports = data.filter(r => r.type === "price").length;
-  const totalFraudReports = data.filter(r => r.type === "fraud").length;
-  const totalEmergencyReports = data.filter(r => r.type === "emergency").length;
-  const pendingReports = data.filter(r => r.status === "pending").length;
-
-  return {
-    totalReports: data.length,
-    totalPriceReports,
-    totalFraudReports,
-    totalEmergencyReports,
-    pendingReports
-  };
+// Updates the status of a report
+export const updateReportStatus = async (reportId: string, status: 'pending' | 'processed' | 'responded'): Promise<void> => {
+  // Simulate API delay
+  await delay(800);
+  
+  console.log(`Updating report ${reportId} to status ${status}`);
+  // In a real app, this would make an API call to update the report status
+  return Promise.resolve();
 };
