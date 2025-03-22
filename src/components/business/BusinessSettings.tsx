@@ -147,31 +147,97 @@ const BusinessSettings = ({ business, onUpdate }: BusinessSettingsProps) => {
                   />
                 </div>
                 
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="isHistorical" 
-                    checked={editedBusinessDetails?.isHistorical || false}
-                    onCheckedChange={(checked) => handleCheckboxChange('isHistorical', checked as boolean)} 
-                  />
-                  <Label htmlFor="isHistorical">Tarihi bir binada hizmet veriyoruz</Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="isHistorical" 
+                      checked={editedBusinessDetails?.isHistorical || false}
+                      onCheckedChange={(checked) => handleCheckboxChange('isHistorical', checked as boolean)} 
+                    />
+                    <Label htmlFor="isHistorical">Tarihi bir binada hizmet veriyoruz</Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="servesTraditionalFood" 
+                      checked={editedBusinessDetails?.servesTraditionalFood || false}
+                      onCheckedChange={(checked) => handleCheckboxChange('servesTraditionalFood', checked as boolean)} 
+                    />
+                    <Label htmlFor="servesTraditionalFood">Geleneksel Kıbrıs yemekleri sunuyoruz</Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="hasLocalArtisans" 
+                      checked={editedBusinessDetails?.hasLocalArtisans || false}
+                      onCheckedChange={(checked) => handleCheckboxChange('hasLocalArtisans', checked as boolean)} 
+                    />
+                    <Label htmlFor="hasLocalArtisans">Yerel zanaatkarlarla çalışıyoruz</Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="servesMezze" 
+                      checked={editedBusinessDetails?.servesMezze || false}
+                      onCheckedChange={(checked) => handleCheckboxChange('servesMezze', checked as boolean)} 
+                    />
+                    <Label htmlFor="servesMezze">Mezze servisi yapıyoruz</Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="servesSeafood" 
+                      checked={editedBusinessDetails?.servesSeafood || false}
+                      onCheckedChange={(checked) => handleCheckboxChange('servesSeafood', checked as boolean)} 
+                    />
+                    <Label htmlFor="servesSeafood">Deniz ürünleri sunuyoruz</Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="hasOutdoorSeating" 
+                      checked={editedBusinessDetails?.hasOutdoorSeating || false}
+                      onCheckedChange={(checked) => handleCheckboxChange('hasOutdoorSeating', checked as boolean)} 
+                    />
+                    <Label htmlFor="hasOutdoorSeating">Açık alan oturma yerimiz var</Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="servesLocalWine" 
+                      checked={editedBusinessDetails?.servesLocalWine || false}
+                      onCheckedChange={(checked) => handleCheckboxChange('servesLocalWine', checked as boolean)} 
+                    />
+                    <Label htmlFor="servesLocalWine">Yerel şaraplar sunuyoruz</Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="hasLiveMusic" 
+                      checked={editedBusinessDetails?.hasLiveMusic || false}
+                      onCheckedChange={(checked) => handleCheckboxChange('hasLiveMusic', checked as boolean)} 
+                    />
+                    <Label htmlFor="hasLiveMusic">Canlı müzik etkinliklerimiz var</Label>
+                  </div>
                 </div>
-                
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="servesTraditionalFood" 
-                    checked={editedBusinessDetails?.servesTraditionalFood || false}
-                    onCheckedChange={(checked) => handleCheckboxChange('servesTraditionalFood', checked as boolean)} 
+
+                <div>
+                  <Label htmlFor="specialties">Özel Yemekler (virgülle ayırın)</Label>
+                  <Input
+                    id="specialties"
+                    type="text"
+                    name="specialties"
+                    value={editedBusinessDetails?.specialties?.join(", ") || ""}
+                    onChange={(e) => {
+                      const specialtiesArray = e.target.value.split(",").map(item => item.trim());
+                      setEditedBusinessDetails(prev => ({
+                        ...prev,
+                        specialties: specialtiesArray
+                      } as Business));
+                    }}
+                    placeholder="Örn: Şeftali Kebabı, Hellim, Molehiya"
                   />
-                  <Label htmlFor="servesTraditionalFood">Geleneksel Kıbrıs yemekleri sunuyoruz</Label>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="hasLocalArtisans" 
-                    checked={editedBusinessDetails?.hasLocalArtisans || false}
-                    onCheckedChange={(checked) => handleCheckboxChange('hasLocalArtisans', checked as boolean)} 
-                  />
-                  <Label htmlFor="hasLocalArtisans">Yerel zanaatkarlarla çalışıyoruz</Label>
+                  <p className="text-sm text-gray-500 mt-1">Kıbrıs'a özgü spesiyalitelerinizi ekleyin</p>
                 </div>
               </div>
 
@@ -237,6 +303,34 @@ const BusinessSettings = ({ business, onUpdate }: BusinessSettingsProps) => {
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Yerel Zanaatkarlar</h3>
                     <p className="mt-1">{business?.hasLocalArtisans ? "Evet" : "Hayır"}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500">Mezze Servisi</h3>
+                    <p className="mt-1">{business?.servesMezze ? "Evet" : "Hayır"}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500">Deniz Ürünleri</h3>
+                    <p className="mt-1">{business?.servesSeafood ? "Evet" : "Hayır"}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500">Açık Alan Oturma</h3>
+                    <p className="mt-1">{business?.hasOutdoorSeating ? "Evet" : "Hayır"}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500">Yerel Şaraplar</h3>
+                    <p className="mt-1">{business?.servesLocalWine ? "Evet" : "Hayır"}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500">Canlı Müzik</h3>
+                    <p className="mt-1">{business?.hasLiveMusic ? "Evet" : "Hayır"}</p>
+                  </div>
+                  <div className="md:col-span-2">
+                    <h3 className="text-sm font-medium text-gray-500">Özel Yemekler</h3>
+                    <p className="mt-1">
+                      {business?.specialties && business.specialties.length > 0 
+                        ? business.specialties.join(", ") 
+                        : "Belirtilmemiş"}
+                    </p>
                   </div>
                 </div>
               </div>

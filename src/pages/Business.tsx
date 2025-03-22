@@ -6,7 +6,7 @@ import {
   LogOut, Activity, ShoppingBag, Settings, MessageSquare, 
   BellRing, BarChart3, FileText, Users, Calendar, 
   BadgePercent, MessageCircle, Sun, Utensils, Hotel,
-  MapPin, Landmark
+  MapPin, Landmark, Wine, Music, Umbrella, ShoppingBasket, Fish
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -73,15 +73,15 @@ const BusinessPage = () => {
 
   const tabItems = [
     { value: "dashboard", label: "Panel", icon: <Activity className="w-4 h-4" /> },
-    { value: "products", label: "Ürünler", icon: <ShoppingBag className="w-4 h-4" /> },
+    { value: "products", label: "Menü", icon: <ShoppingBag className="w-4 h-4" /> },
     { value: "reservations", label: "Rezervasyonlar", icon: <Calendar className="w-4 h-4" /> },
     { value: "events", label: "Etkinlikler", icon: <Calendar className="w-4 h-4" /> },
     { value: "promotions", label: "Promosyonlar", icon: <BadgePercent className="w-4 h-4" /> },
     { value: "employees", label: "Personel", icon: <Users className="w-4 h-4" /> },
-    { value: "feedback", label: "Geri Bildirimler", icon: <FileText className="w-4 h-4" /> },
-    { value: "livechat", label: "Canlı Destek", icon: <MessageCircle className="w-4 h-4" /> },
+    { value: "feedback", label: "Değerlendirmeler", icon: <FileText className="w-4 h-4" /> },
     { value: "messages", label: "Mesajlar", icon: <MessageSquare className="w-4 h-4" /> },
     { value: "notifications", label: "Bildirimler", icon: <BellRing className="w-4 h-4" /> },
+    { value: "livechat", label: "Canlı Destek", icon: <MessageCircle className="w-4 h-4" /> },
     { value: "settings", label: "Ayarlar", icon: <Settings className="w-4 h-4" /> },
   ];
 
@@ -109,8 +109,8 @@ const BusinessPage = () => {
           </Button>
         </motion.div>
 
-        {/* Business Type Indicator */}
-        <div className="mb-6">
+        {/* Business Type and Features Indicators */}
+        <div className="mb-6 flex flex-wrap gap-2">
           <Badge className="text-sm bg-cyan-100 text-cyan-800 border-cyan-200 hover:bg-cyan-200">
             {business?.type === "restaurant" && <Utensils className="w-3 h-3 mr-1" />}
             {business?.type === "hotel" && <Hotel className="w-3 h-3 mr-1" />}
@@ -127,15 +127,57 @@ const BusinessPage = () => {
           </Badge>
           
           {business?.location && (
-            <Badge variant="outline" className="ml-2 text-sm">
+            <Badge variant="outline" className="text-sm">
               <MapPin className="w-3 h-3 mr-1" /> 
               {business.location}
+            </Badge>
+          )}
+          
+          {business?.servesTraditionalFood && (
+            <Badge variant="outline" className="text-sm bg-amber-50">
+              <Utensils className="w-3 h-3 mr-1" /> 
+              Geleneksel Kıbrıs Mutfağı
+            </Badge>
+          )}
+          
+          {business?.servesMezze && (
+            <Badge variant="outline" className="text-sm bg-amber-50">
+              <ShoppingBasket className="w-3 h-3 mr-1" /> 
+              Mezze
+            </Badge>
+          )}
+          
+          {business?.servesSeafood && (
+            <Badge variant="outline" className="text-sm bg-sky-50">
+              <Fish className="w-3 h-3 mr-1" /> 
+              Deniz Ürünleri
+            </Badge>
+          )}
+          
+          {business?.servesLocalWine && (
+            <Badge variant="outline" className="text-sm bg-purple-50">
+              <Wine className="w-3 h-3 mr-1" /> 
+              Yerel Şaraplar
+            </Badge>
+          )}
+          
+          {business?.hasLiveMusic && (
+            <Badge variant="outline" className="text-sm bg-pink-50">
+              <Music className="w-3 h-3 mr-1" /> 
+              Canlı Müzik
+            </Badge>
+          )}
+          
+          {business?.hasOutdoorSeating && (
+            <Badge variant="outline" className="text-sm bg-green-50">
+              <Umbrella className="w-3 h-3 mr-1" /> 
+              Açık Alan
             </Badge>
           )}
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <Card className="border-l-4 border-l-blue-500">
             <CardContent className="pt-6">
               <div className="flex justify-between items-center">
@@ -177,6 +219,20 @@ const BusinessPage = () => {
               </div>
             </CardContent>
           </Card>
+          
+          <Card className="border-l-4 border-l-purple-500">
+            <CardContent className="pt-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Gelir (Günlük)</p>
+                  <h3 className="text-2xl font-bold">₺4,250</h3>
+                </div>
+                <div className="bg-purple-100 p-3 rounded-full">
+                  <BadgePercent className="h-6 w-6 text-purple-500" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Improved Tab Navigation */}
@@ -195,7 +251,7 @@ const BusinessPage = () => {
                     className={`
                       flex-1 min-w-[120px] py-3 px-4 transition-all duration-200
                       data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700
-                      data-[state=active]:shadow-none
+                      data-[state=active]:shadow-none hover:bg-gray-50
                     `}
                   >
                     <div className="flex items-center justify-center">

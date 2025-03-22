@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 // Define the Business type
@@ -21,6 +22,12 @@ export type Business = {
   establishedYear?: number; 
   servesTraditionalFood?: boolean;
   hasLocalArtisans?: boolean;
+  servesMezze?: boolean;
+  servesSeafood?: boolean;
+  hasOutdoorSeating?: boolean;
+  servesLocalWine?: boolean;
+  hasLiveMusic?: boolean;
+  specialties?: string[];
 }
 
 // Business methods
@@ -82,7 +89,13 @@ export const getBusinessDetails = async (): Promise<Business> => {
     isHistorical: true,
     establishedYear: 1985,
     servesTraditionalFood: true,
-    hasLocalArtisans: true
+    hasLocalArtisans: true,
+    servesMezze: true,
+    servesSeafood: true,
+    hasOutdoorSeating: true,
+    servesLocalWine: true,
+    hasLiveMusic: true,
+    specialties: ["Şeftali Kebabı", "Hellim", "Molehiya", "Macun Tatlısı", "Zivaniya"]
   };
 };
 
