@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { Clock, Globe, Upload, Share2 } from "lucide-react";
 
 interface InstitutionDemoPanelProps {
   userData: any;
@@ -24,6 +25,8 @@ const InstitutionDemoPanel: React.FC<InstitutionDemoPanelProps> = ({ userData })
   const [institutionName, setInstitutionName] = useState("Örnek Kurum");
   const [institutionType, setInstitutionType] = useState("");
   const [announcement, setAnnouncement] = useState("Önemli duyurular burada yer alacaktır...");
+  const [notifications, setNotifications] = useState(false);
+  const [maintenance, setMaintenance] = useState(false);
 
   const handleSave = () => {
     toast.success("Ayarlar başarıyla kaydedildi!");
@@ -75,23 +78,69 @@ const InstitutionDemoPanel: React.FC<InstitutionDemoPanelProps> = ({ userData })
           />
         </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex items-center space-x-2">
+            <Switch 
+              id="darkMode" 
+              checked={darkMode}
+              onCheckedChange={setDarkMode}
+            />
+            <Label htmlFor="darkMode">Karanlık Mod</Label>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch 
+              id="notifications" 
+              checked={notifications}
+              onCheckedChange={setNotifications}
+            />
+            <Label htmlFor="notifications">Bildirimler</Label>
+          </div>
+        </div>
+
         <div className="flex items-center space-x-2">
           <Switch 
-            id="darkMode" 
-            checked={darkMode}
-            onCheckedChange={setDarkMode}
+            id="maintenance" 
+            checked={maintenance}
+            onCheckedChange={setMaintenance}
           />
-          <Label htmlFor="darkMode">Karanlık Mod</Label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Switch id="notifications" />
-          <Label htmlFor="notifications">Bildirimler</Label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Switch id="maintenance" />
           <Label htmlFor="maintenance">Bakım Modu</Label>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="p-4 border rounded-md flex items-center space-x-3">
+            <Clock className="h-5 w-5 text-gray-500" />
+            <div>
+              <h4 className="font-medium">Çalışma Saatleri</h4>
+              <p className="text-sm text-gray-500">Pazartesi - Cuma: 09:00 - 17:00</p>
+            </div>
+          </div>
+          
+          <div className="p-4 border rounded-md flex items-center space-x-3">
+            <Globe className="h-5 w-5 text-gray-500" />
+            <div>
+              <h4 className="font-medium">Web Sitesi</h4>
+              <p className="text-sm text-gray-500">www.ornekurum.com.tr</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="p-4 border rounded-md flex items-center space-x-3">
+            <Upload className="h-5 w-5 text-gray-500" />
+            <div>
+              <h4 className="font-medium">Dokuman Yükleme</h4>
+              <p className="text-sm text-gray-500">Belge ve evrakları yükleyin</p>
+            </div>
+          </div>
+          
+          <div className="p-4 border rounded-md flex items-center space-x-3">
+            <Share2 className="h-5 w-5 text-gray-500" />
+            <div>
+              <h4 className="font-medium">Bilgi Paylaşımı</h4>
+              <p className="text-sm text-gray-500">Diğer kurumlarla bilgi paylaşımı</p>
+            </div>
+          </div>
         </div>
 
         <Button onClick={handleSave}>Kaydet</Button>
