@@ -31,6 +31,12 @@ const mockTouristStats = {
     { country: "Almanya", percentage: 10 },
     { country: "Rusya", percentage: 8 },
     { country: "Diğer", percentage: 22 }
+  ],
+  sources: [
+    { source: "Online Booking", percentage: 64 },
+    { source: "Travel Agencies", percentage: 21 },
+    { source: "Direct Bookings", percentage: 9 },
+    { source: "Other", percentage: 6 }
   ]
 };
 

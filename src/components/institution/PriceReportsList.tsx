@@ -21,15 +21,13 @@ interface PriceReportsListProps {
   onAssignReport: (id: string) => void;
   loadData: () => void;
   limit?: number;
-  institution?: string;
 }
 
 const PriceReportsList = ({ 
   onOpenResponseDialog, 
   onAssignReport, 
   loadData, 
-  limit,
-  institution 
+  limit
 }: PriceReportsListProps) => {
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,14 +38,8 @@ const PriceReportsList = ({
         setLoading(true);
         let reportData = await getReports();
         
-        // Filter by institution if provided
-        if (institution) {
-          reportData = reportData.filter(report => 
-            report.type === 'price'
-          );
-        } else {
-          reportData = reportData.filter(report => report.type === 'price');
-        }
+        // Filter for price reports
+        reportData = reportData.filter(report => report.type === 'price');
         
         // Apply limit if provided
         if (limit && reportData.length > limit) {
@@ -64,18 +56,16 @@ const PriceReportsList = ({
     };
 
     fetchReports();
-  }, [limit, institution]);
+  }, [limit]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
         return <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300">Beklemede</Badge>;
-      case 'in_progress':
+      case 'processed':
         return <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">İşleniyor</Badge>;
-      case 'resolved':
+      case 'responded':
         return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">Çözüldü</Badge>;
-      case 'rejected':
-        return <Badge variant="outline" className="bg-red-100 text-red-800 border-red-300">Reddedildi</Badge>;
       default:
         return <Badge variant="outline">Belirsiz</Badge>;
     }
@@ -90,11 +80,9 @@ const PriceReportsList = ({
     }
   };
 
-  const handleStatusChange = async (id: string, newStatus: string) => {
+  const handleStatusChange = async (id: string, newStatus: 'pending' | 'processed' | 'responded') => {
     try {
-      // Convert to acceptable status type
-      const status = newStatus === "resolved" ? "responded" : "pending";
-      await updateReportStatus(id, status);
+      await updateReportStatus(id, newStatus);
       toast.success("Rapor durumu güncellendi");
       loadData();
     } catch (error) {
@@ -174,10 +162,10 @@ const PriceReportsList = ({
                   </Button>
                   <Button 
                     size="sm" 
-                    variant={report.status === 'resolved' ? "success" : "outline"} 
+                    variant={report.status === 'responded' ? "success" : "outline"} 
                     className="text-xs h-8"
-                    onClick={() => handleStatusChange(report.id, 'resolved')}
-                    disabled={report.status === 'resolved'}
+                    onClick={() => handleStatusChange(report.id, 'responded')}
+                    disabled={report.status === 'responded'}
                   >
                     <CheckCircle className="h-3 w-3 mr-1" />
                     Çözüldü
