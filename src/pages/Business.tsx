@@ -157,7 +157,7 @@ const BusinessPage = () => {
           {business?.servesLocalWine && (
             <Badge variant="outline" className="text-sm bg-purple-50">
               <Wine className="w-3 h-3 mr-1" /> 
-              Yerel Şaraplar
+              Şaraplar
             </Badge>
           )}
           
