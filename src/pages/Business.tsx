@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/hooks/useAuth";
 import { getTouristDataStats, getBusinessDetails, updateBusinessDetails, getBusiness } from "@/services";
 import BusinessAnalytics from "@/components/business/BusinessAnalytics";
@@ -27,6 +28,7 @@ const Business = () => {
   const [business, setBusiness] = useState<Business | null>(null);
   const [touristStats, setTouristStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("dashboard");
   const navigate = useNavigate();
   const { signOut } = useAuth();
 
@@ -54,116 +56,120 @@ const Business = () => {
     return <div className="flex items-center justify-center min-h-screen">Yükleniyor...</div>;
   }
 
-  return (
-    <div className="min-h-screen bg-gray-100 py-6">
-      <div className="container mx-auto px-4">
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-3xl font-bold text-gray-800 mb-6"
-        >
-          KKTC İşletme Paneli
-        </motion.h1>
+  const menuItems = [
+    { id: "dashboard", label: "Panel", icon: <Activity className="w-4 h-4" /> },
+    { id: "products", label: "Ürünler", icon: <ShoppingBag className="w-4 h-4" /> },
+    { id: "reservations", label: "Rezervasyonlar", icon: <Calendar className="w-4 h-4" /> },
+    { id: "events", label: "Etkinlikler", icon: <Calendar className="w-4 h-4" /> },
+    { id: "promotions", label: "Promosyonlar", icon: <BadgePercent className="w-4 h-4" /> },
+    { id: "employees", label: "Personel", icon: <Users className="w-4 h-4" /> },
+    { id: "feedback", label: "Geri Bildirimler", icon: <FileText className="w-4 h-4" /> },
+    { id: "livechat", label: "Canlı Destek", icon: <MessageCircle className="w-4 h-4" /> },
+    { id: "messages", label: "Mesajlar", icon: <MessageSquare className="w-4 h-4" /> },
+    { id: "notifications", label: "Bildirimler", icon: <BellRing className="w-4 h-4" /> },
+    { id: "settings", label: "Ayarlar", icon: <Settings className="w-4 h-4" /> },
+  ];
 
-        <Tabs defaultValue="dashboard" className="w-full space-y-4">
-          <div className="flex justify-between items-center">
-            <TabsList className="bg-white border rounded-lg shadow-sm overflow-x-auto">
-              <TabsTrigger value="dashboard" className="data-[state=active]:bg-gray-100">
-                <Activity className="w-4 h-4 mr-2" />
-                Panel
-              </TabsTrigger>
-              <TabsTrigger value="products" className="data-[state=active]:bg-gray-100">
-                <ShoppingBag className="w-4 h-4 mr-2" />
-                Ürünler
-              </TabsTrigger>
-              <TabsTrigger value="reservations" className="data-[state=active]:bg-gray-100">
-                <Calendar className="w-4 h-4 mr-2" />
-                Rezervasyonlar
-              </TabsTrigger>
-              <TabsTrigger value="events" className="data-[state=active]:bg-gray-100">
-                <Calendar className="w-4 h-4 mr-2" />
-                Etkinlikler
-              </TabsTrigger>
-              <TabsTrigger value="promotions" className="data-[state=active]:bg-gray-100">
-                <BadgePercent className="w-4 h-4 mr-2" />
-                Promosyonlar
-              </TabsTrigger>
-              <TabsTrigger value="employees" className="data-[state=active]:bg-gray-100">
-                <Users className="w-4 h-4 mr-2" />
-                Personel
-              </TabsTrigger>
-              <TabsTrigger value="feedback" className="data-[state=active]:bg-gray-100">
-                <FileText className="w-4 h-4 mr-2" />
-                Geri Bildirimler
-              </TabsTrigger>
-              <TabsTrigger value="livechat" className="data-[state=active]:bg-gray-100">
-                <MessageCircle className="w-4 h-4 mr-2" />
-                Canlı Destek
-              </TabsTrigger>
-              <TabsTrigger value="messages" className="data-[state=active]:bg-gray-100">
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Mesajlar
-              </TabsTrigger>
-              <TabsTrigger value="notifications" className="data-[state=active]:bg-gray-100">
-                <BellRing className="w-4 h-4 mr-2" />
-                Bildirimler
-              </TabsTrigger>
-              <TabsTrigger value="settings" className="data-[state=active]:bg-gray-100">
-                <Settings className="w-4 h-4 mr-2" />
-                Ayarlar
-              </TabsTrigger>
-            </TabsList>
-            
+  const renderTabContent = () => {
+    switch(activeTab) {
+      case "dashboard":
+        return <BusinessAnalytics touristStats={touristStats} />;
+      case "products":
+        return <BusinessProducts />;
+      case "reservations":
+        return <BusinessReservations />;
+      case "events":
+        return <BusinessEvents />;
+      case "promotions":
+        return <BusinessPromotions />;
+      case "employees":
+        return <BusinessEmployees />;
+      case "feedback":
+        return <BusinessFeedback />;
+      case "livechat":
+        return <BusinessLiveChat />;
+      case "messages":
+        return <BusinessMessages />;
+      case "notifications":
+        return <BusinessNotifications />;
+      case "settings":
+        return <BusinessSettings business={business} onUpdate={loadData} />;
+      default:
+        return <BusinessAnalytics touristStats={touristStats} />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <div className="flex flex-col h-screen">
+        <header className="bg-white border-b shadow-sm">
+          <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+            <motion.h1
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-2xl font-bold text-gray-800"
+            >
+              KKTC İşletme Paneli
+            </motion.h1>
             <Button variant="destructive" size="sm" onClick={signOut}>
               <LogOut className="w-4 h-4 mr-2" />
               Çıkış Yap
             </Button>
           </div>
-          
-          <TabsContent value="dashboard">
-            <BusinessAnalytics touristStats={touristStats} />
-          </TabsContent>
+        </header>
 
-          <TabsContent value="products">
-            <BusinessProducts />
-          </TabsContent>
+        <div className="flex flex-1 overflow-hidden">
+          {/* Sidebar - visible on desktop */}
+          <aside className="hidden md:block w-64 bg-white border-r">
+            <ScrollArea className="h-[calc(100vh-4rem)]">
+              <div className="p-4">
+                <nav className="space-y-1">
+                  {menuItems.map((item) => (
+                    <Button
+                      key={item.id}
+                      variant={activeTab === item.id ? "secondary" : "ghost"}
+                      className={`w-full justify-start ${
+                        activeTab === item.id ? "bg-gray-100" : ""
+                      }`}
+                      onClick={() => setActiveTab(item.id)}
+                    >
+                      {item.icon}
+                      <span className="ml-2">{item.label}</span>
+                    </Button>
+                  ))}
+                </nav>
+              </div>
+            </ScrollArea>
+          </aside>
 
-          <TabsContent value="reservations">
-            <BusinessReservations />
-          </TabsContent>
+          {/* Main content */}
+          <main className="flex-1 overflow-auto">
+            {/* Mobile tabs - only visible on mobile */}
+            <div className="md:hidden px-4 py-3 overflow-x-auto">
+              <ScrollArea orientation="horizontal" className="w-full">
+                <div className="flex gap-2 min-w-max">
+                  {menuItems.map((item) => (
+                    <Button
+                      key={item.id}
+                      variant={activeTab === item.id ? "secondary" : "outline"}
+                      size="sm"
+                      className="flex items-center"
+                      onClick={() => setActiveTab(item.id)}
+                    >
+                      {item.icon}
+                      <span className="ml-1">{item.label}</span>
+                    </Button>
+                  ))}
+                </div>
+              </ScrollArea>
+            </div>
 
-          <TabsContent value="events">
-            <BusinessEvents />
-          </TabsContent>
-
-          <TabsContent value="promotions">
-            <BusinessPromotions />
-          </TabsContent>
-
-          <TabsContent value="employees">
-            <BusinessEmployees />
-          </TabsContent>
-          
-          <TabsContent value="feedback">
-            <BusinessFeedback />
-          </TabsContent>
-          
-          <TabsContent value="livechat">
-            <BusinessLiveChat />
-          </TabsContent>
-
-          <TabsContent value="messages">
-            <BusinessMessages />
-          </TabsContent>
-
-          <TabsContent value="notifications">
-            <BusinessNotifications />
-          </TabsContent>
-
-          <TabsContent value="settings">
-            <BusinessSettings business={business} onUpdate={loadData} />
-          </TabsContent>
-        </Tabs>
+            {/* Tab content */}
+            <div className="container mx-auto px-4 py-6">
+              {renderTabContent()}
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );

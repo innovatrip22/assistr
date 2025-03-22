@@ -1,97 +1,59 @@
 
 import { useState } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { updateReportStatus } from "@/services";
-import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-interface AssignReportDialogProps {
+export interface AssignReportDialogProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
-  selectedId: string | null;
-  onSubmitSuccess: () => void;
+  onClose: () => void;
+  onAssign: (unitId: string) => void;
 }
 
-const departments = [
-  { id: "tourism", name: "Turizm Departmanı" },
-  { id: "consumer", name: "Tüketici Hakları" },
-  { id: "security", name: "Güvenlik Birimi" },
-  { id: "health", name: "Sağlık Departmanı" },
-  { id: "environment", name: "Çevre Koruma" }
-];
+const AssignReportDialog = ({ open, onClose, onAssign }: AssignReportDialogProps) => {
+  const [selectedUnit, setSelectedUnit] = useState("");
 
-const AssignReportDialog = ({ open, onOpenChange, selectedId, onSubmitSuccess }: AssignReportDialogProps) => {
-  const [selectedDepartment, setSelectedDepartment] = useState<string>("");
-
-  const handleSubmit = async () => {
-    if (!selectedDepartment) {
-      toast.error("Lütfen bir departman seçin");
-      return;
-    }
-
-    if (selectedId) {
-      try {
-        // Burada normalde assignReportToDepartment gibi bir fonksiyon olabilir
-        // Şimdilik updateReportStatus kullanarak durumu "processed" olarak güncelliyoruz
-        await updateReportStatus(selectedId, "processed");
-        
-        toast.success("Rapor ilgili birime atandı");
-        onOpenChange(false);
-        setSelectedDepartment("");
-        onSubmitSuccess();
-      } catch (error) {
-        console.error("Rapor atama hatası:", error);
-        toast.error("Rapor ataması yapılırken bir hata oluştu");
-      }
+  const handleAssign = () => {
+    if (selectedUnit) {
+      onAssign(selectedUnit);
+      setSelectedUnit("");
     }
   };
 
+  const units = [
+    { id: "unit-1", name: "Saha Ekibi 1" },
+    { id: "unit-2", name: "Saha Ekibi 2" },
+    { id: "unit-3", name: "Teknik Servis" },
+    { id: "unit-4", name: "Müşteri Hizmetleri" },
+    { id: "unit-5", name: "Yönetim" },
+  ];
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Raporu Birime Ata</DialogTitle>
+          <DialogTitle>Raporu Ata</DialogTitle>
           <DialogDescription>
-            Bu şikayeti işlemesi için bir birime yönlendirin.
+            Raporu ilgili birime atayın.
           </DialogDescription>
         </DialogHeader>
-        
         <div className="py-4">
-          <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+          <Select value={selectedUnit} onValueChange={setSelectedUnit}>
             <SelectTrigger>
-              <SelectValue placeholder="Bir departman seçin" />
+              <SelectValue placeholder="Birim seçin" />
             </SelectTrigger>
             <SelectContent>
-              {departments.map((dept) => (
-                <SelectItem key={dept.id} value={dept.id}>
-                  {dept.name}
+              {units.map((unit) => (
+                <SelectItem key={unit.id} value={unit.id}>
+                  {unit.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
-        
-        <DialogFooter className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            İptal
-          </Button>
-          <Button onClick={handleSubmit}>
-            Ata
-          </Button>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>İptal</Button>
+          <Button onClick={handleAssign} disabled={!selectedUnit}>Ata</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
