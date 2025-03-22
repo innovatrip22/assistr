@@ -10,6 +10,10 @@ import ProjectMethodology from "./pages/ProjectMethodology";
 import TargetAudience from "./pages/TargetAudience";
 import AuthRequired from "./components/AuthRequired";
 import { Toaster } from "./components/ui/sonner";
+
+// Patch lucide-react to include our custom Tool icon
+import "./utils/iconUtils";
+
 import "./App.css";
 
 function App() {
