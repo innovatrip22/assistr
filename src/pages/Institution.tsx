@@ -1,13 +1,14 @@
+
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EmergencyReportsList } from "@/components/institution/EmergencyReportsList";
-import { PriceReportsList } from "@/components/institution/PriceReportsList";
-import { FraudReportsList } from "@/components/institution/FraudReportsList";
-import { FeedbackList } from "@/components/institution/FeedbackList";
-import { MapSection } from "@/components/institution/MapSection";
+import EmergencyReportsList from "@/components/institution/EmergencyReportsList";
+import PriceReportsList from "@/components/institution/PriceReportsList";
+import FraudReportsList from "@/components/institution/FraudReportsList";
+import FeedbackList from "@/components/institution/FeedbackList";
+import MapSection from "@/components/institution/MapSection";
 import InstitutionDemoPanel from "@/components/tourist/InstitutionDemoPanel";
 
 // Import the custom icons from our utils folder
@@ -22,7 +23,7 @@ const Institution: React.FC = () => {
 
   return (
     <div className="container mx-auto py-10">
-      <Tabs defaultvalue="panel-1" className="w-[100%]">
+      <Tabs defaultValue="panel-1" className="w-[100%]">
         <TabsList>
           <TabsTrigger value="panel-1">
             <Tool className="mr-2 h-4 w-4" />
