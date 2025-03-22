@@ -61,7 +61,6 @@ const Institution = () => {
   const [selectedItemType, setSelectedItemType] = useState<'feedback' | 'report' | null>(null);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
   
-  // Demo data for module content
   const [demoStats, setDemoStats] = useState({
     totalReports: 157,
     pendingTasks: 24,
@@ -83,15 +82,12 @@ const Institution = () => {
   ]);
 
   useEffect(() => {
-    // localStorage'dan kurum kodunu al (gerçek bir uygulamada bu auth sisteminden gelir)
     const institutionCode = localStorage.getItem("testUserType");
     console.log("Institution - Kurum tipi:", institutionCode);
     
-    // Test girişinden kurum koduna göre kurum anahtarını bul
     if (institutionCode) {
       setCurrentInstitution(institutionCode);
       
-      // Kurum adını ayarla
       switch(institutionCode) {
         case 'ELEKTRIK': 
           setInstitutionName("Elektrik Kurumu");
@@ -134,7 +130,6 @@ const Institution = () => {
   }, []);
 
   const loadData = useCallback(() => {
-    // Bu normalde geri bildirim ve raporları yeniden yükler
     toast.success("Veriler yenilendi");
   }, []);
 
@@ -164,7 +159,6 @@ const Institution = () => {
     loadData();
   };
 
-  // Tüm kurumlar için ortak menü öğelerini tanımla
   const commonMenuItems = [
     { id: "dashboard", label: "Dashboard", icon: <BarChart className="w-5 h-5" /> },
     { id: "feedback", label: "Geri Bildirim", icon: <MessageSquare className="w-5 h-5" /> },
@@ -177,7 +171,6 @@ const Institution = () => {
     { id: "settings", label: "Sistem Ayarları", icon: <Settings className="w-5 h-5" /> },
   ];
 
-  // Kuruma özgü menü öğelerini tanımla
   const institutionSpecificMenuItems: Record<string, Array<{ id: string, label: string, icon: JSX.Element }>> = {
     ELEKTRIK: [
       { id: "power-outages", label: "Elektrik Arıza Yönetimi", icon: <Zap className="w-5 h-5" /> },
@@ -229,12 +222,10 @@ const Institution = () => {
     ],
   };
 
-  // Ortak menü öğeleriyle kurum-spesifik olanları bir araya getir eğer bir kurum seçiliyse
   const menuItems = currentInstitution && institutionSpecificMenuItems[currentInstitution] 
     ? [...commonMenuItems, ...institutionSpecificMenuItems[currentInstitution]]
     : commonMenuItems;
 
-  // Kuruma özgü içerik üretimi için yardımcı fonksiyonlar
   const renderInstitutionDashboardCards = () => {
     if (!currentInstitution) return null;
     
@@ -493,7 +484,6 @@ const Institution = () => {
     }
   };
 
-  // Fixing the section with the unclosed tags around line 652-668
   const renderActiveSection = () => {
     if (activeSection === "dashboard") {
       return (
@@ -571,11 +561,9 @@ const Institution = () => {
         </div>
       );
     } else {
-      // Kuruma özgü başlık için
       const menuItem = menuItems.find(item => item.id === activeSection);
       const sectionTitle = menuItem ? menuItem.label : activeSection;
 
-      // Kuruma özgü içerikler
       let sectionContent;
       
       if (currentInstitution === 'ELEKTRIK' && activeSection === "power-outages") {
@@ -666,4 +654,100 @@ const Institution = () => {
                     <div className="p-3 bg-red-50 border border-red-200 rounded-md">
                       <div className="flex justify-between">
                         <h4 className="font-medium">Lefkoşa - Kumsal</h4>
-                        <span className="text-red-600
+                        <span className="text-red-600 text-sm">Acil</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">Ana boru hattı arızası, 3 mahalle etkileniyor</p>
+                      <div className="flex justify-between items-center mt-2">
+                        <span className="text-xs text-gray-500">45 dakika önce bildirildi</span>
+                        <Button size="sm" variant="outline">Detaylar</Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="space-y-6">
+          <h1 className="text-2xl font-bold">{sectionTitle}</h1>
+          {sectionContent ? (
+            sectionContent
+          ) : (
+            <p className="text-gray-600">Bu modül geliştirme aşamasındadır.</p>
+          )}
+        </div>
+      );
+    }
+  };
+
+  return (
+    <div className="flex h-screen bg-background">
+      <div className="hidden md:flex w-64 flex-col border-r">
+        <div className="p-4 border-b">
+          <h2 className="text-xl font-bold">{institutionName}</h2>
+        </div>
+        <ScrollArea className="flex-1">
+          <div className="py-2">
+            {menuItems.map((item) => (
+              <Button
+                key={item.id}
+                variant={activeSection === item.id ? "secondary" : "ghost"}
+                className="w-full justify-start mb-1 px-4"
+                onClick={() => setActiveSection(item.id)}
+              >
+                {item.icon}
+                <span className="ml-2">{item.label}</span>
+              </Button>
+            ))}
+          </div>
+        </ScrollArea>
+        <div className="p-4 border-t">
+          <Button
+            variant="ghost"
+            className="w-full justify-start"
+            onClick={handleSignOut}
+          >
+            <Settings className="mr-2 h-4 w-4" />
+            Çıkış Yap
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="md:hidden flex items-center p-4 border-b">
+          <h2 className="text-xl font-bold">{institutionName}</h2>
+          <div className="ml-auto">
+            <Button variant="ghost" size="icon">
+              <Menu className="h-6 w-6" />
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-auto p-6">
+          {renderActiveSection()}
+        </div>
+      </div>
+
+      {showResponseDialog && selectedItemId && (
+        <ResponseDialog
+          open={showResponseDialog}
+          onOpenChange={handleCloseResponseDialog}
+          onRespond={handleRespond}
+        />
+      )}
+
+      {showAssignDialog && selectedItemId && (
+        <AssignReportDialog
+          open={showAssignDialog}
+          onOpenChange={handleCloseAssignDialog}
+          onAssign={handleAssign}
+        />
+      )}
+    </div>
+  );
+};
+
+export default Institution;
