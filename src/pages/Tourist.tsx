@@ -1,115 +1,156 @@
 
-import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import TouristNavigation from "@/components/tourist/TouristNavigation";
-import TouristHeader from "@/components/tourist/TouristHeader";
-import TouristMobileNav from "@/components/tourist/TouristMobileNav";
-import TabContent from "@/components/tourist/TabContent";
-import BusinessDemoPanel from "@/components/tourist/BusinessDemoPanel";
-import TouristDemoList from "@/components/tourist/TouristDemoList";
-import { useMobile } from "@/hooks/use-mobile";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { Building, Menu, Store, Users } from "lucide-react";
-import BusinessDemoPanelSelector from "@/components/business/BusinessDemoPanelSelector";
-import InstitutionDemoPanel from "@/components/institution/InstitutionDemoPanel";
+import { 
+  Map, MessageSquare, Calendar, Navigation, 
+  FileText, Hotel, Plane, Utensils, 
+  Building, Store, MapPin
+} from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { getFeedbacks, getReports } from "@/services";
+import TouristHeader from "@/components/tourist/TouristHeader";
+import TouristNavigation from "@/components/tourist/TouristNavigation";
+import TabContent from "@/components/tourist/TabContent";
+import TouristMobileNav from "@/components/tourist/TouristMobileNav";
+import TouristNotifications from "@/components/tourist/TouristNotifications";
+import ChatbotButton from "@/components/tourist/ChatbotButton";
 
 const Tourist = () => {
-  const [activeMenuTab, setActiveMenuTab] = useState<string>("travel");
+  const [activeTab, setActiveTab] = useState("nearby");
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const navigate = useNavigate();
-  const isMobile = useMobile();
-  const [showSideMenu, setShowSideMenu] = useState<boolean>(!isMobile);
-  const [activeDemoTab, setActiveDemoTab] = useState<string>("tourists");
+  const { signOut } = useAuth();
 
-  // When window resizes from mobile to desktop, show side menu
-  const handleResize = () => {
-    if (!isMobile && !showSideMenu) {
-      setShowSideMenu(true);
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      // Fetch tourist-specific notifications
+      const mockFeedbacks = await getFeedbacks();
+      const mockReports = await getReports();
+      const newNotifications = [
+        ...mockFeedbacks
+          .filter(fb => fb.response) // Only show feedbacks with responses
+          .slice(0, 2)
+          .map(fb => ({
+            id: fb.id,
+            type: 'feedback',
+            message: `Geri bildiriminize yanıt: ${fb.response?.substring(0, 50) || ''}...`,
+            timestamp: fb.timestamp,
+          })),
+        ...mockReports
+          .filter(report => report.response) // Only show reports with responses
+          .slice(0, 2)
+          .map(report => ({
+            id: report.id,
+            type: 'report',
+            message: `Raporunuza yanıt: ${report.response?.substring(0, 50) || ''}...`,
+            timestamp: report.timestamp,
+          })),
+      ];
+      setNotifications(newNotifications);
+    } catch (error) {
+      console.error("Error loading data:", error);
+      toast.error("Veriler yüklenirken bir hata oluştu.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Handle the mobile menu toggle
-  const toggleMenu = () => {
-    setShowSideMenu(!showSideMenu);
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate("/");
+    } catch (error) {
+      console.error("Sign out error:", error);
+      toast.error("Çıkış yapılırken bir hata oluştu.");
+    }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <TouristHeader toggleMenu={toggleMenu} />
-      
-      <div className="flex-1 flex">
-        {/* Side Navigation - Hidden on mobile when menu is closed */}
-        {showSideMenu && (
-          <div className={`${isMobile ? "absolute z-20 h-[calc(100vh-64px)] shadow-xl" : "w-64"} bg-white border-r`}>
-            <TouristNavigation 
-              activeTab={activeMenuTab}
-              onTabChange={setActiveMenuTab}
-              isMobile={isMobile}
-              onClose={() => setShowSideMenu(false)}
-            />
-          </div>
-        )}
-        
-        {/* Mobile overlay when menu is open */}
-        {isMobile && showSideMenu && (
-          <div 
-            className="fixed inset-0 bg-black/50 z-10"
-            onClick={() => setShowSideMenu(false)}
-          ></div>
-        )}
-        
-        {/* Main Content */}
-        <main className="flex-1 p-4 md:p-6 overflow-auto">
-          <div className="max-w-7xl mx-auto">
-            {/* DEMO TABS - Added for presentation of different panels */}
-            <Card className="mb-6 border-blue-200 bg-blue-50/50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-xl text-blue-800">AssisTR Platform Demosu</CardTitle>
-                <CardDescription>
-                  AssisTR platformundaki farklı kullanıcı tiplerine ait panelleri inceleyebilirsiniz. Bu demo, projenin tüm paydaşlara sunduğu işlevselliği göstermektedir.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Tabs value={activeDemoTab} onValueChange={setActiveDemoTab}>
-                  <TabsList className="w-full">
-                    <TabsTrigger value="tourists" className="flex items-center">
-                      <Users className="h-4 w-4 mr-2" />
-                      Turistler
-                    </TabsTrigger>
-                    <TabsTrigger value="businesses" className="flex items-center">
-                      <Store className="h-4 w-4 mr-2" />
-                      İşletmeler
-                    </TabsTrigger>
-                    <TabsTrigger value="institutions" className="flex items-center">
-                      <Building className="h-4 w-4 mr-2" />
-                      Kurumlar
-                    </TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="tourists" className="mt-4">
-                    <TouristDemoList />
-                  </TabsContent>
-                  
-                  <TabsContent value="businesses" className="mt-4">
-                    <BusinessDemoPanelSelector />
-                  </TabsContent>
-                  
-                  <TabsContent value="institutions" className="mt-4">
-                    <InstitutionDemoPanel />
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    // Mobil menüyü kapat (eğer açıksa)
+    if (showMobileMenu) {
+      setShowMobileMenu(false);
+    }
+  };
 
-            {/* Actual tourist tab content */}
-            <TabContent activeTab={activeMenuTab} />
-          </div>
-        </main>
+  const menuItems = [
+    { value: "nearby", label: "Yakındakiler", icon: <Navigation className="w-4 h-4" /> },
+    { value: "plan", label: "Gezi Planla", icon: <Calendar className="w-4 h-4" /> },
+    { value: "hotel", label: "Otel Rezervasyonu", icon: <Hotel className="w-4 h-4" /> },
+    { value: "restaurant", label: "Restoran Rezervasyonu", icon: <Utensils className="w-4 h-4" /> },
+    { value: "flights", label: "Uçuş Bilgileri", icon: <Plane className="w-4 h-4" /> },
+    { value: "publicBuildings", label: "Yakın Kamu Binaları", icon: <Building className="w-4 h-4" /> },
+    { value: "businessDemo", label: "İşletme Paneli (Demo)", icon: <Store className="w-4 h-4" /> },
+    { value: "assistant", label: "Asistan", icon: <Map className="w-4 h-4" /> },
+    { value: "feedback", label: "Geri Bildirim", icon: <MessageSquare className="w-4 h-4" /> },
+    { value: "report", label: "Raporlar", icon: <FileText className="w-4 h-4" /> },
+  ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen p-4">
+        <div className="text-center space-y-4">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <p className="text-primary">Yükleniyor...</p>
+        </div>
       </div>
-      
-      {/* Mobile Bottom Navigation */}
-      {isMobile && <TouristMobileNav activeTab={activeMenuTab} onTabChange={setActiveMenuTab} />}
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      {/* Header */}
+      <TouristHeader 
+        showMobileMenu={showMobileMenu}
+        setShowMobileMenu={setShowMobileMenu}
+        handleSignOut={handleSignOut}
+        notifications={notifications}
+        handleTabChange={handleTabChange}
+        activeTab={activeTab}
+        menuItems={menuItems}
+      />
+
+      <div className="container mx-auto py-4 px-4">
+        {/* Desktop Menu */}
+        <div className="hidden md:block mb-6">
+          <TouristNavigation 
+            activeTab={activeTab}
+            handleTabChange={handleTabChange}
+            menuItems={menuItems}
+          />
+
+          {/* Tabs Content */}
+          <TabContent activeTab={activeTab} />
+        </div>
+        
+        {/* Mobile Content */}
+        <div className="md:hidden">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold flex items-center">
+              {menuItems.find(item => item.value === activeTab)?.icon}
+              <span className="ml-2">{menuItems.find(item => item.value === activeTab)?.label}</span>
+            </h2>
+          </div>
+
+          <TabContent activeTab={activeTab} />
+        </div>
+
+        {/* Quick Actions - Mobile Only */}
+        <TouristMobileNav activeTab={activeTab} handleTabChange={handleTabChange} />
+
+        {/* Notifications Section */}
+        <TouristNotifications notifications={notifications} />
+      </div>
+
+      {/* Sabit Chatbot Butonu */}
+      <ChatbotButton />
     </div>
   );
 };
