@@ -23,10 +23,30 @@ body.high-contrast select {
   border: 2px solid black !important;
 }
 
+body.high-contrast img,
+body.high-contrast svg {
+  filter: grayscale(100%) contrast(1.5);
+}
+
+body.high-contrast button:focus,
+body.high-contrast a:focus,
+body.high-contrast input:focus,
+body.high-contrast select:focus,
+body.high-contrast textarea:focus {
+  outline: 4px solid blue !important;
+  outline-offset: 2px !important;
+}
+
 /* Focus Styles for Keyboard Navigation */
 *:focus-visible {
   outline: 3px solid #1c64f2 !important;
   outline-offset: 2px !important;
+}
+
+body.focus-highlighted *:focus {
+  outline: 4px solid #ff5722 !important;
+  outline-offset: 4px !important;
+  border-radius: 2px;
 }
 
 /* Skip to Content Link - Hidden until focused */
@@ -37,7 +57,7 @@ body.high-contrast select {
   background: #1c64f2;
   color: white;
   padding: 8px;
-  z-index: 100;
+  z-index: 9999;
   transition: top 0.2s;
 }
 
@@ -54,3 +74,155 @@ body.high-contrast select {
   cursor: not-allowed;
   opacity: 0.7;
 }
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body.reduced-motion *,
+body.reduced-motion *::before,
+body.reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Dark Mode */
+.dark {
+  color-scheme: dark;
+}
+
+.dark body {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.dark button,
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #2d2d2d;
+  color: #ffffff;
+  border-color: #3d3d3d;
+}
+
+.dark .bg-white {
+  background-color: #1e1e1e !important;
+}
+
+.dark .border {
+  border-color: #333333 !important;
+}
+
+.dark .text-gray-700 {
+  color: #d1d5db !important;
+}
+
+.dark .text-gray-500 {
+  color: #9ca3af !important;
+}
+
+/* Improved form input accessibility */
+input:focus,
+select:focus,
+textarea:focus {
+  box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
+}
+
+/* Increased tap target sizes for mobile */
+@media (max-width: 768px) {
+  button,
+  a,
+  input[type="checkbox"],
+  input[type="radio"],
+  select {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Visual indicators for screen readers */
+.sr-only-focusable:not(:focus) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only-focusable:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Custom scrollbar for better visibility */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 6px;
+  border: 3px solid #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #2d2d2d;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #666;
+  border-color: #2d2d2d;
+}
+
+/* Enhanced skip to content functionality */
+#main-content:focus {
+  outline: none;
+}
+
+#main-content:target {
+  scroll-margin-top: 20px;
+}
+
+/* Better table accessibility */
+table {
+  border-collapse: collapse;
+}
+
+table th {
+  text-align: left;
+}
+
+table th,
+table td {
+  padding: 0.5rem;
+}
+
+/* Enhanced SkipToContent component */

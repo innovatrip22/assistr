@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { 
@@ -23,10 +22,20 @@ import {
   Handshake,
   Trash,
   Map,
+  ChevronRight,
+  ChevronLeft,
+  Search,
+  Home,
+  HelpCircle,
+  RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import FeedbackList from "@/components/institution/FeedbackList";
 import PriceReportsList from "@/components/institution/PriceReportsList";
 import FraudReportsList from "@/components/institution/FraudReportsList";
@@ -34,52 +43,74 @@ import EmergencyReportsList from "@/components/institution/EmergencyReportsList"
 import MapSection from "@/components/institution/MapSection";
 import { toast } from "sonner";
 import { INSTITUTIONS } from "@/services/feedbackService";
+import InstitutionModules from "@/components/institution/InstitutionModules";
 
 const Institution = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
   const [currentInstitution, setCurrentInstitution] = useState<string | null>(null);
-  const [institutionName, setInstitutionName] = useState<string>("Kurum Paneli");
+  const [institutionName, setInstitutionName] = useState<string>("Institution Panel");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { signOut } = useAuth();
   const navigate = useNavigate();
   const [showResponseDialog, setShowResponseDialog] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [selectedItemType, setSelectedItemType] = useState<'feedback' | 'report' | null>(null);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
-
+  const [searchTerm, setSearchTerm] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  
   useEffect(() => {
-    // localStorage'dan kurum kodunu al (gerçek bir uygulamada bu auth sisteminden gelir)
     const institutionCode = localStorage.getItem("testUserType");
-    console.log("Institution - Kurum tipi:", institutionCode);
+    console.log("Institution - Institution type:", institutionCode);
     
-    // Test girişinden kurum koduna göre kurum anahtarını bul
     if (institutionCode) {
       setCurrentInstitution(institutionCode);
       
-      // Kurum adını ayarla
       switch(institutionCode) {
         case 'ELEKTRIK': 
-          setInstitutionName("Elektrik Kurumu");
+          setInstitutionName("Electricity Authority");
           break;
         case 'SU': 
-          setInstitutionName("Su İşleri Dairesi");
+          setInstitutionName("Water Department");
           break;
         case 'DOGALGAZ': 
-          setInstitutionName("Doğalgaz Kurumu");
+          setInstitutionName("Natural Gas Authority");
           break;
         case 'BELEDIYE': 
-          setInstitutionName("Belediye");
+          setInstitutionName("Municipality");
           break;
         case 'TURIZM': 
-          setInstitutionName("Turizm Ofisi");
+          setInstitutionName("Tourism Office");
           break;
         case 'BAKANLIK': 
-          setInstitutionName("Turizm Bakanlığı");
+          setInstitutionName("Ministry of Tourism");
           break;
         default:
-          setInstitutionName("Kurum Paneli");
+          setInstitutionName("Institution Panel");
       }
     }
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.altKey && e.key === '3') {
+        e.preventDefault();
+        setIsSearchOpen(true);
+        setTimeout(() => {
+          searchInputRef.current?.focus();
+        }, 100);
+      }
+      if (e.key === 'Escape' && isSearchOpen) {
+        setIsSearchOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.addEventListener('keydown', handleKeyDown);
+    };
+  }, [isSearchOpen]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -98,69 +129,88 @@ const Institution = () => {
   };
 
   const loadData = () => {
-    // Bu normalde geri bildirim ve raporları yeniden yükler
-    toast.success("Veriler yenilendi");
+    toast.success("Data refreshed", {
+      description: "All content has been updated with the latest information",
+    });
   };
 
-  // Tüm kurumlar için ortak menü öğelerini tanımla
+  const toggleSearch = () => {
+    setIsSearchOpen(!isSearchOpen);
+    if (!isSearchOpen) {
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 100);
+    } else {
+      setSearchTerm("");
+    }
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   const commonMenuItems = [
-    { id: "dashboard", label: "Dashboard", icon: <BarChart className="w-5 h-5" /> },
-    { id: "feedback", label: "Geri Bildirim", icon: <MessageSquare className="w-5 h-5" /> },
-    { id: "reports", label: "Raporlama", icon: <BarChart4 className="w-5 h-5" /> },
-    { id: "users", label: "Kullanıcı Yönetimi", icon: <Users className="w-5 h-5" /> },
-    { id: "applications", label: "Başvuru Takibi", icon: <FileText className="w-5 h-5" /> },
-    { id: "announcements", label: "Duyuru Yönetimi", icon: <Bell className="w-5 h-5" /> },
-    { id: "documents", label: "Evrak Yönetimi", icon: <File className="w-5 h-5" /> },
-    { id: "events", label: "Etkinlikler", icon: <Calendar className="w-5 h-5" /> },
-    { id: "settings", label: "Sistem Ayarları", icon: <Settings className="w-5 h-5" /> },
+    { id: "dashboard", label: "Dashboard", icon: <BarChart className="w-5 h-5" />, ariaLabel: "Go to dashboard" },
+    { id: "feedback", label: "Feedback", icon: <MessageSquare className="w-5 h-5" />, ariaLabel: "Manage feedback" },
+    { id: "reports", label: "Reports", icon: <BarChart4 className="w-5 h-5" />, ariaLabel: "View reports" },
+    { id: "users", label: "User Management", icon: <Users className="w-5 h-5" />, ariaLabel: "Manage users" },
+    { id: "applications", label: "Application Tracking", icon: <FileText className="w-5 h-5" />, ariaLabel: "Track applications" },
+    { id: "announcements", label: "Announcement Management", icon: <Bell className="w-5 h-5" />, ariaLabel: "Manage announcements" },
+    { id: "documents", label: "Document Management", icon: <File className="w-5 h-5" />, ariaLabel: "Manage documents" },
+    { id: "events", label: "Events", icon: <Calendar className="w-5 h-5" />, ariaLabel: "Manage events" },
+    { id: "settings", label: "System Settings", icon: <Settings className="w-5 h-5" />, ariaLabel: "System settings" },
   ];
 
-  // Kuruma özgü menü öğelerini tanımla
-  const institutionSpecificMenuItems: Record<string, Array<{ id: string, label: string, icon: JSX.Element }>> = {
+  const institutionSpecificMenuItems: Record<string, Array<{ id: string, label: string, icon: JSX.Element, ariaLabel: string }>> = {
     ELEKTRIK: [
-      { id: "power-outages", label: "Elektrik Arıza Yönetimi", icon: <Zap className="w-5 h-5" /> },
-      { id: "consumption", label: "Tüketim & Sayaç Yönetimi", icon: <TrendingUp className="w-5 h-5" /> },
-      { id: "debt", label: "Borç & Tahsilat Raporları", icon: <DollarSign className="w-5 h-5" /> },
-      { id: "infrastructure", label: "Yatırım & Altyapı", icon: <Building className="w-5 h-5" /> },
+      { id: "power-outages", label: "Power Outage Management", icon: <Zap className="w-5 h-5" />, ariaLabel: "Manage power outages" },
+      { id: "consumption", label: "Consumption & Meter Management", icon: <TrendingUp className="w-5 h-5" />, ariaLabel: "View consumption data" },
+      { id: "debt", label: "Debt & Collection Reports", icon: <DollarSign className="w-5 h-5" />, ariaLabel: "Manage debt collection" },
+      { id: "infrastructure", label: "Investment & Infrastructure", icon: <Building className="w-5 h-5" />, ariaLabel: "View infrastructure projects" },
     ],
     SU: [
-      { id: "water-resources", label: "Su Kaynakları Yönetimi", icon: <Droplet className="w-5 h-5" /> },
-      { id: "water-infrastructure", label: "Altyapı & Şebeke", icon: <Building className="w-5 h-5" /> },
-      { id: "water-billing", label: "Su Faturalandırma", icon: <DollarSign className="w-5 h-5" /> },
-      { id: "water-outages", label: "Su Kesintileri", icon: <Droplet className="w-5 h-5" /> },
+      { id: "water-resources", label: "Water Resources Management", icon: <Droplet className="w-5 h-5" />, ariaLabel: "Manage water resources" },
+      { id: "water-infrastructure", label: "Infrastructure & Network", icon: <Building className="w-5 h-5" />, ariaLabel: "View water infrastructure" },
+      { id: "water-billing", label: "Water Billing", icon: <DollarSign className="w-5 h-5" />, ariaLabel: "Manage water billing" },
+      { id: "water-outages", label: "Water Outages", icon: <Droplet className="w-5 h-5" />, ariaLabel: "Manage water outages" },
     ],
     DOGALGAZ: [
-      { id: "gas-network", label: "Doğalgaz Hattı Yönetimi", icon: <Flame className="w-5 h-5" /> },
-      { id: "gas-maintenance", label: "Teknik Servis & Bakım", icon: <Settings className="w-5 h-5" /> },
-      { id: "gas-billing", label: "Tahsilat & Borçlandırma", icon: <DollarSign className="w-5 h-5" /> },
-      { id: "gas-security", label: "Güvenlik & Acil Durumlar", icon: <Bell className="w-5 h-5" /> },
+      { id: "gas-network", label: "Gas Line Management", icon: <Flame className="w-5 h-5" />, ariaLabel: "Manage gas network" },
+      { id: "gas-maintenance", label: "Technical Service & Maintenance", icon: <Settings className="w-5 h-5" />, ariaLabel: "Manage gas maintenance" },
+      { id: "gas-billing", label: "Collection & Billing", icon: <DollarSign className="w-5 h-5" />, ariaLabel: "Manage gas billing" },
+      { id: "gas-security", label: "Security & Emergencies", icon: <Bell className="w-5 h-5" />, ariaLabel: "Manage gas emergencies" },
     ],
     TURIZM: [
-      { id: "accommodation", label: "Konaklama ve Otel", icon: <Hotel className="w-5 h-5" /> },
-      { id: "tourism-events", label: "Turizm Etkinlikleri", icon: <Calendar className="w-5 h-5" /> },
-      { id: "tourist-regions", label: "Turistik Bölgeler", icon: <Map className="w-5 h-5" /> },
-      { id: "tourism-promotion", label: "Reklam & Tanıtım", icon: <Bell className="w-5 h-5" /> },
+      { id: "accommodation", label: "Accommodation & Hotels", icon: <Hotel className="w-5 h-5" />, ariaLabel: "Manage accommodation" },
+      { id: "tourism-events", label: "Tourism Events", icon: <Calendar className="w-5 h-5" />, ariaLabel: "Manage tourism events" },
+      { id: "tourist-regions", label: "Tourist Regions", icon: <Map className="w-5 h-5" />, ariaLabel: "Manage tourist regions" },
+      { id: "tourism-promotion", label: "Advertising & Promotion", icon: <Bell className="w-5 h-5" />, ariaLabel: "Manage tourism promotion" },
     ],
     BELEDIYE: [
-      { id: "municipal-services", label: "Belediye Hizmetleri", icon: <Building className="w-5 h-5" /> },
-      { id: "tax-collection", label: "Vergi & Harç Takibi", icon: <DollarSign className="w-5 h-5" /> },
-      { id: "permits", label: "Ruhsat & İmar İzinleri", icon: <FileText className="w-5 h-5" /> },
-      { id: "waste-management", label: "Çöp & Şehir Temizliği", icon: <Trash className="w-5 h-5" /> },
+      { id: "municipal-services", label: "Municipal Services", icon: <Building className="w-5 h-5" />, ariaLabel: "Manage municipal services" },
+      { id: "tax-collection", label: "Tax & Fee Tracking", icon: <DollarSign className="w-5 h-5" />, ariaLabel: "Manage tax collection" },
+      { id: "permits", label: "License & Zoning Permits", icon: <FileText className="w-5 h-5" />, ariaLabel: "Manage permits" },
+      { id: "waste-management", label: "Waste & City Cleaning", icon: <Trash className="w-5 h-5" />, ariaLabel: "Manage waste services" },
     ],
     BAKANLIK: [
-      { id: "tourism-stats", label: "Turizm İstatistikleri", icon: <BarChart className="w-5 h-5" /> },
-      { id: "licensing", label: "Otel & Acente Lisans", icon: <Key className="w-5 h-5" /> },
-      { id: "incentives", label: "Teşvik Programları", icon: <DollarSign className="w-5 h-5" /> },
-      { id: "international", label: "Uluslararası İşbirlikleri", icon: <Handshake className="w-5 h-5" /> },
+      { id: "tourism-stats", label: "Tourism Statistics", icon: <BarChart className="w-5 h-5" />, ariaLabel: "View tourism statistics" },
+      { id: "licensing", label: "Hotel & Agency Licensing", icon: <Key className="w-5 h-5" />, ariaLabel: "Manage licensing" },
+      { id: "incentives", label: "Incentive Programs", icon: <DollarSign className="w-5 h-5" />, ariaLabel: "Manage incentive programs" },
+      { id: "international", label: "International Collaborations", icon: <Handshake className="w-5 h-5" />, ariaLabel: "Manage international relations" },
     ],
   };
 
-  // Ortak menü öğeleriyle kurum-spesifik olanları bir araya getir eğer bir kurum seçiliyse
   const menuItems = currentInstitution && institutionSpecificMenuItems[currentInstitution] 
     ? [...commonMenuItems, ...institutionSpecificMenuItems[currentInstitution]]
     : commonMenuItems;
 
-  // Kuruma özgü içerik üretimi için yardımcı fonksiyonlar
+  const filteredMenuItems = searchTerm 
+    ? menuItems.filter(item => 
+        item.label.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        item.id.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : menuItems;
+
   const renderInstitutionDashboardCards = () => {
     if (!currentInstitution) return null;
     
@@ -170,33 +220,42 @@ const Institution = () => {
           <>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-xl">Elektrik Arızaları</CardTitle>
-                <CardDescription>Son 24 saat</CardDescription>
+                <CardTitle className="text-xl">Power Outages</CardTitle>
+                <CardDescription>Last 24 hours</CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-bold">23</p>
-                <p className="text-xs text-muted-foreground mt-1">8 çözüldü</p>
+                <p className="text-xs text-muted-foreground mt-1">8 resolved</p>
               </CardContent>
+              <CardFooter className="pt-2 pb-4">
+                <Badge variant="outline" className="bg-red-50 text-red-600 hover:bg-red-100">Critical: 3</Badge>
+              </CardFooter>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-xl">Sistem Yükü</CardTitle>
-                <CardDescription>Anlık değer</CardDescription>
+                <CardTitle className="text-xl">System Load</CardTitle>
+                <CardDescription>Current value</CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-bold">76%</p>
-                <p className="text-xs text-muted-foreground mt-1">Normal seviye</p>
+                <p className="text-xs text-muted-foreground mt-1">Normal level</p>
               </CardContent>
+              <CardFooter className="pt-2 pb-4">
+                <Badge variant="outline" className="bg-green-50 text-green-600 hover:bg-green-100">Stable</Badge>
+              </CardFooter>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-xl">Toplam Tüketim</CardTitle>
-                <CardDescription>Bu ay</CardDescription>
+                <CardTitle className="text-xl">Total Consumption</CardTitle>
+                <CardDescription>This month</CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-bold">8.2 GW</p>
-                <p className="text-xs text-muted-foreground mt-1">Geçen ay: 7.9 GW</p>
+                <p className="text-xs text-muted-foreground mt-1">Last month: 7.9 GW</p>
               </CardContent>
+              <CardFooter className="pt-2 pb-4">
+                <Badge variant="outline" className="bg-blue-50 text-blue-600 hover:bg-blue-100">+3.8%</Badge>
+              </CardFooter>
             </Card>
           </>
         );
@@ -419,23 +478,93 @@ const Institution = () => {
     }
   };
 
-  // Kuruma özgü içerik oluştur
   const renderActiveSection = () => {
     if (activeSection === "dashboard") {
       return (
         <div className="space-y-6">
-          <h1 className="text-2xl font-bold">{institutionName} Dashboard</h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold" id="dashboard-heading">{institutionName} Dashboard</h1>
+            <div className="flex space-x-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={loadData}
+                className="flex items-center gap-1"
+                aria-label="Refresh data"
+              >
+                <RefreshCw className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Refresh</span>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setIsSearchOpen(!isSearchOpen)}
+                className="flex items-center gap-1"
+                aria-label="Toggle search"
+              >
+                <Search className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Search</span>
+              </Button>
+            </div>
+          </div>
+          
+          {isSearchOpen && (
+            <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 animate-fade-in">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
+                <Input
+                  ref={searchInputRef}
+                  type="search"
+                  placeholder="Search dashboard..."
+                  className="pl-10"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  aria-label="Search dashboard"
+                />
+              </div>
+              {searchTerm && (
+                <div className="mt-4 space-y-2">
+                  <h3 className="text-sm font-medium">Search Results</h3>
+                  {filteredMenuItems.length > 0 ? (
+                    <ul className="space-y-1">
+                      {filteredMenuItems.map((item) => (
+                        <li key={item.id}>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            className="w-full justify-start text-left"
+                            onClick={() => {
+                              setActiveSection(item.id);
+                              setSearchTerm("");
+                              setIsSearchOpen(false);
+                            }}
+                            aria-label={`Go to ${item.label}`}
+                          >
+                            {item.icon}
+                            <span className="ml-2">{item.label}</span>
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">No results found for "{searchTerm}"</p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {renderInstitutionDashboardCards()}
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="md:col-span-2">
+          <div className="grid grid-cols-1 gap-6">
+            <Card>
               <CardHeader>
-                <CardTitle>Bölgesel Dağılım</CardTitle>
-                <CardDescription>İlçelere göre görev dağılımı</CardDescription>
+                <CardTitle>Regional Distribution</CardTitle>
+                <CardDescription>Task distribution by district</CardDescription>
               </CardHeader>
-              <CardContent className="h-[300px] flex items-center justify-center">
+              <CardContent className="h-[400px]">
                 <MapSection />
               </CardContent>
             </Card>
@@ -443,8 +572,20 @@ const Institution = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
-              <CardHeader>
-                <CardTitle>Son Geri Bildirimler</CardTitle>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Recent Feedback</CardTitle>
+                  <CardDescription>Last 5 feedback items</CardDescription>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setActiveSection("feedback")}
+                  aria-label="View all feedback"
+                >
+                  View All
+                  <ChevronRight className="h-4 w-4 ml-1" aria-hidden="true" />
+                </Button>
               </CardHeader>
               <CardContent>
                 <FeedbackList 
@@ -455,8 +596,20 @@ const Institution = () => {
               </CardContent>
             </Card>
             <Card>
-              <CardHeader>
-                <CardTitle>Son Acil Raporlar</CardTitle>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Recent Emergency Reports</CardTitle>
+                  <CardDescription>Last 5 emergency reports</CardDescription>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setActiveSection("feedback")}
+                  aria-label="View all emergency reports"
+                >
+                  View All
+                  <ChevronRight className="h-4 w-4 ml-1" aria-hidden="true" />
+                </Button>
               </CardHeader>
               <CardContent>
                 <EmergencyReportsList 
@@ -473,13 +626,13 @@ const Institution = () => {
     } else if (activeSection === "feedback") {
       return (
         <div className="space-y-6">
-          <h1 className="text-2xl font-bold">Geri Bildirim Yönetimi</h1>
+          <h1 className="text-2xl font-bold" id="feedback-heading">Feedback Management</h1>
           <Tabs defaultValue="all">
-            <TabsList>
-              <TabsTrigger value="all">Tüm Geri Bildirimler</TabsTrigger>
-              <TabsTrigger value="price">Fiyat Raporları</TabsTrigger>
-              <TabsTrigger value="fraud">Dolandırıcılık</TabsTrigger>
-              <TabsTrigger value="emergency">Acil Durumlar</TabsTrigger>
+            <TabsList aria-label="Feedback categories">
+              <TabsTrigger value="all">All Feedback</TabsTrigger>
+              <TabsTrigger value="price">Price Reports</TabsTrigger>
+              <TabsTrigger value="fraud">Fraud</TabsTrigger>
+              <TabsTrigger value="emergency">Emergencies</TabsTrigger>
             </TabsList>
             <TabsContent value="all">
               <FeedbackList onOpenResponseDialog={handleOpenResponseDialog} loadData={loadData} />
@@ -497,45 +650,43 @@ const Institution = () => {
         </div>
       );
     } else {
-      // Kuruma özgü başlık için
       const menuItem = menuItems.find(item => item.id === activeSection);
       const sectionTitle = menuItem ? menuItem.label : activeSection;
 
-      // Kuruma özgü içerikler
       let sectionContent;
       
       if (currentInstitution === 'ELEKTRIK' && activeSection === "power-outages") {
         sectionContent = (
           <div className="space-y-4">
-            <p className="text-gray-600">Anlık elektrik arıza bildirimleri ve planlı kesintileri bu panelden yönetebilirsiniz.</p>
+            <p className="text-gray-600">Manage real-time power outage reports and planned outages from this panel.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Aktif Arızalar</CardTitle>
-                  <CardDescription>Şu anda müdahale edilen arızalar</CardDescription>
+                  <CardTitle>Active Outages</CardTitle>
+                  <CardDescription>Current outages being addressed</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     <div className="p-3 bg-red-50 border border-red-200 rounded-md">
                       <div className="flex justify-between">
-                        <h4 className="font-medium">Girne - Merkez</h4>
-                        <span className="text-red-600 text-sm">Kritik</span>
+                        <h4 className="font-medium">Kyrenia - Center</h4>
+                        <span className="text-red-600 text-sm">Critical</span>
                       </div>
-                      <p className="text-sm text-gray-600 mt-1">Trafo arızası, yaklaşık 250 haneyi etkiliyor</p>
+                      <p className="text-sm text-gray-600 mt-1">Transformer failure, affecting approximately 250 households</p>
                       <div className="flex justify-between items-center mt-2">
-                        <span className="text-xs text-gray-500">12:30'da bildirildi</span>
-                        <Button size="sm" variant="outline">Detaylar</Button>
+                        <span className="text-xs text-gray-500">Reported at 12:30</span>
+                        <Button size="sm" variant="outline">Details</Button>
                       </div>
                     </div>
                     <div className="p-3 bg-amber-50 border border-amber-200 rounded-md">
                       <div className="flex justify-between">
-                        <h4 className="font-medium">Lefkoşa - Göçmenköy</h4>
-                        <span className="text-amber-600 text-sm">Orta</span>
+                        <h4 className="font-medium">Nicosia - Göçmenköy</h4>
+                        <span className="text-amber-600 text-sm">Medium</span>
                       </div>
-                      <p className="text-sm text-gray-600 mt-1">Hat kopması, 3 sokağı etkiliyor</p>
+                      <p className="text-sm text-gray-600 mt-1">Line break, affecting 3 streets</p>
                       <div className="flex justify-between items-center mt-2">
-                        <span className="text-xs text-gray-500">10:15'de bildirildi</span>
-                        <Button size="sm" variant="outline">Detaylar</Button>
+                        <span className="text-xs text-gray-500">Reported at 10:15</span>
+                        <Button size="sm" variant="outline">Details</Button>
                       </div>
                     </div>
                   </div>
@@ -543,38 +694,38 @@ const Institution = () => {
               </Card>
               <Card>
                 <CardHeader>
-                  <CardTitle>Planlı Kesintiler</CardTitle>
-                  <CardDescription>Bakım ve onarım için planlanan kesintiler</CardDescription>
+                  <CardTitle>Planned Outages</CardTitle>
+                  <CardDescription>Scheduled outages for maintenance and repair</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
                       <div className="flex justify-between">
-                        <h4 className="font-medium">Gazimağusa - Sakarya</h4>
-                        <span className="text-blue-600 text-sm">Planlı</span>
+                        <h4 className="font-medium">Famagusta - Sakarya</h4>
+                        <span className="text-blue-600 text-sm">Planned</span>
                       </div>
-                      <p className="text-sm text-gray-600 mt-1">Hat bakımı, yarın 09:00-13:00 arası</p>
+                      <p className="text-sm text-gray-600 mt-1">Line maintenance, tomorrow 09:00-13:00</p>
                       <div className="flex justify-between items-center mt-2">
-                        <span className="text-xs text-gray-500">3 gün önce duyuruldu</span>
-                        <Button size="sm" variant="outline">Düzenle</Button>
+                        <span className="text-xs text-gray-500">Announced 3 days ago</span>
+                        <Button size="sm" variant="outline">Edit</Button>
                       </div>
                     </div>
                     <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
                       <div className="flex justify-between">
-                        <h4 className="font-medium">Girne - Karaoğlanoğlu</h4>
-                        <span className="text-blue-600 text-sm">Planlı</span>
+                        <h4 className="font-medium">Kyrenia - Karaoğlanoğlu</h4>
+                        <span className="text-blue-600 text-sm">Planned</span>
                       </div>
-                      <p className="text-sm text-gray-600 mt-1">Trafo yenileme, 15.05.2023, 07:00-17:00</p>
+                      <p className="text-sm text-gray-600 mt-1">Transformer renewal, 15.05.2023, 07:00-17:00</p>
                       <div className="flex justify-between items-center mt-2">
-                        <span className="text-xs text-gray-500">1 hafta önce duyuruldu</span>
-                        <Button size="sm" variant="outline">Düzenle</Button>
+                        <span className="text-xs text-gray-500">Announced 1 week ago</span>
+                        <Button size="sm" variant="outline">Edit</Button>
                       </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </div>
-            <Button className="mt-4">Yeni Planlı Kesinti Ekle</Button>
+            <Button className="mt-4">Add New Planned Outage</Button>
           </div>
         );
       } else if (currentInstitution === 'SU' && activeSection === "water-outages") {
@@ -651,13 +802,12 @@ const Institution = () => {
           </div>
         );
       } else {
-        // Diğer bölümler için genel içerik
         sectionContent = (
           <div className="flex items-center justify-center p-12 border-2 border-dashed rounded-lg">
             <div className="text-center">
-              <h3 className="mb-2 text-lg font-semibold">{sectionTitle} modülü hazırlanıyor</h3>
+              <h3 className="mb-2 text-lg font-semibold">{sectionTitle} module is being prepared</h3>
               <p className="text-sm text-gray-500">
-                Bu fonksiyon yakında kullanıma açılacaktır.
+                This function will be available soon.
               </p>
             </div>
           </div>
@@ -666,7 +816,7 @@ const Institution = () => {
 
       return (
         <div className="space-y-6">
-          <h1 className="text-2xl font-bold">{sectionTitle}</h1>
+          <h1 className="text-2xl font-bold" id={`${activeSection}-heading`}>{sectionTitle}</h1>
           <Card>
             <CardContent className="pt-6">
               {sectionContent}
@@ -678,54 +828,152 @@ const Institution = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <div className="hidden md:flex flex-col w-64 bg-white border-r">
-        <div className="p-4 border-b">
-          <h2 className="text-xl font-semibold text-primary">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+      <Button
+        variant="outline"
+        size="icon"
+        className="fixed top-4 left-4 z-40 md:hidden"
+        onClick={toggleSidebar}
+        aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
+        aria-expanded={isSidebarOpen}
+        aria-controls="sidebar"
+      >
+        {isSidebarOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+      </Button>
+
+      <div 
+        id="sidebar"
+        className={`${
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } md:translate-x-0 fixed md:static inset-y-0 left-0 z-30 w-64 transition-transform duration-200 ease-in-out bg-white dark:bg-gray-800 border-r dark:border-gray-700 h-full`}
+      >
+        <div className="p-4 border-b dark:border-gray-700">
+          <h2 className="text-xl font-semibold text-primary dark:text-primary-foreground">
             {institutionName}
           </h2>
-          <p className="text-sm text-gray-500">Yönetici Paneli</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Admin Panel</p>
         </div>
-        <nav className="flex-1 overflow-y-auto p-2">
-          {menuItems.map((item) => (
-            <button
-              key={item.id}
-              className={`w-full flex items-center px-4 py-2 my-1 text-left rounded-lg ${
-                activeSection === item.id
-                  ? "bg-primary/10 text-primary"
-                  : "text-gray-700 hover:bg-gray-100"
-              }`}
-              onClick={() => setActiveSection(item.id)}
-            >
-              {item.icon}
-              <span className="ml-3">{item.label}</span>
-            </button>
-          ))}
+        
+        <div className="px-4 py-2 border-b dark:border-gray-700">
+          <div className="relative">
+            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" aria-hidden="true" />
+            <Input
+              type="search"
+              placeholder="Search..."
+              className="pl-8 h-8 text-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              aria-label="Search menu items"
+            />
+          </div>
+        </div>
+        
+        <nav id="main-nav" className="flex-1 overflow-y-auto p-2" aria-label="Main navigation">
+          <ScrollArea className="h-[calc(100vh-160px)]">
+            <div className="space-y-1">
+              {filteredMenuItems.map((item) => (
+                <Button
+                  key={item.id}
+                  className={`w-full flex items-center px-4 py-2 my-1 text-left rounded-lg ${
+                    activeSection === item.id
+                      ? "bg-primary/10 text-primary dark:bg-primary/20"
+                      : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  }`}
+                  onClick={() => setActiveSection(item.id)}
+                  variant={activeSection === item.id ? "default" : "ghost"}
+                  aria-label={item.ariaLabel}
+                  aria-current={activeSection === item.id ? "page" : undefined}
+                >
+                  {item.icon}
+                  <span className="ml-3">{item.label}</span>
+                </Button>
+              ))}
+            </div>
+
+            <Separator className="my-4" />
+
+            <div className="space-y-1 px-3 py-2">
+              <h3 className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold px-1">Help & Support</h3>
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-gray-700 dark:text-gray-200"
+                aria-label="Get help with the platform"
+              >
+                <HelpCircle className="h-4 w-4 mr-2" />
+                Help Center
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-gray-700 dark:text-gray-200"
+                aria-label="View system documentation"
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                Documentation
+              </Button>
+            </div>
+          </ScrollArea>
         </nav>
-        <div className="p-4 border-t">
+        
+        <div className="p-4 border-t dark:border-gray-700">
+          <div className="flex items-center mb-3">
+            <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
+              A
+            </div>
+            <div className="ml-2">
+              <p className="text-sm font-medium">Admin User</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">admin@example.com</p>
+            </div>
+          </div>
           <Button onClick={handleSignOut} variant="outline" className="w-full">
-            Çıkış Yap
+            Sign Out
           </Button>
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Mobile Header */}
-        <header className="md:hidden bg-white border-b p-4 flex justify-between items-center">
-          <h2 className="text-xl font-semibold">
+        <header className="md:hidden bg-white dark:bg-gray-800 border-b dark:border-gray-700 p-4 flex justify-between items-center">
+          <h2 className="text-xl font-semibold ml-10">
             {institutionName}
           </h2>
-          <Button variant="outline" size="sm" onClick={() => toast.info("Menü")}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-menu"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="icon" onClick={toggleSearch} aria-label="Search">
+              <Search className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon" onClick={loadData} aria-label="Refresh data">
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </div>
         </header>
 
-        {/* Content Area */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">
+        <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 dark:bg-gray-900">
+          <div className="hidden md:flex items-center text-sm text-gray-500 dark:text-gray-400 mb-6">
+            <Button 
+              variant="link" 
+              className="p-0 h-auto" 
+              onClick={() => setActiveSection("dashboard")}
+              aria-label="Go to home"
+            >
+              <Home className="h-3.5 w-3.5" />
+            </Button>
+            <ChevronRight className="h-3.5 w-3.5 mx-1" aria-hidden="true" />
+            <span>Institution</span>
+            <ChevronRight className="h-3.5 w-3.5 mx-1" aria-hidden="true" />
+            <span className="font-medium text-gray-700 dark:text-gray-300">
+              {menuItems.find(item => item.id === activeSection)?.label || "Dashboard"}
+            </span>
+          </div>
+          
           {renderActiveSection()}
         </main>
+        
+        <footer id="footer" className="bg-white dark:bg-gray-800 border-t dark:border-gray-700 p-4 text-center text-xs text-gray-500 dark:text-gray-400">
+          <p>© 2025 AssisTR - Institution Management System</p>
+          <p className="mt-1">
+            <a href="#accessibility" className="underline hover:text-blue-600 dark:hover:text-blue-400">Accessibility</a> | 
+            <a href="#privacy" className="underline hover:text-blue-600 dark:hover:text-blue-400 ml-2">Privacy Policy</a> | 
+            <a href="#terms" className="underline hover:text-blue-600 dark:hover:text-blue-400 ml-2">Terms of Service</a>
+          </p>
+        </footer>
       </div>
     </div>
   );
