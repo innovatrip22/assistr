@@ -22,9 +22,10 @@ const MethodologySlide = () => {
             size="sm" 
             onClick={() => navigate('/')}
             className="mr-2"
+            aria-label="Return to home page"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Ana Sayfaya Dön
+            <ArrowLeft className="h-4 w-4 mr-2" aria-hidden="true" />
+            Return to Home
           </Button>
         </div>
 
@@ -34,8 +35,9 @@ const MethodologySlide = () => {
           <Button 
             onClick={() => navigate('/project-summary')} 
             variant="outline"
+            aria-label="Go to project summary page"
           >
-            Proje Özetine Git
+            Go to Project Summary
           </Button>
         </div>
       </motion.div>

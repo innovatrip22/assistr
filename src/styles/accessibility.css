@@ -1,0 +1,56 @@
+
+/* High Contrast Mode Styles */
+body.high-contrast {
+  filter: contrast(1.4);
+}
+
+body.high-contrast * {
+  background-color: white !important;
+  color: black !important;
+  border-color: black !important;
+}
+
+body.high-contrast button,
+body.high-contrast a {
+  border: 2px solid black !important;
+}
+
+body.high-contrast input,
+body.high-contrast textarea,
+body.high-contrast select {
+  background-color: white !important;
+  color: black !important;
+  border: 2px solid black !important;
+}
+
+/* Focus Styles for Keyboard Navigation */
+*:focus-visible {
+  outline: 3px solid #1c64f2 !important;
+  outline-offset: 2px !important;
+}
+
+/* Skip to Content Link - Hidden until focused */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #1c64f2;
+  color: white;
+  padding: 8px;
+  z-index: 100;
+  transition: top 0.2s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* ARIA-related styles */
+[aria-busy="true"] {
+  cursor: progress;
+}
+
+[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.7;
+}

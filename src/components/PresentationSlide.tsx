@@ -3,9 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const PresentationSlide = () => {
   return (
-    <Card className="max-w-4xl mx-auto shadow-lg border-blue-100">
+    <Card className="max-w-4xl mx-auto shadow-lg border-blue-100" role="region" aria-label="Project Methodology Presentation">
       <CardHeader className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-t-lg">
-        <CardTitle className="text-center text-2xl font-bold">
+        <CardTitle className="text-center text-2xl font-bold" id="slide-title">
           AssisTR: Project Methodology and Technical Approach
         </CardTitle>
       </CardHeader>
@@ -19,12 +19,12 @@ const PresentationSlide = () => {
             enabling real-time data communication, user authentication, and database management in a single platform.
           </p>
           
-          <h3 className="text-lg font-semibold text-blue-600">System Menus and Contents</h3>
+          <h3 className="text-lg font-semibold text-blue-600" id="menus-section">System Menus and Contents</h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h4 className="font-medium text-blue-500 mb-1">Tourist Interface Menus:</h4>
-              <ul className="list-disc pl-5 space-y-1 text-gray-700">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4" role="list" aria-labelledby="menus-section">
+            <div role="listitem">
+              <h4 className="font-medium text-blue-500 mb-1" id="tourist-menus">Tourist Interface Menus:</h4>
+              <ul className="list-disc pl-5 space-y-1 text-gray-700" aria-labelledby="tourist-menus">
                 <li><span className="font-medium">Nearby:</span> Shows hotels, restaurants, and activities near the tourist's location.</li>
                 <li><span className="font-medium">Travel Planner:</span> Tool for creating personalized travel itineraries.</li>
                 <li><span className="font-medium">Hotel Reservations:</span> Search and book accommodation options.</li>
@@ -33,9 +33,9 @@ const PresentationSlide = () => {
               </ul>
             </div>
             
-            <div>
-              <h4 className="font-medium text-blue-500 mb-1">Business Interface Menus:</h4>
-              <ul className="list-disc pl-5 space-y-1 text-gray-700">
+            <div role="listitem">
+              <h4 className="font-medium text-blue-500 mb-1" id="business-menus">Business Interface Menus:</h4>
+              <ul className="list-disc pl-5 space-y-1 text-gray-700" aria-labelledby="business-menus">
                 <li><span className="font-medium">Dashboard:</span> Business performance statistics and analytics.</li>
                 <li><span className="font-medium">Menu/Products:</span> Business product and pricing management.</li>
                 <li><span className="font-medium">Reservations:</span> Reservation tracking and management system.</li>
@@ -46,9 +46,9 @@ const PresentationSlide = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-            <div>
-              <h4 className="font-medium text-blue-500 mb-1">Institution Interface Menus:</h4>
-              <ul className="list-disc pl-5 space-y-1 text-gray-700">
+            <div role="listitem">
+              <h4 className="font-medium text-blue-500 mb-1" id="institution-menus">Institution Interface Menus:</h4>
+              <ul className="list-disc pl-5 space-y-1 text-gray-700" aria-labelledby="institution-menus">
                 <li><span className="font-medium">Dashboard:</span> Real-time analysis of tourism data.</li>
                 <li><span className="font-medium">Map View:</span> Tourist density and movement analysis.</li>
                 <li><span className="font-medium">Notification Management:</span> Send emergency and safety notifications.</li>
@@ -56,9 +56,9 @@ const PresentationSlide = () => {
               </ul>
             </div>
             
-            <div>
-              <h4 className="font-medium text-blue-500 mb-1">Integrations and Technologies:</h4>
-              <ul className="list-disc pl-5 space-y-1 text-gray-700">
+            <div role="listitem">
+              <h4 className="font-medium text-blue-500 mb-1" id="integrations">Integrations and Technologies:</h4>
+              <ul className="list-disc pl-5 space-y-1 text-gray-700" aria-labelledby="integrations">
                 <li><span className="font-medium">AI Assistant:</span> Provides travel recommendations and local information to tourists.</li>
                 <li><span className="font-medium">Real-time Maps:</span> Location-based suggestions and navigation.</li>
                 <li><span className="font-medium">Multilingual Support:</span> Provides content and help in different languages.</li>
