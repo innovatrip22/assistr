@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
@@ -40,22 +39,18 @@ const AccessibilityControls: React.FC = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [mousePointer, setMousePointer] = useState<string>("default");
   
-  // Apply font size to the root element
   useEffect(() => {
     document.documentElement.style.fontSize = `${fontSize[0]}px`;
   }, [fontSize]);
   
-  // Apply line height
   useEffect(() => {
     document.body.style.lineHeight = `${lineHeight[0]}`;
   }, [lineHeight]);
   
-  // Apply letter spacing
   useEffect(() => {
     document.body.style.letterSpacing = `${letterSpacing[0]}px`;
   }, [letterSpacing]);
   
-  // Apply high contrast mode
   useEffect(() => {
     if (highContrast) {
       document.body.classList.add("high-contrast");
@@ -64,11 +59,9 @@ const AccessibilityControls: React.FC = () => {
     }
   }, [highContrast]);
 
-  // Apply dyslexic friendly font
   useEffect(() => {
     if (dyslexicFont) {
       document.documentElement.style.fontFamily = "'OpenDyslexic', sans-serif";
-      // Add OpenDyslexic font if not already present
       if (!document.getElementById('dyslexic-font')) {
         const link = document.createElement('link');
         link.id = 'dyslexic-font';
@@ -78,7 +71,6 @@ const AccessibilityControls: React.FC = () => {
       }
     } else {
       document.documentElement.style.fontFamily = "";
-      // Remove font if no longer needed
       const fontLink = document.getElementById('dyslexic-font');
       if (fontLink) {
         document.head.removeChild(fontLink);
@@ -86,7 +78,6 @@ const AccessibilityControls: React.FC = () => {
     }
   }, [dyslexicFont]);
 
-  // Apply focus highlight
   useEffect(() => {
     if (focusHighlight) {
       document.body.classList.add("focus-highlighted");
@@ -95,7 +86,6 @@ const AccessibilityControls: React.FC = () => {
     }
   }, [focusHighlight]);
 
-  // Apply dark mode
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark");
@@ -108,7 +98,6 @@ const AccessibilityControls: React.FC = () => {
     }
   }, [darkMode]);
 
-  // Apply reduced motion
   useEffect(() => {
     if (reducedMotion) {
       document.body.classList.add("reduced-motion");
@@ -117,7 +106,6 @@ const AccessibilityControls: React.FC = () => {
     }
   }, [reducedMotion]);
 
-  // Apply cursor size
   useEffect(() => {
     switch(mousePointer) {
       case "large":
@@ -131,39 +119,34 @@ const AccessibilityControls: React.FC = () => {
     }
   }, [mousePointer]);
   
-  // Toggle screen reader announcements
   const toggleScreenReader = () => {
     setScreenReader(!screenReader);
     if (!screenReader) {
-      toast.success("Screen reader mode activated", {
-        description: "Screen reader functionality is now enabled",
+      toast.success("Ekran Okuyucu Açıldı", {
+        description: "Ekran okuyucu işlevi şimdi etkinleştirildi",
         id: "screen-reader-toast"
       });
-      // In a real app, we would initialize an actual screen reader API here
     } else {
-      toast.info("Screen reader mode deactivated", {
+      toast.info("Ekran Okuyucu Kapatıldı", {
         id: "screen-reader-toast"
       });
     }
   };
 
-  // Toggle text to speech
   const toggleTextToSpeech = () => {
     setTextToSpeech(!textToSpeech);
     if (!textToSpeech) {
-      toast.success("Text to speech activated", {
-        description: "Hover over text to hear it read aloud",
+      toast.success("Metni Sese Çevirme Açıldı", {
+        description: "Metni dinlemek için üzerine gelin",
         id: "text-to-speech-toast"
       });
-      // In a real app, we would initialize text-to-speech functionality here
     } else {
-      toast("Text to speech deactivated", {
+      toast("Metni Sese Çevirme Kapatıldı", {
         id: "text-to-speech-toast"
       });
     }
   };
   
-  // Reset all settings to default
   const resetSettings = () => {
     setFontSize([16]);
     setLineHeight([1.5]);
@@ -189,13 +172,12 @@ const AccessibilityControls: React.FC = () => {
     document.documentElement.style.fontFamily = "";
     document.body.style.cursor = "";
     
-    // Remove dyslexic font if loaded
     const fontLink = document.getElementById('dyslexic-font');
     if (fontLink) {
       document.head.removeChild(fontLink);
     }
     
-    toast("Accessibility settings reset to default", {
+    toast("Erişilebilirlik Ayarları Sıfırlandı", {
       id: "reset-toast"
     });
   };
@@ -208,7 +190,7 @@ const AccessibilityControls: React.FC = () => {
             variant="outline" 
             size="icon" 
             className="rounded-full bg-white shadow-md border-2 border-blue-200 hover:bg-blue-50 relative"
-            aria-label="Accessibility options"
+            aria-label="Erişilebilirlik seçenekleri"
           >
             <AccessibilityIcon className="h-5 w-5 text-blue-600" />
             {(highContrast || screenReader || textToSpeech || dyslexicFont || darkMode || reducedMotion || fontSize[0] !== 16) && (
@@ -227,26 +209,25 @@ const AccessibilityControls: React.FC = () => {
             className="mt-2 p-4 bg-white rounded-lg shadow-lg border border-blue-100 w-80 max-h-[90vh] overflow-y-auto dark:bg-gray-800 dark:border-gray-700"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">Accessibility Options</h3>
-              <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)} aria-label="Close menu">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">Erişilebilirlik Seçenekleri</h3>
+              <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)} aria-label="Menüyü kapat">
                 ×
               </Button>
             </div>
             
             <Tabs defaultValue="text">
               <TabsList className="grid grid-cols-3 mb-4">
-                <TabsTrigger value="text" className="text-xs">Text</TabsTrigger>
-                <TabsTrigger value="visual" className="text-xs">Visual</TabsTrigger>
-                <TabsTrigger value="navigation" className="text-xs">Navigation</TabsTrigger>
+                <TabsTrigger value="text" className="text-xs">Metin</TabsTrigger>
+                <TabsTrigger value="visual" className="text-xs">Görsel</TabsTrigger>
+                <TabsTrigger value="navigation" className="text-xs">Navigasyon</TabsTrigger>
               </TabsList>
               
               <TabsContent value="text" className="space-y-6">
-                {/* Font Size Control */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="font-size" className="text-sm font-medium flex items-center">
                       <Text className="h-4 w-4 mr-2" />
-                      Text Size
+                      Metin Boyutu
                     </Label>
                     <span className="text-xs text-gray-500 dark:text-gray-400">{fontSize[0]}px</span>
                   </div>
@@ -256,7 +237,7 @@ const AccessibilityControls: React.FC = () => {
                       size="icon" 
                       className="h-6 w-6 p-0" 
                       onClick={() => setFontSize([Math.max(12, fontSize[0] - 1)])}
-                      aria-label="Decrease text size"
+                      aria-label="Metin boyutunu küçült"
                     >
                       <ArrowDown className="h-3 w-3" />
                     </Button>
@@ -267,7 +248,7 @@ const AccessibilityControls: React.FC = () => {
                       step={1}
                       value={fontSize}
                       onValueChange={setFontSize}
-                      aria-label="Adjust text size"
+                      aria-label="Metin boyutunu ayarla"
                       className="flex-1"
                     />
                     <Button 
@@ -275,19 +256,18 @@ const AccessibilityControls: React.FC = () => {
                       size="icon" 
                       className="h-6 w-6 p-0" 
                       onClick={() => setFontSize([Math.min(24, fontSize[0] + 1)])}
-                      aria-label="Increase text size"
+                      aria-label="Metin boyutunu büyült"
                     >
                       <ArrowUp className="h-3 w-3" />
                     </Button>
                   </div>
                 </div>
                 
-                {/* Line Height Control */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="line-height" className="text-sm font-medium flex items-center">
                       <Type className="h-4 w-4 mr-2" />
-                      Line Spacing
+                      Satır Aralığı
                     </Label>
                     <span className="text-xs text-gray-500 dark:text-gray-400">{lineHeight[0]}×</span>
                   </div>
@@ -298,16 +278,15 @@ const AccessibilityControls: React.FC = () => {
                     step={0.1}
                     value={lineHeight}
                     onValueChange={setLineHeight}
-                    aria-label="Adjust line spacing"
+                    aria-label="Satır aralığını ayarla"
                   />
                 </div>
                 
-                {/* Letter Spacing Control */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="letter-spacing" className="text-sm font-medium flex items-center">
                       <Underline className="h-4 w-4 mr-2" />
-                      Letter Spacing
+                      Harf Aralığı
                     </Label>
                     <span className="text-xs text-gray-500 dark:text-gray-400">{letterSpacing[0]}px</span>
                   </div>
@@ -318,158 +297,150 @@ const AccessibilityControls: React.FC = () => {
                     step={0.5}
                     value={letterSpacing}
                     onValueChange={setLetterSpacing}
-                    aria-label="Adjust letter spacing"
+                    aria-label="Harf aralığını ayarla"
                   />
                 </div>
                 
-                {/* Dyslexia Friendly Font */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Type className="h-4 w-4" />
                     <Label htmlFor="dyslexic-font" className="text-sm font-medium">
-                      Dyslexia Friendly Font
+                      Disleksi Dostu Font
                     </Label>
                   </div>
                   <Switch
                     id="dyslexic-font"
                     checked={dyslexicFont}
                     onCheckedChange={setDyslexicFont}
-                    aria-label="Toggle dyslexia friendly font"
+                    aria-label="Disleksi dostu fontu aç/kapat"
                   />
                 </div>
               </TabsContent>
               
               <TabsContent value="visual" className="space-y-6">
-                {/* High Contrast Mode */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     {highContrast ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                     <Label htmlFor="high-contrast" className="text-sm font-medium">
-                      High Contrast Mode
+                      Yüksek Kontrast Modu
                     </Label>
                   </div>
                   <Switch
                     id="high-contrast"
                     checked={highContrast}
                     onCheckedChange={setHighContrast}
-                    aria-label="Toggle high contrast mode"
+                    aria-label="Yüksek kontrast modunu aç/kapat"
                   />
                 </div>
 
-                {/* Dark Mode */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     {darkMode ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
                     <Label htmlFor="dark-mode" className="text-sm font-medium">
-                      Dark Mode
+                      Karanlık Mod
                     </Label>
                   </div>
                   <Switch
                     id="dark-mode"
                     checked={darkMode}
                     onCheckedChange={setDarkMode}
-                    aria-label="Toggle dark mode"
+                    aria-label="Karanlık modu aç/kapat"
                   />
                 </div>
                 
-                {/* Focus Highlighting */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <MousePointerClick className="h-4 w-4" />
                     <Label htmlFor="focus-highlight" className="text-sm font-medium">
-                      Enhanced Focus Indicators
+                      Gelişmiş Odak Göstergeleri
                     </Label>
                   </div>
                   <Switch
                     id="focus-highlight"
                     checked={focusHighlight}
                     onCheckedChange={setFocusHighlight}
-                    aria-label="Toggle enhanced focus indicators"
+                    aria-label="Gelişmiş odak göstergelerini aç/kapat"
                   />
                 </div>
                 
-                {/* Reduced Motion */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <PanelRight className="h-4 w-4" />
                     <Label htmlFor="reduced-motion" className="text-sm font-medium">
-                      Reduce Animations
+                      Animasyonları Azalt
                     </Label>
                   </div>
                   <Switch
                     id="reduced-motion"
                     checked={reducedMotion}
                     onCheckedChange={setReducedMotion}
-                    aria-label="Toggle reduced motion"
+                    aria-label="Animasyonları azaltmayı aç/kapat"
                   />
                 </div>
                 
-                {/* Cursor Size */}
                 <div className="space-y-2">
                   <Label htmlFor="mouse-pointer" className="text-sm font-medium">
-                    Mouse Pointer
+                    Fare İşaretçisi
                   </Label>
                   <select 
                     id="mouse-pointer"
                     value={mousePointer}
                     onChange={(e) => setMousePointer(e.target.value)}
                     className="w-full px-3 py-2 border rounded-md text-sm"
-                    aria-label="Select mouse pointer style"
+                    aria-label="Fare işaretçisi stilini seç"
                   >
-                    <option value="default">Default</option>
-                    <option value="large">Large</option>
-                    <option value="contrast">High Contrast</option>
+                    <option value="default">Varsayılan</option>
+                    <option value="large">Büyük</option>
+                    <option value="contrast">Yüksek Kontrast</option>
                   </select>
                 </div>
               </TabsContent>
               
               <TabsContent value="navigation" className="space-y-6">
-                {/* Screen Reader Support */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     {screenReader ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
                     <Label htmlFor="screen-reader" className="text-sm font-medium">
-                      Screen Reader
+                      Ekran Okuyucu
                     </Label>
                   </div>
                   <Switch
                     id="screen-reader"
                     checked={screenReader}
                     onCheckedChange={toggleScreenReader}
-                    aria-label="Toggle screen reader"
+                    aria-label="Ekran okuyucuyu aç/kapat"
                   />
                 </div>
                 
-                {/* Text to Speech */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Volume2 className="h-4 w-4" />
                     <Label htmlFor="text-to-speech" className="text-sm font-medium">
-                      Text to Speech
+                      Metni Sese Çevirme
                     </Label>
                   </div>
                   <Switch
                     id="text-to-speech"
                     checked={textToSpeech}
                     onCheckedChange={toggleTextToSpeech}
-                    aria-label="Toggle text to speech"
+                    aria-label="Metni sese çevirmeyi aç/kapat"
                   />
                 </div>
                 
                 <div className="space-y-2 pt-4">
-                  <h4 className="text-sm font-medium">Keyboard Shortcuts</h4>
+                  <h4 className="text-sm font-medium">Klavye Kısayolları</h4>
                   <div className="rounded-md bg-gray-50 dark:bg-gray-900 p-2 text-xs">
                     <div className="grid grid-cols-2 gap-y-1">
-                      <span>Skip to content:</span>
+                      <span>İçeriğe atla:</span>
                       <kbd className="px-1 bg-gray-200 dark:bg-gray-700 rounded">Alt + 1</kbd>
                       
-                      <span>Main menu:</span>
+                      <span>Ana menü:</span>
                       <kbd className="px-1 bg-gray-200 dark:bg-gray-700 rounded">Alt + 2</kbd>
                       
-                      <span>Search:</span>
+                      <span>Arama:</span>
                       <kbd className="px-1 bg-gray-200 dark:bg-gray-700 rounded">Alt + 3</kbd>
                       
-                      <span>Accessibility menu:</span>
+                      <span>Erişilebilirlik menüsü:</span>
                       <kbd className="px-1 bg-gray-200 dark:bg-gray-700 rounded">Alt + A</kbd>
                     </div>
                   </div>
@@ -477,18 +448,17 @@ const AccessibilityControls: React.FC = () => {
               </TabsContent>
             </Tabs>
 
-            {/* Reset Button */}
             <Button 
               variant="outline" 
               size="sm" 
               className="w-full mt-6" 
               onClick={resetSettings}
             >
-              Reset All Settings
+              Tüm Ayarları Sıfırla
             </Button>
             
             <div className="mt-4 text-xs text-gray-500 dark:text-gray-400 text-center">
-              <a href="#accessibility-help" className="underline hover:text-blue-600">Learn more about accessibility features</a>
+              <a href="#accessibility-help" className="underline hover:text-blue-600">Erişilebilirlik özellikleri hakkında daha fazla bilgi edinin</a>
             </div>
           </motion.div>
         </CollapsibleContent>
