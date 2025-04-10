@@ -225,4 +225,78 @@ table td {
   padding: 0.5rem;
 }
 
-/* Enhanced SkipToContent component */
+/* Emotion-Aware Accessibility Assistant Styles */
+:root {
+  --transition-duration: 0.3s;
+}
+
+body * {
+  transition: background-color var(--transition-duration), 
+              color var(--transition-duration), 
+              border-color var(--transition-duration), 
+              filter var(--transition-duration),
+              transform var(--transition-duration);
+}
+
+/* Sakinleştirici mod */
+body.calm-mode {
+  transition: filter 0.5s ease;
+}
+
+body.calm-mode button:not(.no-emotion-style) {
+  transition: all 0.5s ease;
+}
+
+body.calm-mode .animate-bounce,
+body.calm-mode .animate-spin,
+body.calm-mode .animate-pulse {
+  animation-duration: 2s !important;
+}
+
+body.calm-mode button:hover:not(.no-emotion-style) {
+  transform: scale(1.02);
+}
+
+/* Enerjik mod */
+body.energetic-mode {
+  transition: filter 0.2s ease;
+}
+
+body.energetic-mode button:not(.no-emotion-style) {
+  transition: all 0.2s ease;
+}
+
+body.energetic-mode button:hover:not(.no-emotion-style) {
+  transform: scale(1.05);
+}
+
+body.energetic-mode .animate-bounce,
+body.energetic-mode .animate-spin,
+body.energetic-mode .animate-pulse {
+  animation-duration: 0.7s !important;
+}
+
+/* Duygusal durum göstergeleri için özel renkler */
+.emotion-happy {
+  color: #f59e0b !important;
+}
+
+.emotion-sad {
+  color: #3b82f6 !important;
+}
+
+.emotion-angry {
+  color: #ef4444 !important;
+}
+
+.emotion-calm {
+  color: #10b981 !important;
+}
+
+.emotion-energetic {
+  color: #8b5cf6 !important;
+}
+
+.emotion-neutral {
+  color: #6b7280 !important;
+}

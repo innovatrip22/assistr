@@ -28,6 +28,11 @@ const Institution = () => {
   const { userType } = useAuth();
   const [activeTab, setActiveTab] = useState("dashboard");
 
+  const handleOpenResponseDialog = (id: string, type: 'feedback' | 'report') => {
+    // This function is needed to pass to FeedbackManagement
+    console.log(`Opening response dialog for ${type} with ID: ${id}`);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <SkipToContent />
@@ -167,7 +172,7 @@ const Institution = () => {
             {activeTab === "dashboard" && <DashboardContent />}
             {activeTab === "map" && <MapSection />}
             {activeTab === "reporting" && <ReportingContent />}
-            {activeTab === "feedback" && <FeedbackManagement />}
+            {activeTab === "feedback" && <FeedbackManagement onOpenResponseDialog={handleOpenResponseDialog} />}
             {activeTab === "announcements" && <AnnouncementManagement />}
             {activeTab === "applications" && <ApplicationTracking />}
             {activeTab === "users" && <UserManagementContent />}

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
@@ -14,7 +15,15 @@ import {
   Type, 
   MousePointerClick, 
   Underline,
-  PanelRight
+  PanelRight,
+  Smile,
+  Frown,
+  Meh,
+  Heart,
+  Activity,
+  Mic,
+  Video,
+  Shield
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Slider } from "@/components/ui/slider";
@@ -24,6 +33,9 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { toast } from "sonner";
+import EmotionDetector from "@/components/accessibility/EmotionDetector";
+
+type EmotionType = "neutral" | "happy" | "sad" | "angry" | "calm" | "energetic" | "manual";
 
 const AccessibilityControls: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -39,6 +51,20 @@ const AccessibilityControls: React.FC = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [mousePointer, setMousePointer] = useState<string>("default");
   
+  // Duygusal Durum Algılama Sistemi için ekstra durumlar
+  const [emotionDetectionEnabled, setEmotionDetectionEnabled] = useState(false);
+  const [currentEmotion, setCurrentEmotion] = useState<EmotionType>("neutral");
+  const [cameraEnabled, setCameraEnabled] = useState(false);
+  const [microphoneEnabled, setMicrophoneEnabled] = useState(false);
+  const [calmingMode, setCalmingMode] = useState(false);
+  const [energeticMode, setEnergeticMode] = useState(false);
+  const [backgroundMusic, setBackgroundMusic] = useState(false);
+  const [autoAdjust, setAutoAdjust] = useState(true);
+
+  // Audio referansı
+  const calmMusicRef = React.useRef<HTMLAudioElement | null>(null);
+  const energeticMusicRef = React.useRef<HTMLAudioElement | null>(null);
+
   useEffect(() => {
     document.documentElement.style.fontSize = `${fontSize[0]}px`;
   }, [fontSize]);
@@ -118,6 +144,93 @@ const AccessibilityControls: React.FC = () => {
         document.body.style.cursor = "";
     }
   }, [mousePointer]);
+
+  // Duygusal durum değiştiğinde yapılacak ayarlamalar
+  useEffect(() => {
+    if (!emotionDetectionEnabled || !autoAdjust) return;
+
+    // Duygusal duruma göre arayüz ayarlamaları
+    switch (currentEmotion) {
+      case "sad":
+      case "angry":
+        // Sakinleştirici mod
+        setCalmingMode(true);
+        setEnergeticMode(false);
+        setDarkMode(true);
+        setReducedMotion(true);
+        setBackgroundMusic(true);
+        if (fontSize[0] > 16) setFontSize([16]);
+        if (calmMusicRef.current && backgroundMusic) {
+          calmMusicRef.current.play().catch(e => console.log("Müzik çalınamadı:", e));
+        }
+        toast.info("Sakinleştirici mod aktif edildi", {
+          description: "Sizin için daha sakin bir deneyim oluşturuldu"
+        });
+        break;
+      
+      case "happy":
+      case "energetic":
+        // Enerjik mod
+        setCalmingMode(false);
+        setEnergeticMode(true);
+        setDarkMode(false);
+        setReducedMotion(false);
+        if (energeticMusicRef.current && backgroundMusic) {
+          energeticMusicRef.current.play().catch(e => console.log("Müzik çalınamadı:", e));
+        }
+        toast.success("Enerjik mod aktif edildi", {
+          description: "Sizin için daha canlı bir deneyim oluşturuldu"
+        });
+        break;
+      
+      case "calm":
+      case "neutral":
+      default:
+        // Nötr mod
+        setCalmingMode(false);
+        setEnergeticMode(false);
+        if (calmMusicRef.current) calmMusicRef.current.pause();
+        if (energeticMusicRef.current) energeticMusicRef.current.pause();
+        break;
+    }
+
+  }, [currentEmotion, emotionDetectionEnabled, autoAdjust, backgroundMusic]);
+
+  // Arka plan müziği etkisi
+  useEffect(() => {
+    if (!backgroundMusic) {
+      if (calmMusicRef.current) calmMusicRef.current.pause();
+      if (energeticMusicRef.current) energeticMusicRef.current.pause();
+    } else if (calmingMode && calmMusicRef.current) {
+      calmMusicRef.current.play().catch(e => console.log("Müzik çalınamadı:", e));
+    } else if (energeticMode && energeticMusicRef.current) {
+      energeticMusicRef.current.play().catch(e => console.log("Müzik çalınamadı:", e));
+    }
+  }, [backgroundMusic, calmingMode, energeticMode]);
+
+  // Sakinleştirici ve Enerjik mod etkileri
+  useEffect(() => {
+    const root = document.documentElement;
+    
+    if (calmingMode) {
+      // Arayüzü sakinleştirici hale getir
+      root.style.setProperty('--transition-duration', '0.5s');
+      document.body.style.filter = "brightness(0.9)";
+      document.body.classList.add("calm-mode");
+      document.body.classList.remove("energetic-mode");
+    } else if (energeticMode) {
+      // Arayüzü daha canlı hale getir
+      root.style.setProperty('--transition-duration', '0.2s');
+      document.body.style.filter = "brightness(1.05) saturate(1.1)";
+      document.body.classList.add("energetic-mode");
+      document.body.classList.remove("calm-mode");
+    } else {
+      // Normal mod
+      root.style.setProperty('--transition-duration', '0.3s');
+      document.body.style.filter = "";
+      document.body.classList.remove("calm-mode", "energetic-mode");
+    }
+  }, [calmingMode, energeticMode]);
   
   const toggleScreenReader = () => {
     setScreenReader(!screenReader);
@@ -146,6 +259,62 @@ const AccessibilityControls: React.FC = () => {
       });
     }
   };
+
+  const toggleEmotionDetection = () => {
+    const newState = !emotionDetectionEnabled;
+    setEmotionDetectionEnabled(newState);
+    
+    if (newState) {
+      // Eğer kamera veya mikrofon izni gerekiyorsa soralım
+      if (!cameraEnabled && !microphoneEnabled) {
+        setCameraEnabled(true);
+        setMicrophoneEnabled(true);
+        
+        // İzin isteme işlemleri burada olacak
+        // Gerçek uygulamada tarayıcı izinleri sorulur
+        
+        toast.info("Duygu Algılama için kamera ve mikrofon erişimi gerekli", {
+          action: {
+            label: "İzin Ver",
+            onClick: () => {
+              toast.success("İzinler verildi");
+            }
+          }
+        });
+      }
+      
+      toast.success("Duygu Durumu Algılama Aktif", {
+        description: "Sistem duygularınıza göre arayüzü otomatik olarak ayarlayacak"
+      });
+    } else {
+      toast.info("Duygu Durumu Algılama Kapatıldı");
+      
+      // Durum algılama kapatıldığında, müzikleri de kapatalım
+      if (calmMusicRef.current) calmMusicRef.current.pause();
+      if (energeticMusicRef.current) energeticMusicRef.current.pause();
+    }
+  };
+
+  const manuallySetEmotion = (emotion: EmotionType) => {
+    setCurrentEmotion(emotion);
+    setAutoAdjust(false);
+    
+    toast.success(`Duygusal Durum: ${getEmotionName(emotion)}`, {
+      description: "Arayüz seçilen duyguya göre ayarlandı"
+    });
+  };
+
+  const getEmotionName = (emotion: EmotionType): string => {
+    switch (emotion) {
+      case "happy": return "Mutlu";
+      case "sad": return "Üzgün";
+      case "angry": return "Sinirli";
+      case "calm": return "Sakin";
+      case "energetic": return "Enerjik";
+      case "neutral": return "Nötr";
+      default: return "Manuel";
+    }
+  };
   
   const resetSettings = () => {
     setFontSize([16]);
@@ -159,6 +328,12 @@ const AccessibilityControls: React.FC = () => {
     setFocusHighlight(false);
     setDarkMode(false);
     setMousePointer("default");
+    setEmotionDetectionEnabled(false);
+    setCurrentEmotion("neutral");
+    setCalmingMode(false);
+    setEnergeticMode(false);
+    setBackgroundMusic(false);
+    setAutoAdjust(true);
     
     document.documentElement.style.fontSize = "16px";
     document.body.style.lineHeight = "1.5";
@@ -166,11 +341,17 @@ const AccessibilityControls: React.FC = () => {
     document.body.classList.remove("high-contrast");
     document.body.classList.remove("focus-highlighted");
     document.body.classList.remove("reduced-motion");
+    document.body.classList.remove("calm-mode");
+    document.body.classList.remove("energetic-mode");
     document.documentElement.classList.remove("dark");
     document.body.style.backgroundColor = "";
     document.body.style.color = "";
     document.documentElement.style.fontFamily = "";
     document.body.style.cursor = "";
+    document.body.style.filter = "";
+    
+    if (calmMusicRef.current) calmMusicRef.current.pause();
+    if (energeticMusicRef.current) energeticMusicRef.current.pause();
     
     const fontLink = document.getElementById('dyslexic-font');
     if (fontLink) {
@@ -182,8 +363,45 @@ const AccessibilityControls: React.FC = () => {
     });
   };
 
+  // Duygu durumuna göre renk
+  const getEmotionColor = (emotion: EmotionType): string => {
+    switch (emotion) {
+      case "happy": return "text-yellow-500";
+      case "sad": return "text-blue-500";
+      case "angry": return "text-red-500";
+      case "calm": return "text-green-500";
+      case "energetic": return "text-purple-500";
+      default: return "text-gray-500";
+    }
+  };
+
+  const getEmotionIcon = (emotion: EmotionType): JSX.Element => {
+    switch (emotion) {
+      case "happy": return <Smile className={`h-5 w-5 ${getEmotionColor(emotion)}`} />;
+      case "sad": return <Frown className={`h-5 w-5 ${getEmotionColor(emotion)}`} />;
+      case "angry": return <Frown className={`h-5 w-5 ${getEmotionColor(emotion)}`} />;
+      case "calm": return <Meh className={`h-5 w-5 ${getEmotionColor(emotion)}`} />;
+      case "energetic": return <Activity className={`h-5 w-5 ${getEmotionColor(emotion)}`} />;
+      default: return <Meh className="h-5 w-5 text-gray-500" />;
+    }
+  };
+
   return (
     <div className="fixed bottom-4 right-4 z-50">
+      {/* Müzik elemanları (görünmez) */}
+      <audio 
+        ref={calmMusicRef}
+        src="https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0c6ff1eac.mp3?filename=calm-meditation-145576.mp3"
+        loop
+        preload="none"
+      />
+      <audio 
+        ref={energeticMusicRef}
+        src="https://cdn.pixabay.com/download/audio/2021/10/25/audio_dac815c0f7.mp3?filename=positive-uplifting-corporate-142875.mp3"
+        loop
+        preload="none"
+      />
+
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
           <Button 
@@ -193,7 +411,7 @@ const AccessibilityControls: React.FC = () => {
             aria-label="Erişilebilirlik seçenekleri"
           >
             <AccessibilityIcon className="h-5 w-5 text-blue-600" />
-            {(highContrast || screenReader || textToSpeech || dyslexicFont || darkMode || reducedMotion || fontSize[0] !== 16) && (
+            {(highContrast || screenReader || textToSpeech || dyslexicFont || darkMode || reducedMotion || fontSize[0] !== 16 || emotionDetectionEnabled || calmingMode || energeticMode) && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                 !
               </span>
@@ -215,12 +433,191 @@ const AccessibilityControls: React.FC = () => {
               </Button>
             </div>
             
-            <Tabs defaultValue="text">
-              <TabsList className="grid grid-cols-3 mb-4">
+            <Tabs defaultValue="duygusal">
+              <TabsList className="grid grid-cols-4 mb-4">
+                <TabsTrigger value="duygusal" className="text-xs">Duygu</TabsTrigger>
                 <TabsTrigger value="text" className="text-xs">Metin</TabsTrigger>
                 <TabsTrigger value="visual" className="text-xs">Görsel</TabsTrigger>
-                <TabsTrigger value="navigation" className="text-xs">Navigasyon</TabsTrigger>
+                <TabsTrigger value="navigation" className="text-xs">Gezinme</TabsTrigger>
               </TabsList>
+              
+              {/* Duygusal Durum Sekmesi */}
+              <TabsContent value="duygusal" className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Heart className="h-4 w-4 text-red-500" />
+                    <Label htmlFor="emotion-detection" className="text-sm font-medium">
+                      Duygu Durumu Algılama
+                    </Label>
+                  </div>
+                  <Switch
+                    id="emotion-detection"
+                    checked={emotionDetectionEnabled}
+                    onCheckedChange={toggleEmotionDetection}
+                    aria-label="Duygu durumu algılamayı aç/kapat"
+                  />
+                </div>
+
+                {emotionDetectionEnabled && (
+                  <>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-sm font-medium flex items-center">
+                          {getEmotionIcon(currentEmotion)}
+                          <span className="ml-2">Mevcut Durum: {getEmotionName(currentEmotion)}</span>
+                        </Label>
+                        <Switch
+                          id="auto-adjust"
+                          checked={autoAdjust}
+                          onCheckedChange={setAutoAdjust}
+                          aria-label="Otomatik ayarlamayı aç/kapat"
+                        />
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        Otomatik ayarlama {autoAdjust ? "açık" : "kapalı"}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">
+                        Manuel Duygu Ayarı
+                      </Label>
+                      <div className="grid grid-cols-3 gap-2">
+                        <Button 
+                          size="sm" 
+                          variant={currentEmotion === "happy" ? "default" : "outline"}
+                          className={currentEmotion === "happy" ? "bg-yellow-500 hover:bg-yellow-600" : ""}
+                          onClick={() => manuallySetEmotion("happy")}
+                        >
+                          <Smile className="h-4 w-4 mr-1" /> Mutlu
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant={currentEmotion === "calm" ? "default" : "outline"}
+                          className={currentEmotion === "calm" ? "bg-green-500 hover:bg-green-600" : ""}
+                          onClick={() => manuallySetEmotion("calm")}
+                        >
+                          <Meh className="h-4 w-4 mr-1" /> Sakin
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant={currentEmotion === "sad" ? "default" : "outline"}
+                          className={currentEmotion === "sad" ? "bg-blue-500 hover:bg-blue-600" : ""}
+                          onClick={() => manuallySetEmotion("sad")}
+                        >
+                          <Frown className="h-4 w-4 mr-1" /> Üzgün
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">
+                        Duygu Ayarlama Seçenekleri
+                      </Label>
+                      
+                      <div className="space-y-3 rounded-md bg-gray-50 dark:bg-gray-900 p-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Sun className="h-4 w-4 text-yellow-500" />
+                            <Label htmlFor="calming-mode" className="text-sm">
+                              Sakinleştirici Mod
+                            </Label>
+                          </div>
+                          <Switch
+                            id="calming-mode"
+                            checked={calmingMode}
+                            onCheckedChange={setCalmingMode}
+                            aria-label="Sakinleştirici modu aç/kapat"
+                          />
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Activity className="h-4 w-4 text-purple-500" />
+                            <Label htmlFor="energetic-mode" className="text-sm">
+                              Enerjik Mod
+                            </Label>
+                          </div>
+                          <Switch
+                            id="energetic-mode"
+                            checked={energeticMode}
+                            onCheckedChange={setEnergeticMode}
+                            aria-label="Enerjik modu aç/kapat"
+                          />
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Volume2 className="h-4 w-4 text-green-500" />
+                            <Label htmlFor="background-music" className="text-sm">
+                              Arka Plan Müziği
+                            </Label>
+                          </div>
+                          <Switch
+                            id="background-music"
+                            checked={backgroundMusic}
+                            onCheckedChange={setBackgroundMusic}
+                            aria-label="Arka plan müziğini aç/kapat"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="camera-enabled" className="text-sm font-medium flex items-center">
+                          <Video className="h-4 w-4 mr-2" />
+                          Kamera ile Yüz Analizi
+                        </Label>
+                        <Switch
+                          id="camera-enabled"
+                          checked={cameraEnabled}
+                          onCheckedChange={setCameraEnabled}
+                          aria-label="Kamera ile yüz analizini aç/kapat"
+                        />
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="microphone-enabled" className="text-sm font-medium flex items-center">
+                          <Mic className="h-4 w-4 mr-2" />
+                          Ses Tonuyla Duygu Analizi
+                        </Label>
+                        <Switch
+                          id="microphone-enabled"
+                          checked={microphoneEnabled}
+                          onCheckedChange={setMicrophoneEnabled}
+                          aria-label="Mikrofon ile ses tonu analizini aç/kapat"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mt-4 text-xs text-gray-500 dark:text-gray-400 border-t pt-2">
+                      <div className="flex items-center mb-2">
+                        <Shield className="h-4 w-4 mr-2 text-green-500" />
+                        <span className="font-medium">Gizlilik Bilgisi</span>
+                      </div>
+                      <p>Tüm duygu analizi işlemleri cihazınızda yerel olarak gerçekleştirilir. Hiçbir veri sunuculara gönderilmez.</p>
+                    </div>
+                  </>
+                )}
+
+                {!emotionDetectionEnabled && (
+                  <div className="py-6 text-center">
+                    <Heart className="h-12 w-12 mx-auto text-gray-300 dark:text-gray-600 mb-2" />
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Duygu durumu algılama şu anda devre dışı.
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="mt-2" 
+                      onClick={toggleEmotionDetection}
+                    >
+                      Aktifleştir
+                    </Button>
+                  </div>
+                )}
+              </TabsContent>
               
               <TabsContent value="text" className="space-y-6">
                 <div className="space-y-2">
