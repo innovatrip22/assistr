@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Navigation, Calendar, Hotel, Utensils, Plane } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface TouristMobileNavProps {
   activeTab: string;
@@ -9,55 +10,74 @@ interface TouristMobileNavProps {
 
 const TouristMobileNav = ({ activeTab, handleTabChange }: TouristMobileNavProps) => {
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t p-2 z-10">
+    <motion.div 
+      className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t dark:border-gray-800 p-2 z-10 shadow-lg"
+      initial={{ y: 100 }}
+      animate={{ y: 0 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+    >
       <div className="grid grid-cols-5 gap-1">
-        <Button 
-          variant={activeTab === "nearby" ? "default" : "ghost"} 
-          size="sm"
-          className="flex flex-col items-center h-16 text-xs p-1"
+        <NavButton 
+          isActive={activeTab === "nearby"} 
+          icon={<Navigation className="h-5 w-5" />}
+          label="Keşfet"
           onClick={() => handleTabChange("nearby")}
-        >
-          <Navigation className="h-5 w-5 mb-1" />
-          Keşfet
-        </Button>
-        <Button 
-          variant={activeTab === "plan" ? "default" : "ghost"} 
-          size="sm"
-          className="flex flex-col items-center h-16 text-xs p-1"
+        />
+        <NavButton 
+          isActive={activeTab === "plan"} 
+          icon={<Calendar className="h-5 w-5" />}
+          label="Gezi Planla"
           onClick={() => handleTabChange("plan")}
-        >
-          <Calendar className="h-5 w-5 mb-1" />
-          Gezi Planla
-        </Button>
-        <Button 
-          variant={activeTab === "hotel" ? "default" : "ghost"} 
-          size="sm"
-          className="flex flex-col items-center h-16 text-xs p-1"
+        />
+        <NavButton 
+          isActive={activeTab === "hotel"} 
+          icon={<Hotel className="h-5 w-5" />}
+          label="Konaklama"
           onClick={() => handleTabChange("hotel")}
-        >
-          <Hotel className="h-5 w-5 mb-1" />
-          Konaklama
-        </Button>
-        <Button 
-          variant={activeTab === "restaurant" ? "default" : "ghost"} 
-          size="sm"
-          className="flex flex-col items-center h-16 text-xs p-1"
+        />
+        <NavButton 
+          isActive={activeTab === "restaurant"} 
+          icon={<Utensils className="h-5 w-5" />}
+          label="Restoran"
           onClick={() => handleTabChange("restaurant")}
-        >
-          <Utensils className="h-5 w-5 mb-1" />
-          Restoran
-        </Button>
-        <Button 
-          variant={activeTab === "flights" ? "default" : "ghost"} 
-          size="sm"
-          className="flex flex-col items-center h-16 text-xs p-1"
+        />
+        <NavButton 
+          isActive={activeTab === "flights"} 
+          icon={<Plane className="h-5 w-5" />}
+          label="Uçuşlar"
           onClick={() => handleTabChange("flights")}
-        >
-          <Plane className="h-5 w-5 mb-1" />
-          Uçuşlar
-        </Button>
+        />
       </div>
-    </div>
+    </motion.div>
+  );
+};
+
+interface NavButtonProps {
+  isActive: boolean;
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+}
+
+const NavButton = ({ isActive, icon, label, onClick }: NavButtonProps) => {
+  return (
+    <Button 
+      variant={isActive ? "default" : "ghost"} 
+      size="sm"
+      className={`flex flex-col items-center h-16 text-xs p-1 rounded-xl ${
+        isActive ? 'bg-gradient-to-b from-primary to-primary/80' : ''
+      }`}
+      onClick={onClick}
+    >
+      <motion.div
+        whileTap={{ scale: 0.9 }}
+        animate={isActive ? { y: [0, -2, 0] } : {}}
+        transition={{ duration: 0.2 }}
+      >
+        {icon}
+      </motion.div>
+      <span className="mt-1">{label}</span>
+    </Button>
   );
 };
 

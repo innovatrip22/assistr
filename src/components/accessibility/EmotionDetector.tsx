@@ -1,13 +1,17 @@
 
 import { useState, useEffect } from 'react';
 
-type EmotionType = "neutral" | "happy" | "sad" | "angry" | "calm" | "energetic" | "manual";
+export type EmotionType = "neutral" | "happy" | "sad" | "angry" | "calm" | "energetic" | "manual";
 
 interface EmotionDetectorProps {
   onEmotionDetected: (emotion: EmotionType) => void;
   useCamera: boolean;
   useMicrophone: boolean;
   enabled: boolean;
+}
+
+interface EmotionValues {
+  [key: string]: number;
 }
 
 const EmotionDetector: React.FC<EmotionDetectorProps> = ({ 
@@ -21,48 +25,69 @@ const EmotionDetector: React.FC<EmotionDetectorProps> = ({
   const [voiceAnalysisStatus, setVoiceAnalysisStatus] = useState<string>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Simüle edilmiş duygu değerleri
-  const emotionValues = {
+  // Simulated emotion values - in a real app, these would be calculated based on camera/mic input
+  const [emotionValues, setEmotionValues] = useState<EmotionValues>({
     happy: 0,
     sad: 0,
     angry: 0,
     calm: 0,
     energetic: 0,
-    neutral: 1, // Default olarak nötr durum
-  };
+    neutral: 1, // Default neutral state
+  });
 
   useEffect(() => {
     if (!enabled) return;
 
-    // Demo amaçlı değişen duygu durumunu simüle eden fonksiyon
+    // Function to simulate emotion changes - would be replaced with actual ML analysis in production
     const simulateEmotionChanges = () => {
-      // Gerçek uygulamada burada ML modeliyle analiz yapılacak
-      // Şu an için rastgele değişimler gösteriyoruz
+      // In a real app, this would analyze camera feed and/or microphone input
+      // For demo, we're randomly selecting emotions
       
-      // Rastgele bir duygu seçelim
-      const emotions: EmotionType[] = ["happy", "sad", "angry", "calm", "energetic", "neutral"];
-      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+      // Generate random emotion values
+      const randomEmotions: EmotionValues = {
+        happy: Math.random() * 0.5,
+        sad: Math.random() * 0.5,
+        angry: Math.random() * 0.5,
+        calm: Math.random() * 0.5,
+        energetic: Math.random() * 0.5,
+        neutral: Math.random() * 0.5,
+      };
       
-      // Güncellenmiş duyguyu dışarıya bildirelim
-      setLastDetectedEmotion(randomEmotion);
-      onEmotionDetected(randomEmotion);
+      // Find dominant emotion
+      let dominantEmotion: EmotionType = "neutral";
+      let maxValue = 0;
       
-      console.log("Detected emotion:", randomEmotion);
+      (Object.keys(randomEmotions) as Array<keyof typeof randomEmotions>).forEach(emotion => {
+        if (randomEmotions[emotion] > maxValue) {
+          maxValue = randomEmotions[emotion];
+          dominantEmotion = emotion as EmotionType;
+        }
+      });
+      
+      // Update the detected emotion
+      setEmotionValues(randomEmotions);
+      setLastDetectedEmotion(dominantEmotion);
+      onEmotionDetected(dominantEmotion);
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log("Emotion detected:", dominantEmotion, "with confidence:", maxValue.toFixed(2));
+      }
     };
 
-    // Yalnızca demo amaçlı, her 30-60 saniye arasında duygu değişimi simüle ediliyor
+    // For demo purposes, simulate emotion changes every 30-60 seconds
     let timer: number | null = null;
+    
     if (enabled) {
-      // İlk çalıştırmada kısa bir gecikme
+      // Initial short delay
       timer = window.setTimeout(() => {
         simulateEmotionChanges();
         
-        // Ardından periyodik olarak kontrol et (gerçek uygulamada sürekli analiz yapılacak)
+        // Then periodic checks
         timer = window.setInterval(simulateEmotionChanges, Math.random() * 30000 + 30000);
       }, 5000);
     }
     
-    // Cleanup
+    // Clean up timers
     return () => {
       if (timer) {
         clearInterval(timer);
@@ -70,7 +95,7 @@ const EmotionDetector: React.FC<EmotionDetectorProps> = ({
     };
   }, [enabled, useCamera, useMicrophone, onEmotionDetected]);
 
-  // Bu component görünmez, yalnızca durum analizi yapar
+  // This component is invisible, it only analyzes state
   return null;
 };
 

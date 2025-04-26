@@ -10,6 +10,7 @@ import FeedbackAssistant from "./FeedbackAssistant";
 import ReportAssistant from "./ReportAssistant";
 import FlightInfo from "./FlightInfo";
 import TravelChat from "./TravelChat";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface TabContentProps {
   activeTab: string;
@@ -44,9 +45,18 @@ const TabContent = ({ activeTab }: TabContentProps) => {
   };
 
   return (
-    <div className="border rounded-xl p-6 bg-white shadow-xl backdrop-blur-sm border-blue-100">
-      {renderContent()}
-    </div>
+    <AnimatePresence mode="wait">
+      <motion.div 
+        key={activeTab}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
+        transition={{ duration: 0.3 }}
+        className="border rounded-xl p-6 bg-white shadow-xl backdrop-blur-sm border-blue-100 dark:bg-gray-800 dark:border-blue-900"
+      >
+        {renderContent()}
+      </motion.div>
+    </AnimatePresence>
   );
 };
 
