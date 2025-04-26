@@ -52,7 +52,7 @@ const TabContent = ({ activeTab }: TabContentProps) => {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.3 }}
-        className="border rounded-xl p-6 bg-white shadow-xl backdrop-blur-sm border-blue-100 dark:bg-gray-800 dark:border-blue-900"
+        className="border rounded-xl p-6 bg-white shadow-xl backdrop-blur-sm border-blue-100 dark:bg-gray-800/90 dark:border-blue-900"
       >
         {renderContent()}
       </motion.div>

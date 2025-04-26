@@ -66,3 +66,14 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* Emotion System Animation */
+@keyframes pulse-emotion {
+  0% { box-shadow: 0 0 0 0 rgba(66, 153, 225, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(66, 153, 225, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(66, 153, 225, 0); }
+}
+
+.emotion-active {
+  animation: pulse-emotion 2s infinite;
+}
